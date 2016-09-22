@@ -12,6 +12,7 @@ import org.junit.runner.RunWith;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Guillaume Mary
@@ -75,6 +76,72 @@ public class ReflectionsTest {
 		assertEquals(expectedDeclaringClass, method.getDeclaringClass());
 		assertEquals(exectedParameterCount, method.getParameterTypes().length);
 	}
+	
+	
+	@Test
+	public void testOnJavaBeanPropertyWrapperName_getterIsRecognized() throws NoSuchMethodException {
+		class X {
+			void getA() {
+			}
+		}
+		boolean found = Reflections.onJavaBeanPropertyWrapperName(X.class.getDeclaredMethod("getA"), () -> true, () -> false, () -> false);
+		assertTrue(found);
+	}
+	
+	@Test
+	public void testOnJavaBeanPropertyWrapperName_getterIsRecognized_boolean() throws NoSuchMethodException {
+		class X {
+			void isA() {
+			}
+		}
+		boolean found = Reflections.onJavaBeanPropertyWrapperName(X.class.getDeclaredMethod("isA"), () -> false, () -> false, () -> true);
+		assertTrue(found);
+	}
+	
+	@Test
+	public void testOnJavaBeanPropertyWrapperName_setterIsRecognized() throws NoSuchMethodException {
+		class X {
+			void setA() {
+			}
+		}
+		boolean found = Reflections.onJavaBeanPropertyWrapperName(X.class.getDeclaredMethod("setA"), () -> false, () -> true, () -> false);
+		assertTrue(found);
+	}
+	
+	@Test
+	public void testOnJavaBeanPropertyWrapper_getterIsRecognized() throws NoSuchMethodException {
+		class X {
+			String getA() {
+				return null;
+			}
+		}
+		boolean found = Reflections.onJavaBeanPropertyWrapper(X.class.getDeclaredMethod("getA"), () -> true, () -> false, () -> false);
+		assertTrue(found);
+	}
+	
+	@Test
+	public void testOnJavaBeanPropertyWrapper_getterIsRecognized_boolean() throws NoSuchMethodException {
+		class X {
+			boolean isA() {
+				return true;
+			}
+		}
+		boolean found = Reflections.onJavaBeanPropertyWrapper(X.class.getDeclaredMethod("isA"), () -> false, () -> false, () -> true);
+		assertTrue(found);
+	}
+	
+	@Test
+	public void testOnJavaBeanPropertyWrapper_setterIsRecognized() throws NoSuchMethodException {
+		class X {
+			void setA(String a) {
+			}
+		}
+		boolean found = Reflections.onJavaBeanPropertyWrapper(X.class.getDeclaredMethod("setA", String.class), () -> false, () -> true, () -> false);
+		assertTrue(found);
+	}
+	
+	
+	
 	
 	private static class Toto {
 		private int a;
