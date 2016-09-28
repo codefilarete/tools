@@ -26,6 +26,10 @@ public class Nullable<T> {
 		this.value = value;
 	}
 	
+	public boolean isPresent() {
+		return value != null;
+	}
+	
 	public T get() {
 		return value;
 	}
@@ -34,8 +38,8 @@ public class Nullable<T> {
 		return isPresent() ? get() : anotherValue;
 	}
 	
-	public boolean isPresent() {
-		return value != null;
+	public <C> C orGet(Function<T, C> function) {
+		return orApply(function).get();
 	}
 	
 	public <C> Nullable<C> orApply(Function<T, C> function) {
