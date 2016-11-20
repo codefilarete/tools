@@ -6,11 +6,11 @@ import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 
 /**
- * Iterator de 2 autres sous la forme de {@link Entry}. A des éléments tant que les 2 Iterators délégués ont des élements.
+ * {@link Iterator} of 2 others by giving {@link Entry}. Gives elements while 2 Iterators have elements together.
  * 
  * @param <K>
  * @param <V>
- * @author mary
+ * @author Guillaume Mary
  */
 public class PairIterator<K, V> implements Iterator<Entry<K, V>> {
 	
@@ -43,9 +43,9 @@ public class PairIterator<K, V> implements Iterator<Entry<K, V>> {
 	}
 	
 	/**
-	 * Iterator d'une paire qui continue tant que au moins un des 2 Iterators délégués a encore des éléments.
-	 * S'arrête donc quand les 2 Iterators sont épuisés.
-	 * Renvoie la paire sous la forme d'une {@link Entry}.
+	 * {@link Iterator} which continue while one of the surrogate {@link Iterator} still has elements. So it stops when both {@link Iterator}s are
+	 * drained.
+	 * Gives the pair as an {@link Entry}
 	 * 
 	 * @param <K>
 	 * @param <V>
@@ -92,8 +92,8 @@ public class PairIterator<K, V> implements Iterator<Entry<K, V>> {
 	}
 	
 	/**
-	 * Iterator à l'infini, commence par renvoyer les éléments d'un Iterator délégué, puis renvoie ce que {@link #getMissingElement()}
-	 * renvoie (null par défaut).
+	 * {@link Iterator} running indefinitely, starts by giving surrogate's elements, then gives what {@link #getMissingElement()} returns
+	 * (default is null).
 	 * 
 	 * @param <E>
 	 */
@@ -130,7 +130,7 @@ public class PairIterator<K, V> implements Iterator<Entry<K, V>> {
 	}
 	
 	/**
-	 * Itérateur qui n'a aucun élément. Simple bouchon pour les API qui ont besoin d'un Iterator.
+	 * {@link Iterator} without any element. Stub for API that needs an {@link Iterator}.
 	 * @param <E>
 	 */
 	public static class EmptyIterator<E> implements Iterator<E> {
