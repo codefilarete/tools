@@ -43,12 +43,12 @@ public class StringAppenderTest {
 	}
 	
 	@Test
-	public void testToStringOverride() {
+	public void testCat_overriden() {
 		// every Number appended to the StringAppender will be replaced by "999" (stupid !)
 		StringAppender testInstance = new StringAppender() {
 			@Override
-			protected CharSequence toString(Object o) {
-				return o instanceof Number ? "999" : super.toString(o);
+			public StringAppender cat(Object o) {
+				return o instanceof Number ? cat("999") : super.cat(o);
 			}
 		};
 		
