@@ -1,10 +1,23 @@
 package org.gama.lang.bean;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
+
 import org.gama.lang.collection.Iterables;
 
-import java.util.*;
-
 /**
+ * A simple class for randomly generate things.
+ * It can delegates its repartition to a {@link IRandomGenerator}. Hence every draw is based on {@link IRandomGenerator#drawDouble()} which is less
+ * optimized than using dedicated methods as {@link Random}.
+ *
  * @author Guillaume Mary
  */
 public class Randomizer {
@@ -14,18 +27,27 @@ public class Randomizer {
 	private static final String BASE64CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 	
 	private static final String HEXCHARS = "ABCDEFGH0123456789";
-
+	
 	private final IRandomGenerator random;
 	
+	/**
+	 * Create a linearly distributing {@link Randomizer}
+	 */
 	public Randomizer() {
 		this(new LinearRandomGenerator());
 	}
 	
+	/**
+	 * Create a Gaussian distributing {@link Randomizer}
+	 */
 	public Randomizer(boolean gaussian) {
 		this(gaussian ? new LinearRandomGenerator() : new LinearRandomGenerator());
 	}
 	
-	private Randomizer(IRandomGenerator random) {
+	/**
+	 * Create a customized distributing {@link Randomizer}
+	 */
+	public Randomizer(IRandomGenerator random) {
 		this.random = random;
 	}
 	
@@ -34,15 +56,19 @@ public class Randomizer {
 	}
 	
 	public double drawDouble(double lowBound, double highBound) {
-		return (highBound -lowBound) * drawDouble() + lowBound;
+		return (highBound - lowBound) * drawDouble() + lowBound;
 	}
 	
 	public long drawLong(long lowBound, long highBound) {
-		return (long) ((highBound -lowBound) * drawDouble() + lowBound);
+		return (long) ((highBound - lowBound) * drawDouble() + lowBound);
+	}
+	
+	public int drawInt() {
+		return drawInt(Integer.MIN_VALUE, Integer.MAX_VALUE);
 	}
 	
 	public int drawInt(int lowBound, int highBound) {
-		return (int) ((highBound -lowBound) * drawDouble() + lowBound);
+		return (int) ((highBound - lowBound) * drawDouble() + lowBound);
 	}
 	
 	public boolean drawBoolean() {
@@ -57,13 +83,13 @@ public class Randomizer {
 		int hatLength = hat.length();
 		int startIndex = drawInt(0, hatLength);
 		int length = drawInt(0, maxLength);
-		return hat.substring(startIndex, Math.min(startIndex+length, hatLength));
+		return hat.substring(startIndex, Math.min(startIndex + length, hatLength));
 	}
 	
 	public <E> List<E> drawElements(Iterable<E> hat, int count) {
 		List<E> toReturn = new ArrayList<>(count);
 		Iterator<E> hatIterator = hat.iterator();
-		while(toReturn.size() < count && hatIterator.hasNext()) {
+		while (toReturn.size() < count && hatIterator.hasNext()) {
 			if (drawBoolean()) {
 				toReturn.add(hatIterator.next());
 			}
@@ -82,7 +108,7 @@ public class Randomizer {
 			int drawnIndex;
 			do {
 				drawnIndex = drawInt(0, hatSize);
-			} while(drawnIndexes.contains(drawnIndex));
+			} while (drawnIndexes.contains(drawnIndex));
 			drawnIndexes.add(drawnIndex);
 		}
 		toReturn.addAll(getElementsByIndex(hat, new TreeSet<>(drawnIndexes)));
@@ -92,10 +118,7 @@ public class Randomizer {
 	static <E> List<E> getElementsByIndex(Iterable<E> iterable, TreeSet<Integer> indexes) {
 		List<E> toReturn;
 		if (iterable instanceof List) {
-			toReturn = new ArrayList<>(((List) iterable).size());
-			for (Integer index : indexes) {
-				toReturn.add(((List<E>) iterable).get(index));
-			}
+			toReturn = indexes.stream().map(((List<E>) iterable)::get).collect(Collectors.toList());
 		} else {
 			toReturn = new ArrayList<>();
 			int i = 0;
@@ -105,7 +128,7 @@ public class Randomizer {
 				do {
 					next = iterator.next();
 					i++;
-				} while(i <= index && iterator.hasNext());
+				} while (i <= index && iterator.hasNext());
 				toReturn.add(next);
 			}
 		}
@@ -143,11 +166,16 @@ public class Randomizer {
 	}
 	
 	
-	private interface IRandomGenerator {
+	public interface IRandomGenerator {
 		double randomDouble();
 	}
 	
-	private static class LinearRandomGenerator implements IRandomGenerator {
+	/**
+	 * Generator that will draw double linearly reparted
+	 *
+	 * @see Random#nextDouble()
+	 */
+	public static class LinearRandomGenerator implements IRandomGenerator {
 		private Random random = new Random();
 		
 		@Override
@@ -156,7 +184,12 @@ public class Randomizer {
 		}
 	}
 	
-	private static class GaussianRandomGenerator implements IRandomGenerator {
+	/**
+	 * Generator that will draw double according to the Gaussion law
+	 *
+	 * @see Random#nextGaussian()
+	 */
+	public static class GaussianRandomGenerator implements IRandomGenerator {
 		private Random random = new Random();
 		
 		@Override

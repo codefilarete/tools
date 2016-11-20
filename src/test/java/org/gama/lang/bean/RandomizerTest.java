@@ -9,7 +9,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 /**
- * @author Guillaume
+ * @author Guillaume Mary
  */
 public class RandomizerTest {
 	

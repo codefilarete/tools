@@ -14,62 +14,66 @@ public class StringAppender implements Serializable, CharSequence {
 	public StringAppender() {
 		appender = new StringBuilder();
 	}
-
+	
 	public StringAppender(int capacity) {
 		appender = new StringBuilder(capacity);
 	}
 	
-	public StringAppender(Object ... s) {
+	public StringAppender(Object... s) {
 		this();
 		cat(s);
 	}
-
+	
 	public StringAppender cat(Object s) {
 		appender.append(toString(s));
 		return this;
 	}
 	
 	public StringAppender cat(Object s1, Object s2) {
+		// we skip an array creation by calling cat() multiple times
 		return cat(s1).cat(s2);
 	}
 	
 	public StringAppender cat(Object s1, Object s2, Object s3) {
-		return cat(s1,s2).cat(s3);
+		// we skip an array creation by calling cat() multiple times
+		return cat(s1).cat(s2).cat(s3);
 	}
 	
-	public StringAppender cat(Object ... ss) {
+	public StringAppender cat(Object... ss) {
 		for (Object s : ss) {
 			cat(toString(s));
 		}
 		return this;
 	}
 	
-	public StringAppender catAt(int index, Object ... ss) {
+	public StringAppender catAt(int index, Object... ss) {
 		for (Object s : ss) {
 			CharSequence cs = toString(s);
 			appender.insert(index, cs);
-			index+=cs.length();
+			index += cs.length();
 		}
 		return this;
 	}
 	
-	public StringAppender catIf(boolean condition, Object ... ss) {
+	public StringAppender catIf(boolean condition, Object... ss) {
 		if (condition) {
 			cat(ss);
 		}
 		return this;
 	}
 	
-	public StringAppender ccat(Object ... s) {
-		Object[] dest = new Object[s.length - 1];
-		System.arraycopy(s, 0, dest, 0, s.length - 1);
-		return ccat(dest, (CharSequence) s[s.length-1]);
+	public StringAppender ccat(Object... s) {
+		return ccat(s, toString(s[s.length - 1]), s.length - 1);
 	}
 	
 	public StringAppender ccat(Object[] s, CharSequence sep) {
-		if (s.length>0) {
-			for (Object arg : s) {
-				appender.append(toString(arg)).append(sep);
+		return ccat(s, sep, s.length);
+	}
+	
+	public StringAppender ccat(Object[] s, CharSequence sep, int objectCount) {
+		if (s.length > 0) {
+			for (int i = 0; i < objectCount; i++) {
+				appender.append(toString(s[i])).append(sep);
 			}
 			cutTail(sep.length());
 		}
@@ -90,7 +94,7 @@ public class StringAppender implements Serializable, CharSequence {
 		// Concatenated objects are not supposed to be null, so a toString() on it is sufficient and skip a "if null" check
 		return o.toString();
 	}
-
+	
 	public StringAppender cutTail(int nbChar) {
 		int newLength = length() - nbChar;
 		if (newLength > -1) {
@@ -105,7 +109,8 @@ public class StringAppender implements Serializable, CharSequence {
 	}
 	
 	/**
-	 * Gives access to delegate appender, because it can be usefull to append directly to the standat API StringBuilder
+	 * Gives access to delegate appender, because it can be usefull to append directly to the standard API StringBuilder
+	 *
 	 * @return the underlying appender
 	 */
 	public StringBuilder getAppender() {
