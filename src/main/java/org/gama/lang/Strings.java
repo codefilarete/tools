@@ -9,6 +9,10 @@ public abstract class Strings {
 		return charSequence == null || charSequence.length() == 0;
 	}
 	
+	public static CharSequence preventEmpty(CharSequence charSequence, CharSequence replacement) {
+		return isEmpty(charSequence) ? replacement : charSequence;
+	}
+	
 	public static String capitalize(final CharSequence cs) {
 		return (String) doWithDelegate(cs, new DefaultNullOrEmptyDelegate() {
 			@Override
