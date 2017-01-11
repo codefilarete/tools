@@ -1,24 +1,34 @@
 package org.gama.lang.collection;
 
+import java.util.Comparator;
 import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.TreeMap;
 
 /**
- * @author mary
+ * @author Guillaume Mary
  */
 public final class Maps {
 	
 	/**
-	 * Méthode qui permet d'enchaîner les appels à add(K, V) et ainsi de créer rapidement une Map d'éléments constants.
-	 * @return une Map
+	 * Allow chaining of the {@link ChainingMap#add(Object, Object)} method and then easily create a Map
+	 * @return a new Map instance
 	 */
 	public static <K, V> ChainingMap<K, V> asMap(K key, V value) {
 		return new ChainingMap<K, V>().add(key, value);
 	}
 	
 	/**
-	 * Simple {@link LinkedHashMap} qui permet d'enchaîner les appels à {@link #add(Object, Object)} (équivalent de put)
-	 * et donc de créer rapidement une {@link Map} d'éléments.
+	 * Allow chaining of the {@link ChainingMap#add(Object, Object)} method and then easily create a TreeMap
+	 * @param comparator the {@link Comparator} for the keys of the {@link TreeMap}
+	 * @return a new TreeMap instance
+	 */
+	public static <K, V> ChainingComparingMap<K, V> asComparingMap(Comparator<K> comparator, K key, V value) {
+		return new ChainingComparingMap<K, V>(comparator).add(key, value);
+	}
+	
+	/**
+	 * Simple {@link LinkedHashMap} that allows to chain calls to {@link #add(Object, Object)} (same as put) and so quickly create a Map.
+	 * 
 	 * @param <K>
 	 * @param <V>
 	 */
@@ -29,6 +39,24 @@ public final class Maps {
 		}
 		
 		public ChainingMap<K, V> add(K key, V value) {
+			put(key, value);
+			return this;
+		}
+	}
+	
+	/**
+	 * Simple {@link TreeMap} that allows to chain calls to {@link #add(Object, Object)} (same as put) and so quickly create a Map.
+	 *
+	 * @param <K>
+	 * @param <V>
+	 */
+	public static class ChainingComparingMap<K, V> extends TreeMap<K, V> {
+		
+		public ChainingComparingMap(Comparator<K> comparator) {
+			super(comparator);
+		}
+		
+		public ChainingComparingMap<K, V> add(K key, V value) {
 			put(key, value);
 			return this;
 		}
