@@ -7,6 +7,8 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import org.gama.lang.bean.FieldIterator;
@@ -15,11 +17,26 @@ import org.gama.lang.collection.Iterables;
 import org.gama.lang.collection.Iterables.Finder;
 import org.gama.lang.collection.Iterables.Mapper;
 import org.gama.lang.exception.Exceptions;
+import org.gama.lang.reflect.MemberPrinter;
+
+import static org.gama.lang.reflect.MemberPrinter.FLATTEN_PACKAGE_PRINTER;
+import static org.gama.lang.reflect.MemberPrinter.FULL_PACKAGE_PRINTER;
 
 /**
  * @author Guillaume Mary
  */
 public final class Reflections {
+	
+	public static final String FLAT_PACKAGES_OPTION_KEY = "reflections.flatPackages";
+	
+	public static final Set<String> DISABLE_FLAT_PACKAGES_OPTION = org.gama.lang.collection.Arrays.asTreeSet(String.CASE_INSENSITIVE_ORDER, "disable, false, off");
+	
+	private static final MemberPrinter classPrinter = ((Supplier<MemberPrinter>) () -> {
+		Optional<String> flattenPackageOption = Optional.ofNullable(System.getProperty(FLAT_PACKAGES_OPTION_KEY));
+		return flattenPackageOption.filter(DISABLE_FLAT_PACKAGES_OPTION::contains).isPresent()
+				? FULL_PACKAGE_PRINTER
+				: FLATTEN_PACKAGE_PRINTER;
+	}).get(); 
 	
 	public static void ensureAccessible(AccessibleObject accessibleObject) {
 		accessibleObject.setAccessible(true);
@@ -29,12 +46,12 @@ public final class Reflections {
 		try {
 			return clazz.getDeclaredConstructor();
 		} catch (NoSuchMethodException e) {
-			throw new UnsupportedOperationException("Class " + clazz.getName() + " doesn't have a default constructor");
+			throw new UnsupportedOperationException("Class " + toString(clazz) + " doesn't have a default constructor");
 		}
 	}
 	
 	public static Map<String, Field> mapFieldsOnName(Class clazz) {
-		Mapper<String, Field> fieldVisitor = new Mapper<String, Field>(new LinkedHashMap<String, Field>()) {
+		Mapper<String, Field> fieldVisitor = new Mapper<String, Field>(new LinkedHashMap<>()) {
 			@Override
 			protected String getKey(Field field) {
 				return field.getName();
@@ -50,7 +67,7 @@ public final class Reflections {
 	 * @param name the name of the field
 	 * @return the found field, null possible
 	 */
-	public static Field findField(Class clazz, final String name) {
+	public static Field findField(Class clazz, String name) {
 		Finder<Field> fieldVisitor = new Finder<Field>() {
 			@Override
 			public boolean accept(Field field) {
@@ -68,10 +85,10 @@ public final class Reflections {
 	 * @param name the name of the method
 	 * @return the found method, never null
 	 */
-	public static Field getField(Class clazz, final String name) {
+	public static Field getField(Class clazz, String name) {
 		Field field = findField(clazz, name);
 		if (field == null) {
-			throw new MemberNotFoundException("Field " + name + " on " + clazz.getName() + " was not found");
+			throw new MemberNotFoundException("Field " + name + " on " + toString(clazz) + " was not found");
 		}
 		return field;
 	}
@@ -84,7 +101,7 @@ public final class Reflections {
 	 * @param argTypes the argument types of the method
 	 * @return the found method, null possible
 	 */
-	public static Method findMethod(Class clazz, final String name, final Class... argTypes) {
+	public static Method findMethod(Class clazz, String name, Class... argTypes) {
 		Finder<Method> methodVisitor = new Finder<Method>() {
 			@Override
 			public boolean accept(Method method) {
@@ -103,10 +120,11 @@ public final class Reflections {
 	 * @param argTypes the argument types of the method
 	 * @return the found method, never null
 	 */
-	public static Method getMethod(Class clazz, final String name, final Class... argTypes) {
+	public static Method getMethod(Class clazz, String name, Class... argTypes) {
 		Method method = findMethod(clazz, name, argTypes);
 		if (method == null) {
-			throw new MemberNotFoundException("Method " + name + "(" + new StringAppender().ccat(argTypes, ", ").toString() + ") on " + clazz.getName() + " was not found");
+			throw new MemberNotFoundException("Method " + name + "(" + new StringAppender().ccat(argTypes, ", ").toString()
+					+ ") on " + toString(clazz) + " was not found");
 		}
 		return method;
 	}
@@ -118,7 +136,6 @@ public final class Reflections {
 			throw Exceptions.asRuntimeException(t);
 		}
 	}
-	
 	
 	public static class MemberNotFoundException extends RuntimeException {
 		public MemberNotFoundException(String message) {
@@ -183,9 +200,18 @@ public final class Reflections {
 	
 	private static IllegalArgumentException newEncapsulationException(Method method) {
 		return new IllegalArgumentException("Field wrapper "
-				+ method.getDeclaringClass().getName() + "." + method.getName()
+				+ toString(method)
 				+ " doesn't feet encapsulation naming convention");
 	}
+	
+	public static String toString(Method method) {
+		return classPrinter.toString(method);
+	}
+	
+	public static String toString(Class clazz) {
+		return classPrinter.toString(clazz);
+	}
+	
 	
 	@FunctionalInterface
 	private interface Checker {
