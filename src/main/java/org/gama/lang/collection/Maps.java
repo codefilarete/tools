@@ -1,6 +1,7 @@
 package org.gama.lang.collection;
 
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.TreeMap;
 
@@ -15,6 +16,14 @@ public final class Maps {
 	 */
 	public static <K, V> ChainingMap<K, V> asMap(K key, V value) {
 		return new ChainingMap<K, V>().add(key, value);
+	}
+	
+	/**
+	 * Allow chaining of the {@link ChainingHashMap#add(Object, Object)} method and then easily create a Map
+	 * @return a new HashMap instance
+	 */
+	public static <K, V> ChainingHashMap<K, V> asHashMap(K key, V value) {
+		return new ChainingHashMap<K, V>().add(key, value);
 	}
 	
 	/**
@@ -43,6 +52,25 @@ public final class Maps {
 			return this;
 		}
 	}
+	
+	/**
+	 * Simple {@link HashMap} that allows to chain calls to {@link #add(Object, Object)} (same as put) and so quickly create a Map.
+	 *
+	 * @param <K>
+	 * @param <V>
+	 */
+	public static class ChainingHashMap<K, V> extends HashMap<K, V> {
+		
+		public ChainingHashMap() {
+			super();
+		}
+		
+		public ChainingHashMap<K, V> add(K key, V value) {
+			put(key, value);
+			return this;
+		}
+	}
+	
 	
 	/**
 	 * Simple {@link TreeMap} that allows to chain calls to {@link #add(Object, Object)} (same as put) and so quickly create a Map.

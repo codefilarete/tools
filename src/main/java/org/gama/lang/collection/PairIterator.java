@@ -43,7 +43,7 @@ public class PairIterator<K, V> implements Iterator<Entry<K, V>> {
 	}
 	
 	/**
-	 * {@link Iterator} which continue while one of the surrogate {@link Iterator} still has elements. So it stops when both {@link Iterator}s are
+	 * {@link Iterator} which continues while one of the surrogate {@link Iterator} still has elements. So it stops when both {@link Iterator}s are
 	 * drained.
 	 * Gives the pair as an {@link Entry}
 	 * 
