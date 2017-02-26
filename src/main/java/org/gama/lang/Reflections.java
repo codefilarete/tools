@@ -205,6 +205,17 @@ public final class Reflections {
 				+ " doesn't feet encapsulation naming convention");
 	}
 	
+	/**
+	 * Gives the "target" type of some method. Target type is the returned type for getter, and first arg type for setter. boolean if getter startint with "is".
+	 * The method must follow the Java Bean Convention : starts by "get", "set", or "is", else it will throw an {@link IllegalArgumentException}
+	 * 
+	 * @param method not null, expected to be a getter or setter
+	 * @return the target type of the getter/setter
+	 */
+	public static Class javaBeanTargetType(Method method) {
+		return Reflections.onJavaBeanPropertyWrapper(method, Method::getReturnType, m -> m.getParameterTypes()[0], m -> boolean.class);
+	}
+	
 	public static String toString(Method method) {
 		return classPrinter.toString(method);
 	}
