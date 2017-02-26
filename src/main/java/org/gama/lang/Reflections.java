@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.gama.lang.bean.FieldIterator;
@@ -151,7 +152,7 @@ public final class Reflections {
 	 * @return the eventualy-wrapped field type, not null
 	 */
 	public static Class propertyType(Method method) {
-		return onJavaBeanPropertyWrapper(method, method::getReturnType, () -> method.getParameterTypes()[0], () -> boolean.class);
+		return onJavaBeanPropertyWrapper(method, Method::getReturnType, m -> m.getParameterTypes()[0], m -> boolean.class);
 	}
 	
 	/**
@@ -165,7 +166,7 @@ public final class Reflections {
 	 * @param <E> the returned type
 	 * @return the result of the called action
 	 */
-	public static <E> E onJavaBeanPropertyWrapper(Method fieldWrapper, Supplier<E> getterAction, Supplier<E> setterAction, Supplier<E> booleanGetterAction) {
+	public static <E> E onJavaBeanPropertyWrapper(Method fieldWrapper, Function<Method, E> getterAction, Function<Method, E> setterAction, Function<Method, E> booleanGetterAction) {
 		int parameterCount = fieldWrapper.getParameterCount();
 		Class<?> returnType = fieldWrapper.getReturnType();
 		IllegalArgumentException exception = newEncapsulationException(fieldWrapper);
@@ -185,14 +186,14 @@ public final class Reflections {
 	 * @param <E> the returned type
 	 * @return the result of the called action
 	 */
-	public static <E> E onJavaBeanPropertyWrapperName(Method fieldWrapper, Supplier<E> getterAction, Supplier<E> setterAction, Supplier<E> booleanGetterAction) {
+	public static <E> E onJavaBeanPropertyWrapperName(Method fieldWrapper, Function<Method, E> getterAction, Function<Method, E> setterAction, Function<Method, E> booleanGetterAction) {
 		String methodName = fieldWrapper.getName();
 		if (methodName.startsWith("get")) {
-			return getterAction.get();
+			return getterAction.apply(fieldWrapper);
 		} else if (methodName.startsWith("set")) {
-			return setterAction.get();
+			return setterAction.apply(fieldWrapper);
 		} else if (methodName.startsWith("is")) {
-			return booleanGetterAction.get();
+			return booleanGetterAction.apply(fieldWrapper);
 		} else {
 			throw newEncapsulationException(fieldWrapper);
 		}
@@ -218,22 +219,22 @@ public final class Reflections {
 		boolean check();
 	}
 	
-	private static class getOrThrow<E> implements Supplier<E> {
+	private static class getOrThrow<E> implements Function<Method, E> {
 		
-		private final Supplier<E> surrogate;
+		private final Function<Method, E> surrogate;
 		private final Checker predicate;
 		private final Supplier<RuntimeException> throwableSupplier;
 		
-		private getOrThrow(Supplier<E> surrogate, Checker predicate, Supplier<RuntimeException> s) {
+		private getOrThrow(Function<Method, E> surrogate, Checker predicate, Supplier<RuntimeException> s) {
 			this.surrogate = surrogate;
 			this.predicate = predicate;
 			this.throwableSupplier = s;
 		}
 		
 		@Override
-		public E get() {
+		public E apply(Method method) {
 			if (predicate.check()) {
-				return surrogate.get();
+				return surrogate.apply(method);
 			} else {
 				throw throwableSupplier.get();
 			}

@@ -84,7 +84,7 @@ public class ReflectionsTest {
 			void getA() {
 			}
 		}
-		boolean found = Reflections.onJavaBeanPropertyWrapperName(X.class.getDeclaredMethod("getA"), () -> true, () -> false, () -> false);
+		boolean found = Reflections.onJavaBeanPropertyWrapperName(X.class.getDeclaredMethod("getA"), m -> true, m -> false, m -> false);
 		assertTrue(found);
 	}
 	
@@ -94,7 +94,7 @@ public class ReflectionsTest {
 			void isA() {
 			}
 		}
-		boolean found = Reflections.onJavaBeanPropertyWrapperName(X.class.getDeclaredMethod("isA"), () -> false, () -> false, () -> true);
+		boolean found = Reflections.onJavaBeanPropertyWrapperName(X.class.getDeclaredMethod("isA"), m -> false, m -> false, m -> true);
 		assertTrue(found);
 	}
 	
@@ -104,7 +104,7 @@ public class ReflectionsTest {
 			void setA() {
 			}
 		}
-		boolean found = Reflections.onJavaBeanPropertyWrapperName(X.class.getDeclaredMethod("setA"), () -> false, () -> true, () -> false);
+		boolean found = Reflections.onJavaBeanPropertyWrapperName(X.class.getDeclaredMethod("setA"), m -> false, m -> true, m -> false);
 		assertTrue(found);
 	}
 	
@@ -115,7 +115,7 @@ public class ReflectionsTest {
 				return null;
 			}
 		}
-		boolean found = Reflections.onJavaBeanPropertyWrapper(X.class.getDeclaredMethod("getA"), () -> true, () -> false, () -> false);
+		boolean found = Reflections.onJavaBeanPropertyWrapper(X.class.getDeclaredMethod("getA"), m -> true, m -> false, m -> false);
 		assertTrue(found);
 	}
 	
@@ -126,7 +126,7 @@ public class ReflectionsTest {
 				return true;
 			}
 		}
-		boolean found = Reflections.onJavaBeanPropertyWrapper(X.class.getDeclaredMethod("isA"), () -> false, () -> false, () -> true);
+		boolean found = Reflections.onJavaBeanPropertyWrapper(X.class.getDeclaredMethod("isA"), m -> false, m -> false, m -> true);
 		assertTrue(found);
 	}
 	
@@ -136,7 +136,7 @@ public class ReflectionsTest {
 			void setA(String a) {
 			}
 		}
-		boolean found = Reflections.onJavaBeanPropertyWrapper(X.class.getDeclaredMethod("setA", String.class), () -> false, () -> true, () -> false);
+		boolean found = Reflections.onJavaBeanPropertyWrapper(X.class.getDeclaredMethod("setA", String.class), m -> false, m -> true, m -> false);
 		assertTrue(found);
 	}
 	
