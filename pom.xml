@@ -11,7 +11,7 @@
 	<properties>
 		<encoding>UTF-8</encoding>
 		<jsr305.version>3.0.0</jsr305.version>
-		<mockito.version>2.5.0</mockito.version>
+		<mockito.version>2.7.13</mockito.version>
 		<junit.version>4.12</junit.version>
 		<junit-dataprovider.version>1.12.0</junit-dataprovider.version>
 	</properties>
