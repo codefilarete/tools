@@ -36,6 +36,10 @@ public class Objects {
 		}
 	}
 	
+	public static String preventNull(String value) {
+		return preventNull(value, "");
+	}
+	
 	public static <E> E preventNull(E value, E nullValue) {
 		return value == null ? nullValue : value;
 	}
