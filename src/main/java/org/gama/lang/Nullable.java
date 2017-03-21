@@ -42,6 +42,10 @@ public class Nullable<T> {
 		return orApply(function).get();
 	}
 	
+	public T orNull() {
+		return orGet((T) null);
+	}
+	
 	public <C> Nullable<C> orApply(Function<T, C> function) {
 		return Nullable.of(doIfPresent(function));
 	}
