@@ -10,6 +10,10 @@ import org.gama.lang.bean.IQuietConverter.NullAwareConverter;
  */
 public class Converter {
 	
+	/**
+	 * Instance based on valueOf() methods of default JDK classes like {@link Integer#valueOf(String)}
+	 * Aimed at reading {@link java.util.Properties} values, for instance.
+	 */
 	public static final Converter DEFAULT = new Converter();
 	
 	static {
@@ -46,7 +50,7 @@ public class Converter {
 		DEFAULT.setConverter(String.class, new NullAwareConverter<Object, String>() {
 			@Override
 			public String convertNotNull(Object o) {
-				return o.toString();
+				return (String) o;
 			}
 		});
 	}

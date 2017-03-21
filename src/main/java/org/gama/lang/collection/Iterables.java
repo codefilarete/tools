@@ -3,6 +3,7 @@ package org.gama.lang.collection;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -126,6 +127,38 @@ public final class Iterables {
 		} else {
 			return iterable.get(iterable.size()-1);
 		}
+	}
+	
+	/**
+	 * Maps an {@link Iterable} on a key took as a {@link Function} of its beans. The value is also a function took on them.
+	 * 
+	 * @param iterable the iterable to Map, not null
+	 * @param keyMapper the key provider
+	 * @param valueMapper the value provider
+	 * @param <T> the type of objets iterated
+	 * @param <K> the type of the keys
+	 * @param <V> the type of the values
+	 * @return a new (Hash)Map, never null
+	 */
+	public static <T, K, V> Map<K, V> map(Iterable<T> iterable, Function<T, K> keyMapper, Function<T, V> valueMapper) {
+		Map<K, V> result = new HashMap<>();
+		for (T t : iterable) {
+			result.put(keyMapper.apply(t), valueMapper.apply(t));
+		}
+		return result;
+	}
+	
+	/**
+	 * Maps objects of an {@link Iterable} over a key took as a {@link Function} of them. 
+	 * 
+	 * @param iterable the iterable to Map, not null
+	 * @param keyMapper the key provider
+	 * @param <T> the type of objects iterated
+	 * @param <K> the type of the keys
+	 * @return a new (Hash)Map, never null
+	 */
+	public static <T, K> Map<K, T> mapIdentity(Iterable<T> iterable, Function<T, K> keyMapper) {
+		return map(iterable, keyMapper, Function.identity());
 	}
 	
 	/**
