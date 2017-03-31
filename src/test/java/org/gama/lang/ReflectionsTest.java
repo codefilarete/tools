@@ -140,8 +140,18 @@ public class ReflectionsTest {
 		assertTrue(found);
 	}
 	
+	@Test
+	public void testNewInstance_privateConstructor() {
+		// This shouldn't cause problem
+		ClosedClass closedClass = Reflections.newInstance(ClosedClass.class);
+		// minimal test
+		assertNotNull(closedClass);
+	}
 	
-	
+	private static class ClosedClass {
+		private ClosedClass() {
+		}
+	}
 	
 	private static class Toto {
 		private int a;

@@ -130,9 +130,19 @@ public final class Reflections {
 		return method;
 	}
 	
+	/**
+	 * Instanciates a class from its default contructor
+	 * 
+	 * @param clazz the target intance class
+	 * @param <E> the target instance type
+	 * @return a new instance of type E, never null
+	 */
 	public static <E> E newInstance(Class<E> clazz) {
 		try {
-			return getDefaultConstructor(clazz).newInstance();
+			Constructor<E> defaultConstructor = getDefaultConstructor(clazz);
+			// safeguard for non-accessible accessor
+			defaultConstructor.setAccessible(true);
+			return defaultConstructor.newInstance();
 		} catch (Throwable t) {
 			throw Exceptions.asRuntimeException(t);
 		}
