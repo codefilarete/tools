@@ -10,8 +10,12 @@ import java.util.Iterator;
  */
 public class MethodIterator extends InheritedElementIterator<Method> {
 	
-	public MethodIterator(Class aClass) {
-		this(new ClassIterator(aClass));
+	public MethodIterator(Class fromClass) {
+		this(fromClass, null);
+	}
+	
+	public MethodIterator(Class fromClass, Class toClass) {
+		this(new ClassIterator(fromClass, toClass));
 	}
 	
 	public MethodIterator(Iterator<Class> classIterator) {

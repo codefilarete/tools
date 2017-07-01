@@ -8,32 +8,30 @@ import java.util.function.BiPredicate;
 public class Objects {
 	
 	/**
-	 * Vérifie que o1.equals(o2) en prenant en compte les cas où o1 ou o2 sont null.
+	 * Checks that o1.equals(o2) by taking null check into account
 	 *
-	 * @param o1 un objet
-	 * @param o2 un objet
-	 * @return true si o1 == null && o2 == null
-	 *		<br> o1.equals(o2) si o1 et o2 non null
-	 *		<br> false si o1 != null ou-exclusif o2 != null
+	 * @param o1 an instance, null possible
+	 * @param o2 an instance, null possible
+	 * @return true if o1 == null && o2 == null
+	 *		<br> o1.equals(o2) if o1 and o2 non null
+	 *		<br> false if o1 != null or-exclusive o2 != null
 	 */
 	public static boolean equalsWithNull(Object o1, Object o2) {
-		if (o1 == null && o2 == null) {
-			return true;
-		} else if (o1 != null ^ o2 != null) {
-			return false;
-		} else {
-			return o1.equals(o2);
-		}
+		return equalsWithNull(o1, o2, Object::equals);
 	}
 	
+	/**
+	 * Checks that 2 instance are equals according a {@link java.util.function.Predicate} and by taking null check into account
+	 *
+	 * @param t an instance, null possible
+	 * @param u an instance, null possible
+	 * @return true if o1 == null && o2 == null
+	 *		<br> o1.equals(o2) if o1 and o2 non null
+	 *		<br> false if o1 != null or-exclusive o2 != null
+	 */
 	public static <T, U> boolean equalsWithNull(T t, U u, BiPredicate<T, U> equalsNonNullDelegate) {
-		if (t == null && u == null) {
-			return true;
-		} else if (t != null ^ u != null) {
-			return false;
-		} else {
-			return equalsNonNullDelegate.test(t, u);
-		}
+		return (t == null && u == null)
+				|| ((t != null) == (u != null) && equalsNonNullDelegate.test(t, u));
 	}
 	
 	public static String preventNull(String value) {

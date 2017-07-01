@@ -35,7 +35,7 @@ public class MethodIteratorTest {
 	@Test
 	@UseDataProvider("testNextMethodsData")
 	public void testNextMethods(Class clazz, List<Method> expectedMethods) throws Exception {
-		MethodIterator testInstance = new MethodIterator(clazz);
+		MethodIterator testInstance = new MethodIterator(clazz, Object.class);
 		assertEquals(expectedMethods, Iterables.visit(testInstance, new Iterables.ForEach<Method, Method>() {
 			
 			@Override

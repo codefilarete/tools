@@ -22,8 +22,8 @@ public class ClassIteratorTest {
 	@DataProvider
 	public static Object[][] testNextMethodsData() {
 		return new Object[][] {
-				{ X.class, Arrays.asList((Class) X.class) },
-				{ Y.class, Arrays.asList((Class) Y.class, X.class) }
+				{ X.class, Arrays.asList((Class) X.class, Object.class) },
+				{ Y.class, Arrays.asList((Class) Y.class, X.class, Object.class) }
 		};
 	}
 	
