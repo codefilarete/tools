@@ -1,6 +1,5 @@
 package org.gama.lang.function;
 
-import java.util.Objects;
 import java.util.function.Function;
 
 /**
@@ -9,30 +8,50 @@ import java.util.function.Function;
 public class Functions {
 	
 	/**
-	 * Chains several {@link Function} taking null-returned values into account by skipping chain hence preventing NullPointerException
+	 * Chains several {@link Function}s taking null-returned values into account by skipping chain hence preventing NullPointerException.
+	 * Prefer {@link #chain(Function, Function)} if you want to keep the behavior of a default Java statement chaining : throw a {@link NullPointerException}.
+	 * 
+	 * The method name "link" can be discussed, but it finally looks shorter than a "chainBeingNullAware" (kind of) name method which is too long but clearer. 
+	 * 
 	 * @param firstFunction the first function that will be applied in the chain
 	 * @param secondFunction the second function that will be applied in the chain
 	 * @return a {@link Function} that chains the 2 given ones by avoiding NullPointerException
+	 * @see #chain(Function, Function) 
 	 */
-	public static <K, A, V> Function<K, V> chain(NullAwareFunction<K, A> firstFunction, NullAwareFunction<A, V> secondFunction) {
+	public static <K, A, V> Function<K, V> link(Function<K, A> firstFunction, Function<A, V> secondFunction) {
+		return chain(new NullProofFunction<>(firstFunction), new NullProofFunction<>(secondFunction));
+	}
+	
+	/**
+	 * Chains several {@link Function}s.
+	 * Prefer {@link #link(Function, Function)} if you want a "null proof" chain.
+	 * 
+	 * @param firstFunction the first function that will be applied in the chain
+	 * @param secondFunction the second function that will be applied in the chain
+	 * @return a {@link Function} that chains the 2 given ones by avoiding NullPointerException
+	 * @see #link(Function, Function)
+	 */
+	public static <K, A, V> Function<K, V> chain(Function<K, A> firstFunction, Function<A, V> secondFunction) {
 		return firstFunction.andThen(secondFunction);
 	}
 	
 	/**
-	 * Same as the JDK {@link Function} class but with null-robust chaining through {@link #andThen(Function)}
-	 * @param <T>
-	 * @param <R>
+	 * A {@link Function} that skip calling a given one if input is null. Will return null in that case.
+	 * 
+	 * @param <I> function input type
+	 * @param <O> function output type
 	 */
-	@FunctionalInterface
-	public interface NullAwareFunction<T, R> extends Function<T, R> {
+	public static class NullProofFunction<I, O> implements Function<I, O> {
+		
+		private final Function<I, O> surrogate;
+		
+		public NullProofFunction(Function<I, O> surrogate) {
+			this.surrogate = surrogate;
+		}
 		
 		@Override
-		default <V> Function<T, V> andThen(Function<? super R, ? extends V> after) {
-			Objects.requireNonNull(after);
-			return (T t) -> {
-				R result = apply(t);
-				return result == null ? null : after.apply(result);
-			};
+		public O apply(I input) {
+			return input == null ? null : surrogate.apply(input);
 		}
 	}
 }
