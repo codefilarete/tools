@@ -42,7 +42,7 @@ public class MemberPrinter {
 	 * Gives a compact view of a package name by keeping only first character of each path, separated by dots.
 	 * 
 	 * @param aPackage not null (not compatible with top level classes / primitive types)
-	 * @return a String of only first character of package name
+	 * @return a String of the first character of package names
 	 */
 	private static String flattenPackage(Package aPackage) {
 		StringAppender result = new StringAppender();

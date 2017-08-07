@@ -148,6 +148,23 @@ public class ReflectionsTest {
 		assertNotNull(closedClass);
 	}
 	
+	@Test
+	public void testForName() throws ClassNotFoundException {
+		assertEquals(boolean.class, Reflections.forName("Z"));
+		assertEquals(int.class, Reflections.forName("I"));
+		assertEquals(long.class, Reflections.forName("J"));
+		assertEquals(short.class, Reflections.forName("S"));
+		assertEquals(byte.class, Reflections.forName("B"));
+		assertEquals(double.class, Reflections.forName("D"));
+		assertEquals(float.class, Reflections.forName("F"));
+		assertEquals(char.class, Reflections.forName("C"));
+		assertEquals(void.class, Reflections.forName("V"));
+		assertEquals(String.class, Reflections.forName(String.class.getName()));
+		assertEquals(Object[].class, Reflections.forName("[Ljava.lang.Object;"));
+		assertEquals(boolean[].class, Reflections.forName("[Z"));
+		assertEquals(boolean[][].class, Reflections.forName("[[Z"));
+	}
+	
 	private static class ClosedClass {
 		private ClosedClass() {
 		}

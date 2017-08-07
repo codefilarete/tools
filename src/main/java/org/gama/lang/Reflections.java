@@ -234,6 +234,41 @@ public final class Reflections {
 		return classPrinter.toString(clazz);
 	}
 	
+	/**
+	 * Almost the same as {@link Class#forName(String)} but accepts serialized form of type names.
+	 * @param typeName a type name, not null
+	 * @return the {@link Class} found behind typeName
+	 * @throws ClassNotFoundException as thrown by {@link Class#forName(String)}
+	 * @see Class#getName()
+	 */
+	public static Class forName(String typeName) throws ClassNotFoundException {
+		switch (typeName) {
+			case "Z":
+				return boolean.class;
+			case "B":
+				return byte.class;
+			case "C":
+				return char.class;
+			case "D":
+				return double.class;
+			case "F":
+				return float.class;
+			case "I":
+				return int.class;
+			case "J":
+				return long.class;
+			case "S":
+				return short.class;
+			case "V":
+				return void.class;
+			default:
+				if (typeName.startsWith("L")) {
+					typeName = typeName.substring(1, typeName.length()-1);
+					typeName = typeName.replace("/", ".");
+				}
+				return Class.forName(typeName);
+		}
+	}
 	
 	@FunctionalInterface
 	private interface Checker {
