@@ -4,8 +4,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import org.gama.lang.bean.IConverter;
-import org.gama.lang.bean.IQuietConverter;
+import org.gama.lang.bean.Converter;
+import org.gama.lang.bean.QuietConverter;
 
 /**
  * @author Guillaume Mary
@@ -50,7 +50,7 @@ public class Nullable<T> {
 		return Nullable.of(doIfPresent(function));
 	}
 	
-	public <C, E extends Exception> Nullable<C> orConvert(IConverter<T, C, E> function) throws E {
+	public <C, E extends Exception> Nullable<C> orConvert(Converter<T, C, E> function) throws E {
 		return Nullable.of(doIfPresent(function));
 	}
 	
@@ -63,7 +63,7 @@ public class Nullable<T> {
 	}
 	
 	private void doIfPresent(Consumer<T> consumer) {
-		doIfPresent(new IQuietConverter<T, Void>() {
+		doIfPresent(new QuietConverter<T, Void>() {
 			@Override
 			public Void convert(T input) {
 				consumer.accept(input);
@@ -73,10 +73,10 @@ public class Nullable<T> {
 	}
 	
 	private <O> O doIfPresent(Function<T, O> consumer) {
-		return doIfPresent((IQuietConverter<T, O>) consumer::apply);
+		return doIfPresent((QuietConverter<T, O>) consumer::apply);
 	}
 	
-	private <O, E extends Exception> O doIfPresent(IConverter<T, O, E> consumer) throws E {
+	private <O, E extends Exception> O doIfPresent(Converter<T, O, E> consumer) throws E {
 		return isPresent() ? consumer.convert(get()) : null;
 	}
 	

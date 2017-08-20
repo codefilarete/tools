@@ -4,9 +4,9 @@ package org.gama.lang.bean;
 * @author Guillaume Mary
 */
 @FunctionalInterface
-public interface IQuietConverter<I, O> extends IConverter<I, O, RuntimeException> {
+public interface QuietConverter<I, O> extends Converter<I, O, RuntimeException> {
 	
-	abstract class NullAwareConverter<I, O> implements IQuietConverter<I, O> {
+	abstract class NullAwareConverter<I, O> implements QuietConverter<I, O> {
 		
 		@Override
 		public O convert(I input) {
