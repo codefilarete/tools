@@ -2,7 +2,7 @@ package org.gama.lang;
 
 import java.util.function.Supplier;
 
-import org.gama.lang.function.Holder;
+import org.gama.lang.function.Hanger;
 import org.gama.lang.function.ThrowingRunnable;
 import org.gama.lang.function.ThrowingSupplier;
 
@@ -76,7 +76,7 @@ public class ThreadLocals {
 	/**
 	 * A {@link ThreadLocal} that will be cleared ({@link ThreadLocal#remove()} method called) after usage as a try-with-resource.
 	 */
-	public static class AutoRemoveThreadLocal<T> implements AutoCloseable, Supplier<T>, Holder<T> {
+	public static class AutoRemoveThreadLocal<T> implements AutoCloseable, Supplier<T>, Hanger<T> {
 		
 		private final ThreadLocal<T> surrogate;
 		
