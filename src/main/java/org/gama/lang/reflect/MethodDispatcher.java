@@ -84,7 +84,7 @@ public class MethodDispatcher {
 	 * @return
 	 * @throws Throwable
 	 */
-	public Object invoke(Object target, Method method, Object[] args) throws Throwable {
+	private Object invoke(Object target, Method method, Object[] args) throws Throwable {
 		try {
 			return method.invoke(target, args);
 		} catch (InvocationTargetException e) {
