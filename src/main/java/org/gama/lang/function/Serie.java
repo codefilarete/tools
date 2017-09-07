@@ -1,9 +1,10 @@
 package org.gama.lang.function;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
- * Very close of {@link Sequence} but with a seed on each {@link #next(Object)} : {@link Serie}s doesn't have to keep their own state.
+ * Very close to {@link Sequence} but with a seed on each {@link #next(Object)} : {@link Serie}s doesn't have to keep their state.
  * 
  * @author Guillaume Mary
  */
@@ -40,11 +41,11 @@ public interface Serie<I> {
 	}
 	
 	/** Every {@link #next(Object)} returns a new {@link Date} */
-	class NowSerie implements Serie<Date> {
+	class NowSerie implements Serie<LocalDateTime> {
 		
 		@Override
-		public Date next(Date input) {
-			return new Date();
+		public LocalDateTime next(LocalDateTime input) {
+			return LocalDateTime.now();
 		}
 	}
 }
