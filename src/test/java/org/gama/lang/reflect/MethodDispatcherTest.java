@@ -120,7 +120,35 @@ public class MethodDispatcherTest {
 		}
 		
 		assertTrue(thrownThrowable.getMessage().contains(" doesn't implement "));
+	}
+	
+	@Test
+	public void testRedirect_returnTypesAreNotThoseOfInterface_exceptionIsThrown() {
+		DummyFluentInterface testInstance = new MethodDispatcher()
+				.redirect(SubclassAwareFluentInterface.class, new FluentInterfaceSupport())
+				.fallbackOn(666)
+				.build(DummyFluentInterface.class);
 		
+		Throwable thrownThrowable = null;
+		try {
+			// This won't work because FluentInterfaceSupport returns itself which doesn't match DummyFluentInterface : they are dissociated subclasses.
+			testInstance.doSomething().doSomethingElse();
+		} catch (ClassCastException e) {
+			thrownThrowable = e;
+		}
+		assertTrue(thrownThrowable.getMessage().equals("org.gama.lang.reflect.MethodDispatcherTest$FluentInterfaceSupport cannot be cast" +
+				" to org.gama.lang.reflect.MethodDispatcherTest$DummyFluentInterface"));
+	}
+	
+	@Test
+	public void testRedirect_returnTypesAreNotThoseOfInterfaceButReturnProxyIsAsked() {
+		DummyFluentInterface testInstance = new MethodDispatcher()
+				.redirect(SubclassAwareFluentInterface.class, new FluentInterfaceSupport(), true)
+				.fallbackOn(666)
+				.build(DummyFluentInterface.class);
+		
+		// This will work because we ask to return the proxy after FluentInterfaceSupport invocations
+		testInstance.doSomething().doSomethingElse();
 	}
 	
 	private interface Holder1 extends Supplier<String>, Hanger<Integer> {
@@ -135,4 +163,35 @@ public class MethodDispatcherTest {
 		
 	}
 	
+	/**
+	 * We define an interface that takes into account subclasses by returning them on default methods, hence their methods can be chained on them too.
+	 * @param <Z> a subclass type
+	 */
+	private interface SubclassAwareFluentInterface<Z extends SubclassAwareFluentInterface<Z>> {
+		Z doSomething();
+		
+		Z doSomethingElse();
+	}
+	
+	private interface DummyFluentInterface extends SubclassAwareFluentInterface<DummyFluentInterface> {
+		// For our test case we should not declare again SubclassAwareFluentInterface methods with DummyFluentInterface return type,
+		// because they will be invoked in priority whereas we want SubclassAwareFluentInterface methods to be invoked
+		/** A non necessary method just to demonstrate the test case */
+		DummyFluentInterface doSpecialThing();
+	}
+	
+	/**
+	 * This is a default implementation of an interface, it holds default behavior
+	 */
+	private static class FluentInterfaceSupport implements SubclassAwareFluentInterface {
+		@Override
+		public SubclassAwareFluentInterface doSomething() {
+			return this;
+		}
+		
+		@Override
+		public SubclassAwareFluentInterface doSomethingElse() {
+			return this;
+		}
+	}
 }

@@ -21,13 +21,35 @@ import org.gama.lang.Reflections;
  */
 public class MethodDispatcher {
 	
-	private final Map<Method, Object> methodsToBeIntercepted = new HashMap<>();
+	private final Map<Method, Object /* target */> methodsToBeIntercepted = new HashMap<>();
+	private final Map<Method, Boolean> methodsReturningProxy = new HashMap<>();
 	
 	private Object fallback;
 	
+	/**
+	 * Redirects all interfazz methods to extensionSurrogate
+	 * @param interfazz an interface, must be extended by the one that will be given by {@link #build(Class)} (should be a super type of it) 
+	 * @param extensionSurrogate an instance implementing X so methods of X can be redirect to it
+	 * @param <X> a interface type
+	 * @return this
+	 */
 	public <X> MethodDispatcher redirect(Class<X> interfazz, X extensionSurrogate) {
+		return redirect(interfazz, extensionSurrogate, false);
+	}
+	
+	/**
+	 * Same as {@link #redirect(Class, Object)} but proxy will be return by all methods invocation : result of them will be ignored.
+	 * Usefull when return types of extensionSurrogate methods don't match those of {@link #build(Class)} (kind of rare case).
+	 * 
+	 * @param interfazz an interface, must be extended by the one that will be given by {@link #build(Class)} (should be a super type of it) 
+	 * @param extensionSurrogate an instance implementing X so methods of X can be redirect to it
+	 * @param <X> a interface type
+	 * @return this
+	 */
+	public <X> MethodDispatcher redirect(Class<X> interfazz, X extensionSurrogate, boolean returnProxy) {
 		for (Method method : interfazz.getMethods()) {
 			methodsToBeIntercepted.put(method, extensionSurrogate);
+			methodsReturningProxy.put(method, returnProxy);
 		}
 		return this;
 	}
@@ -43,12 +65,18 @@ public class MethodDispatcher {
 		Set<Class<?>> targetInterfaces = methodsToBeIntercepted.keySet().stream().map(Method::getDeclaringClass).collect(Collectors.toSet());
 		// we must add the X interface to the list that will be proxied, else we'll get a "com.sun.proxy.$Proxy4 cannot be cast to X"
 		targetInterfaces.add(interfazz);
-		Class[] interfaces = targetInterfaces.toArray(new Class[0]);
+		// building invocationHandler : we create a holder for the proxy because it must be referenced in some cases
+		Object[] proxyHolder = new Object[1];
 		InvocationHandler dispatcher = new InvocationHandlerSupport((input, method, args) -> {
 			Object targetInstance = methodsToBeIntercepted.getOrDefault(method, fallback);
-			return invoke(targetInstance, method, args);
+			Object result = invoke(targetInstance, method, args);
+			if (methodsReturningProxy.getOrDefault(method, false)) {
+				result = proxyHolder[0];
+			}
+			return result;
 		});
-		return (X) Proxy.newProxyInstance(classLoader, interfaces, dispatcher);
+		proxyHolder[0] = Proxy.newProxyInstance(classLoader, targetInterfaces.toArray(new Class[0]), dispatcher);
+		return (X) proxyHolder[0];
 	}
 	
 	private <X> void assertClassImplementsInterceptingInterface(Class<X> interfazz) {
