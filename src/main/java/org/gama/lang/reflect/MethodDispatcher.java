@@ -56,7 +56,8 @@ public class MethodDispatcher {
 	
 	public <X> X build(Class<X> interfazz) {
 		assertClassImplementsInterceptingInterface(interfazz);
-		assertFallbackInstanceIsNotNull();
+		// Fallback instance must not be null, else you'll get NullPointerException hard to debug
+		ensureFallbackInstanceIsNotNull(interfazz);
 		
 		// Which ClassLoader ? Thread, fallback, this ?
 		// we don't use the Thread one because it can live forever so it might lead to memory leak
@@ -88,9 +89,15 @@ public class MethodDispatcher {
 		});
 	}
 	
-	private void assertFallbackInstanceIsNotNull() {
+	private <X> void ensureFallbackInstanceIsNotNull(Class<X> interfazz) {
 		if (this.fallback == null) {
-			throw new IllegalArgumentException("Fallback instance must not be null, else you'll get NullPointerException hard to debug");
+			// we fallback equals(), hashCode(), toString(), etc on a more printable instance
+			this.fallback = new Object() {
+				@Override
+				public String toString() {
+					return interfazz.getName() + "@" + Integer.toHexString(hashCode());
+				}
+			};
 		}
 	}
 	

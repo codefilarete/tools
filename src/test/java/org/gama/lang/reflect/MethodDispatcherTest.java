@@ -31,25 +31,19 @@ public class MethodDispatcherTest {
 	}
 	
 	@Test
-	public void testBuild_noFallbackInstance_throwsException() {
+	public void testBuild_noFallbackInstance_toStringReflectBuiltClass() {
 		MethodDispatcher methodDispatcher = new MethodDispatcher()
 				.redirect(Supplier.class, () -> "Hello world !");
 		
-		Throwable thrownThrowable = null;
-		try {
-			methodDispatcher.build(Holder1.class);
-		} catch (IllegalArgumentException e) {
-			thrownThrowable = e;
-		}
-		
-		assertTrue(thrownThrowable.getMessage().contains("Fallback instance must not be null"));
+		methodDispatcher.fallbackOn(null);
+		Holder1 builtInstance = methodDispatcher.build(Holder1.class);
+		assertTrue(builtInstance.toString().contains(Holder1.class.getName()));
 	}
 	
 	@Test
 	public void testBuild_noFallbackInstance_throwsException2() throws Exception {
 		Holder3 testInstance = new MethodDispatcher()
 				.redirect(AutoCloseable.class, () -> { throw new SQLException(); })
-				.fallbackOn(666)
 				.build(Holder3.class);
 		
 		Throwable thrownThrowable = null;
@@ -70,7 +64,6 @@ public class MethodDispatcherTest {
 				.redirect(Supplier.class, () -> "Hello world !")
 				// this will produce ClassCastException because Holder2 implements Hanger<String> whereas we used Hanger accepts Integer
 				.redirect(Hanger.class, (Hanger<Integer>) hanger::increment)
-				.fallbackOn("fd")
 				.build(Holder2.class);
 		
 		assertEquals("Hello world !", testInstance.get());
@@ -107,8 +100,7 @@ public class MethodDispatcherTest {
 	@Test
 	public void testBuild_targetClassDoesntImplementRedirectingClasses_exceptionIsThrown() {
 		MethodDispatcher methodDispatcher = new MethodDispatcher()
-				.redirect(Supplier.class, () -> "Hello world !")
-				.fallbackOn(new Object());
+				.redirect(Supplier.class, () -> "Hello world !");
 		Throwable thrownThrowable = null;
 		try {
 			// Exception is thrown here, else we could do successfully
@@ -126,7 +118,6 @@ public class MethodDispatcherTest {
 	public void testRedirect_returnTypesAreNotThoseOfInterface_exceptionIsThrown() {
 		DummyFluentInterface testInstance = new MethodDispatcher()
 				.redirect(SubclassAwareFluentInterface.class, new FluentInterfaceSupport())
-				.fallbackOn(666)
 				.build(DummyFluentInterface.class);
 		
 		Throwable thrownThrowable = null;
@@ -144,7 +135,6 @@ public class MethodDispatcherTest {
 	public void testRedirect_returnTypesAreNotThoseOfInterfaceButReturnProxyIsAsked() {
 		DummyFluentInterface testInstance = new MethodDispatcher()
 				.redirect(SubclassAwareFluentInterface.class, new FluentInterfaceSupport(), true)
-				.fallbackOn(666)
 				.build(DummyFluentInterface.class);
 		
 		// This will work because we ask to return the proxy after FluentInterfaceSupport invocations
