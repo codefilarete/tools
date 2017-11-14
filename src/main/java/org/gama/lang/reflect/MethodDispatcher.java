@@ -55,6 +55,7 @@ public class MethodDispatcher {
 	}
 	
 	public <X> X build(Class<X> interfazz) {
+		assertInterceptingMethodsAreFromInterfaces();
 		assertClassImplementsInterceptingInterface(interfazz);
 		// Fallback instance must not be null, else you'll get NullPointerException hard to debug
 		ensureFallbackInstanceIsNotNull(interfazz);
@@ -89,15 +90,18 @@ public class MethodDispatcher {
 		});
 	}
 	
+	private void assertInterceptingMethodsAreFromInterfaces() {
+		methodsToBeIntercepted.keySet().forEach(m -> {
+			if (!m.getDeclaringClass().isInterface()) {
+				throw new IllegalArgumentException("Cannot intercept concrete method : " + Reflections.toString(m));
+			}
+		});
+	}
+	
 	private <X> void ensureFallbackInstanceIsNotNull(Class<X> interfazz) {
 		if (this.fallback == null) {
 			// we fallback equals(), hashCode(), toString(), etc on a more printable instance
-			this.fallback = new Object() {
-				@Override
-				public String toString() {
-					return interfazz.getName() + "@" + Integer.toHexString(hashCode());
-				}
-			};
+			this.fallback = new Fallback(interfazz);
 		}
 	}
 	
@@ -135,6 +139,24 @@ public class MethodDispatcher {
 				result = new IllegalArgumentException(message);
 			}
 			throw result;
+		}
+	}
+	
+	/**
+	 * Dedicated class to fallback objects so printed stack trace are more understandable
+	 * Only override the {@link #toString()}
+	 */
+	private static class Fallback {
+		
+		private final Class interfazz;
+		
+		public Fallback(Class interfazz) {
+			this.interfazz = interfazz;
+		}
+		
+		@Override
+		public String toString() {
+			return interfazz.getName() + "@" + Integer.toHexString(hashCode());
 		}
 	}
 }

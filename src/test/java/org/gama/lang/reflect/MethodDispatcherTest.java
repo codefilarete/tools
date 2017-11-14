@@ -141,6 +141,21 @@ public class MethodDispatcherTest {
 		testInstance.doSomething().doSomethingElse();
 	}
 	
+	@Test
+	public void test_returnTypesAreNotThoseOfInterfaceButReturnProxyIsAsked() {
+		MethodDispatcher testInstance = new MethodDispatcher()
+				.redirect(String.class, "abc");
+		
+		Throwable thrownThrowable = null;
+		try {
+			// This won't work because FluentInterfaceSupport returns itself which doesn't match DummyFluentInterface : they are dissociated subclasses.
+			testInstance.build(CharSequence.class);
+		} catch (IllegalArgumentException e) {
+			thrownThrowable = e;
+		}
+		assertTrue(thrownThrowable.getMessage().contains("Cannot intercept concrete method"));
+	}
+	
 	private interface Holder1 extends Supplier<String>, Hanger<Integer> {
 		
 	}
