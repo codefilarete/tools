@@ -17,10 +17,13 @@ import org.gama.lang.collection.Arrays;
  */
 public class MemberPrinter {
 	
+	/** A printer that shows the whole package name (full path) */
 	public static final MemberPrinter FULL_PACKAGE_PRINTER = new MemberPrinter(Package::getName);
 	
+	/** A printer for compact package name presentation (first letter of each path) */
 	public static final MemberPrinter FLATTEN_PACKAGE_PRINTER = new MemberPrinter(MemberPrinter::flattenPackage);
 	
+	/** A printer that won't print package name for "well known" package : java.util and java.lang */
 	public static final MemberPrinter WELL_KNOWN_FLATTEN_PACKAGE_PRINTER = new MemberPrinter(new PackagePrinter() {
 		
 		private final Set<Package> WELL_KNOW_PACKAGES = Collections.unmodifiableSet(Arrays.asSet(
@@ -67,7 +70,8 @@ public class MemberPrinter {
 	}
 	
 	public String toString(Class aClass) {
-		String packageName = toString(aClass.getPackage());
+		Package classPackage = aClass.isArray() ? aClass.getComponentType().getPackage() : aClass.getPackage();
+		String packageName = toString(classPackage);
 		if (packageName.isEmpty()) {
 			return aClass.getSimpleName();
 		} else {
@@ -76,18 +80,12 @@ public class MemberPrinter {
 	}
 	
 	public String toString(Method method) {
-		return toString(method.getReturnType()) + " " + toString(method.getDeclaringClass()) + "." + method.getName()
-				+ "(" + new StringAppender() {
-			@Override
-			public StringAppender cat(Object o) {
-				Class c = (Class) o;
-				return super.cat(MemberPrinter.this.toString(c));
-			}
-		}.cat((Object[]) method.getParameterTypes()) + ")";
+		return new ClassAppender().cat(method.getReturnType(), " ", method.getDeclaringClass(), ".", method.getName())
+				.cat("(").cat((Object[]) method.getParameterTypes()).cat(")").toString();
 	}
 	
 	public String toString(Field field) {
-		return toString(field.getType()) + " " + toString(field.getDeclaringClass()) + "." + field.getName();
+		return new ClassAppender().cat(field.getType(), " ", field.getDeclaringClass(), ".", field.getName()).toString();
 	}
 	
 	
@@ -100,5 +98,16 @@ public class MemberPrinter {
 		 * @return not null, an empty String in worst case
 		 */
 		String toString(Package aPackage);
+	}
+	
+	private class ClassAppender extends StringAppender {
+		@Override
+		public StringAppender cat(Object o) {
+			if (o instanceof Class) {
+				return super.cat(MemberPrinter.this.toString((Class) o));
+			} else {
+				return super.cat(o);
+			}
+		}
 	}
 }

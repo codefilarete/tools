@@ -28,21 +28,38 @@ import static org.gama.lang.reflect.MemberPrinter.FULL_PACKAGE_PRINTER;
  */
 public final class Reflections {
 	
+	/** The system property name to manage how classes are printed when using {@link #toString(Class)} */
 	public static final String FLAT_PACKAGES_OPTION_KEY = "reflections.flatPackages";
 	
-	public static final Set<String> DISABLE_FLAT_PACKAGES_OPTION = org.gama.lang.collection.Arrays.asTreeSet(String.CASE_INSENSITIVE_ORDER, "disable, false, off");
+	/** Possible values of {@link #FLAT_PACKAGES_OPTION_KEY} : disable, false, off */
+	public static final Set<String> DISABLE_FLAT_PACKAGES_OPTIONS = org.gama.lang.collection.Arrays.asTreeSet(String.CASE_INSENSITIVE_ORDER, "disable, false, off");
 	
+	/**
+	 * Printer for {@link #toString(Class)} and {@link #toString(Method)}.
+	 * Depends on {@link #FLAT_PACKAGES_OPTION_KEY} system property
+	 */
 	private static final MemberPrinter classPrinter = ((Supplier<MemberPrinter>) () -> {
 		Optional<String> flattenPackageOption = Optional.ofNullable(System.getProperty(FLAT_PACKAGES_OPTION_KEY));
-		return flattenPackageOption.filter(DISABLE_FLAT_PACKAGES_OPTION::contains).isPresent()
+		return flattenPackageOption.filter(DISABLE_FLAT_PACKAGES_OPTIONS::contains).isPresent()
 				? FULL_PACKAGE_PRINTER
 				: FLATTEN_PACKAGE_PRINTER;
-	}).get(); 
+	}).get();
 	
+	/**
+	 * Shortcut for {@link AccessibleObject#setAccessible(boolean)}
+	 * @param accessibleObject the object to be set accessible
+	 */
 	public static void ensureAccessible(AccessibleObject accessibleObject) {
 		accessibleObject.setAccessible(true);
 	}
 	
+	/**
+	 * Looks for the "default constructor" (no argument) of a class
+	 * @param clazz a class, not null
+	 * @param <T> type of the class instances
+	 * @return the default constructor of the given class (never null)
+	 * @throws UnsupportedOperationException if the class doesn't have a default constructor
+	 */
 	public static <T> Constructor<T> getDefaultConstructor(Class<T> clazz) {
 		try {
 			return clazz.getDeclaredConstructor();

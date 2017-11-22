@@ -29,6 +29,7 @@ public class MemberPrinterTest {
 		assertEquals("boolean", testInstance.toString(boolean.class));
 		assertEquals("boolean", testInstance.toString(Boolean.TYPE));
 		assertEquals("void", testInstance.toString(Void.TYPE));
+		assertEquals("j.l.Comparable[]", testInstance.toString(Comparable[].class));
 	}
 	
 	@Test
