@@ -12,8 +12,11 @@ import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+
+import org.gama.lang.collection.PairIterator.UntilBothIterator;
 
 /**
  * @author Guillaume Mary
@@ -141,7 +144,23 @@ public final class Iterables {
 	 * @return a new (Hash)Map, never null
 	 */
 	public static <T, K, V> Map<K, V> map(Iterable<T> iterable, Function<T, K> keyMapper, Function<T, V> valueMapper) {
-		Map<K, V> result = new HashMap<>();
+		return map(iterable, keyMapper, valueMapper, HashMap::new);
+	}
+	
+	/**
+	 * Maps an {@link Iterable} on a key took as a {@link Function} of its beans. The value is also a function took on them.
+	 *
+	 * @param iterable the iterable to Map, not null
+	 * @param keyMapper the key provider
+	 * @param valueMapper the value provider
+	 * @param target the map to be filled
+	 * @param <T> the type of objets iterated
+	 * @param <K> the type of the keys
+	 * @param <V> the type of the values
+	 * @return a new (Hash)Map, never null
+	 */
+	public static <T, K, V, M extends Map<K, V>> M map(Iterable<T> iterable, Function<T, K> keyMapper, Function<T, V> valueMapper, Supplier<M> target) {
+		M result = target.get();
 		for (T t : iterable) {
 			result.put(keyMapper.apply(t), valueMapper.apply(t));
 		}
@@ -190,6 +209,26 @@ public final class Iterables {
 			result.add(iterator.next());
 		}
 		return result;
+	}
+	
+	public static <E, C extends Collection<E>> C copy(Iterable<E> iterable, C result) {
+		return copy(iterable.iterator(), result);
+	}
+	
+	public static <E, C extends Collection<E>> C copy(Iterator<E> iterator, C result) {
+		while (iterator.hasNext()) {
+			result.add(iterator.next());
+		}
+		return result;
+	}
+	
+	public static <K, V> Map<K, V> pair(Iterable<K> keys, Iterable<V> values) {
+		return pair(keys, values, HashMap::new);
+	}
+	
+	public static <K, V, M extends Map<K, V>> M pair(Iterable<K> keys, Iterable<V> values, Supplier<M> target) {
+		UntilBothIterator<K, V> bothIterator = new UntilBothIterator<>(keys, values);
+		return map(() -> bothIterator, Entry::getKey, Entry::getValue, target);
 	}
 	
 	/**

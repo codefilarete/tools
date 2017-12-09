@@ -4,19 +4,25 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 /**
- * Faux Set qui doit conserver l'ordre d'insertion
+ * Fake Set that keeps insertion order
  * 
- * @author mary
+ * @author Guillaume Mary
  */
-public class KeepOrderSet<E> implements Iterable<E> {
+public class KeepOrderSet<E> implements Set<E> {
 	
 	private LinkedHashSet<E> delegate = new LinkedHashSet<>();
 	
 	public KeepOrderSet(E ... e) {
-		this.delegate.addAll(Arrays.asList(e));
+		this(Arrays.asList(e));
+	}
+	
+	public KeepOrderSet(List<E> elements) {
+		this.delegate.addAll(elements);
 	}
 	
 	public int size() {
@@ -35,8 +41,23 @@ public class KeepOrderSet<E> implements Iterable<E> {
 		return delegate.iterator();
 	}
 	
+	@Override
+	public Object[] toArray() {
+		return delegate.toArray();
+	}
+	
+	@Override
+	public <T> T[] toArray(T[] a) {
+		return delegate.toArray(a);
+	}
+	
 	public boolean add(E e) {
 		return delegate.add(e);
+	}
+	
+	@Override
+	public boolean remove(Object o) {
+		return false;
 	}
 	
 	public boolean containsAll(Collection<?> c) {
@@ -45,6 +66,21 @@ public class KeepOrderSet<E> implements Iterable<E> {
 	
 	public boolean addAll(Collection<? extends E> c) {
 		return delegate.addAll(c);
+	}
+	
+	@Override
+	public boolean retainAll(Collection<?> c) {
+		return false;
+	}
+	
+	@Override
+	public boolean removeAll(Collection<?> c) {
+		return false;
+	}
+	
+	@Override
+	public void clear() {
+		
 	}
 	
 	public boolean equals(Object o) {
