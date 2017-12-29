@@ -21,10 +21,16 @@ public class IncrementableInt {
 		return value;
 	}
 	
-	public void increment() {
-		value++;
+	public int increment() {
+		return ++value;
 	}
-	public void increment(int increment) {
-		value += increment;
+	
+	public int increment(int increment) {
+		return value += increment;
+	}
+	
+	@Override
+	public String toString() {
+		return String.valueOf(value);
 	}
 }
