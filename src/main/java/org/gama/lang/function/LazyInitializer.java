@@ -4,9 +4,9 @@ import java.util.function.Supplier;
 
 /**
  * A {@link Supplier} for use case that needs a lazy instanciation of a variable.
- * Non thread-safe (would need a volatile internal variable and a internnaly synchronized get()
+ * Non thread-safe (would need a volatile internal variable and a internaly synchronized get())
  * 
- * @param <T>
+ * @param <T> the type of the created instance
  */
 public abstract class LazyInitializer<T> implements Supplier<T> {
 	
@@ -22,5 +22,9 @@ public abstract class LazyInitializer<T> implements Supplier<T> {
 		return this.instance;
 	}
 	
+	/**
+	 * Will be called once, for value initialization
+	 * @return a new instance of the expected type
+	 */
 	protected abstract T createInstance();
 }
