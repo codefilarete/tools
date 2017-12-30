@@ -1,5 +1,6 @@
 package org.gama.lang.bean;
 
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -8,15 +9,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.gama.lang.collection.Iterables;
 
 /**
- * A simple class for randomly generate things.
- * It can delegates its repartition to a {@link IRandomGenerator}. Hence every draw is based on {@link IRandomGenerator#drawDouble()} which is less
- * optimized than using dedicated methods as {@link Random}.
+ * A simple class to randomly generate values of basic types (double, int, Date, objects from a list, ...)
+ * It delegates its repartition to a {@link IRandomGenerator}. Then every draw is based on {@link IRandomGenerator#drawDouble()} which is less
+ * optimized than using dedicated methods as {@link Random} does.
  *
  * @author Guillaume Mary
  */
@@ -41,7 +43,7 @@ public class Randomizer {
 	 * Create a Gaussian distributing {@link Randomizer}
 	 */
 	public Randomizer(boolean gaussian) {
-		this(gaussian ? new LinearRandomGenerator() : new LinearRandomGenerator());
+		this(gaussian ? new GaussianRandomGenerator() : new LinearRandomGenerator());
 	}
 	
 	/**
@@ -115,7 +117,7 @@ public class Randomizer {
 		return toReturn;
 	}
 	
-	static <E> List<E> getElementsByIndex(Iterable<E> iterable, TreeSet<Integer> indexes) {
+	static <E> List<E> getElementsByIndex(Iterable<E> iterable, SortedSet<Integer> indexes) {
 		List<E> toReturn;
 		if (iterable instanceof List) {
 			toReturn = indexes.stream().map(((List<E>) iterable)::get).collect(Collectors.toList());
@@ -176,11 +178,31 @@ public class Randomizer {
 	 * @see Random#nextDouble()
 	 */
 	public static class LinearRandomGenerator implements IRandomGenerator {
-		private Random random = new Random();
+		private final Random random;
+		
+		public LinearRandomGenerator() {
+			this(new Random());
+		}
+		
+		public LinearRandomGenerator(Random random) {
+			this.random = random;
+		}
 		
 		@Override
 		public double randomDouble() {
 			return random.nextDouble();
+		}
+	}
+	
+	/**
+	 * Same as {@link LinearRandomGenerator} but with pseudo-random number generator (PRNG)
+	 * @see SecureRandom
+	 * @see "https://blog.frankel.ch/managing-randomness-java/" 
+	 */
+	public static class SecureLinearRandomGenerator extends LinearRandomGenerator {
+		
+		public SecureLinearRandomGenerator() {
+			super(new SecureRandom());
 		}
 	}
 	
@@ -190,7 +212,7 @@ public class Randomizer {
 	 * @see Random#nextGaussian()
 	 */
 	public static class GaussianRandomGenerator implements IRandomGenerator {
-		private Random random = new Random();
+		private final Random random = new Random();
 		
 		@Override
 		public double randomDouble() {

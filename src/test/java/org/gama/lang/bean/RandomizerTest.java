@@ -15,17 +15,15 @@ public class RandomizerTest {
 	
 	@Test
 	public void testGetElementsByIndex_listInput() {
-		TreeSet<Integer> indexes = new TreeSet<>();
-		indexes.addAll(Arrays.asList(0, 2, 8));
+		TreeSet<Integer> indexes = new TreeSet<>(Arrays.asList(0, 2, 8));
 		List<String> elementsByIndex = Randomizer.getElementsByIndex(Arrays.asList("a", "b", "c", "d", "e", "f", "g", "h", "i"), indexes);
 		assertEquals(Arrays.asList("a", "c", "i"), elementsByIndex);
 	}
 	
 	@Test
 	public void testGetElementsByIndex_setInput() {
-		TreeSet<Integer> indexes = new TreeSet<>();
-		indexes.addAll(Arrays.asList(0, 2, 8));
-		List<String> elementsByIndex = Randomizer.getElementsByIndex(Arrays.asSet("a", "b", "c", "d", "e", "f", "g", "h", "i"), indexes);
+		TreeSet<Integer> indexes = new TreeSet<>(Arrays.asList(0, 2, 8));
+		List<String> elementsByIndex = Randomizer.getElementsByIndex(Arrays.asHashSet("a", "b", "c", "d", "e", "f", "g", "h", "i"), indexes);
 		assertEquals(Arrays.asList("a", "c", "i"), elementsByIndex);
 	}
 	
