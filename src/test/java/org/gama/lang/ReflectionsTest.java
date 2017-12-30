@@ -161,6 +161,7 @@ public class ReflectionsTest {
 		assertEquals(void.class, Reflections.forName("V"));
 		assertEquals(String.class, Reflections.forName(String.class.getName()));
 		assertEquals(Object[].class, Reflections.forName("[Ljava.lang.Object;"));
+		assertEquals(Object.class, Reflections.forName("Ljava/lang/Object"));
 		assertEquals(boolean[].class, Reflections.forName("[Z"));
 		assertEquals(boolean[][].class, Reflections.forName("[[Z"));
 	}

@@ -280,7 +280,7 @@ public final class Reflections {
 				return void.class;
 			default:
 				if (typeName.startsWith("L")) {
-					typeName = typeName.substring(1, typeName.length()-1);
+					typeName = typeName.substring(1, typeName.length());
 					typeName = typeName.replace("/", ".");
 				}
 				return Class.forName(typeName);
