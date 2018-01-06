@@ -1,6 +1,7 @@
 package org.gama.lang.collection;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -80,11 +81,20 @@ public class IterablesTest {
 		Set<String> aSet = new LinkedHashSet<>();
 		aSet.add("d");
 		aSet.add("a");
-		assertEquals(Iterables.copy(aSet), Arrays.asList("d", "a"));
+		assertEquals(Arrays.asList("d", "a"), Iterables.copy(aSet));
 		// test that copy is not the same instance than the original
-		assertNotSame(Iterables.copy(aSet), aSet);
+		assertNotSame(aSet, Iterables.copy(aSet));
 		// test on corner case: empty content
-		assertEquals(Iterables.copy(Arrays.asList()), Arrays.asList());
+		assertEquals(Arrays.asList(), Iterables.copy(Arrays.asList()));
+	}
+	
+	@Test
+	public void testCollect() {
+		// test with content
+		List<Integer> aSet = Arrays.asList(1, 2, 1);
+		assertEquals(Arrays.asList("1", "2", "1"), Iterables.collectToList(aSet, Object::toString));
+		
+		assertEquals(Arrays.asHashSet("1", "2"), Iterables.collect(aSet, Object::toString, HashSet::new));
 	}
 	
 	@Test

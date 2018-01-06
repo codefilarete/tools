@@ -181,28 +181,59 @@ public final class Iterables {
 	}
 	
 	/**
-	 * Crée une copie du Iterable en tant que List
-	 * @param iterable un Iterable, non null
-	 * @return une List<E> qui contient tous les éléments de <t>iterable</t>
+	 * Equivalent to {@link #collect(Iterable, Function, Supplier)} collecting to a {@link List}
+	 * @param iterable the source
+	 * @param mapper the mapping function
+	 * @param <I> the input type
+	 * @param <O> the output type
+	 * @return the collection given by the supplier
+	 */
+	public static <I, O> List collectToList(Iterable<I> iterable, Function<I, O> mapper) {
+		return collect(iterable, mapper, ArrayList::new);
+	}
+	
+	/**
+	 * Applies a mapper over an iterable to collect information and put each result into a collection.
+	 * 
+	 * @param iterable the source
+	 * @param mapper the mapping function
+	 * @param target the supplier of resulting collection
+	 * @param <I> the input type
+	 * @param <O> the output type
+	 * @param <C> the collecting type
+	 * @return the collection given by the supplier
+	 */
+	public static <I, O, C extends Collection<O>> C collect(Iterable<I> iterable, Function<I, O> mapper, Supplier<C> target) {
+		C result = target.get();
+		iterable.forEach(i -> result.add(mapper.apply(i)));
+		return result;
+	}
+	
+	/**
+	 * Copies an {@link Iterable} to a {@link List}
+	 * 
+	 * @param iterable an {@link Iterable}, not null
+	 * @return a new {@link List}<E> containing all elements of <t>iterable</t>
 	 */
 	public static <E> List<E> copy(Iterable<E> iterable) {
 		return (iterable instanceof Collection) ? new ArrayList<>((Collection<E>) iterable) : copy(iterable.iterator());
 	}
 	
 	/**
-	 * Crée une copie du Iterator en tant que List
-	 * @param iterator un Iterator, non null
-	 * @return une List<E> qui contient tous les éléments de <t>iterator</t>
+	 * Copies an {@link Iterator} to a {@link List}
+	 * 
+	 * @param iterator an {@link Iterator}, not null
+	 * @return a new {@link List}<E> containing all elements of <t>iterator</t>
 	 */
 	public static <E> List<E> copy(Iterator<E> iterator) {
 		return copy(iterator, new ArrayList<>());
 	}
 	
 	/**
-	 * Ajoute tous les élément de l'Iterator dans une List
-	 * @param iterator un Iterator, non null
-	 * @param result the target of the copy
-	 * @return the result instance
+	 * Copies an {@link Iterator} to a given {@link List}
+	 * 
+	 * @param iterator an {@link Iterator}, not null
+	 * @return the given {@link List}
 	 */
 	public static <E> List<E> copy(Iterator<E> iterator, List<E> result) {
 		while (iterator.hasNext()) {
@@ -232,7 +263,7 @@ public final class Iterables {
 	}
 	
 	/**
-	 * Convert an {@link Iterator} to a {@link Stream}.
+	 * Converts an {@link Iterator} to a {@link Stream}.
 	 * If the {@link Iterator} comes from a {@link Collection}, then prefer usage of {@link Collection#stream()}
 	 * 
 	 * @param iterator an {@link Iterator}, not null
@@ -243,7 +274,7 @@ public final class Iterables {
 	}
 	
 	/**
-	 * Convert an {@link Iterable} to a {@link Stream}.
+	 * Converts an {@link Iterable} to a {@link Stream}.
 	 * If the {@link Iterable} is a {@link Collection}, then prefer usage of {@link Collection#stream()}
 	 * 
 	 * @param iterable an {@link Iterable}, not null
@@ -267,7 +298,7 @@ public final class Iterables {
 	}
 	
 	/**
-	 * Find the first predicate-matching value (according to mapper) into the {@link Iterator} of an {@link Iterable}
+	 * Finds the first predicate-matching value (according to mapper) into the {@link Iterator} of an {@link Iterable}
 	 *
 	 * @param <I> input type
 	 * @param <O> output type
@@ -280,7 +311,7 @@ public final class Iterables {
 	}
 	
 	/**
-	 * Find the first predicate-matching value (according to mapper) into an {@link Iterator}
+	 * Finds the first predicate-matching value (according to mapper) into an {@link Iterator}
 	 * 
 	 * @param iterator the {@link Iterator} to scan
 	 * @param mapper the mapper to extract the value to test
@@ -302,7 +333,7 @@ public final class Iterables {
 	}
 	
 	/**
-	 * Find the first predicate-matching value (according to mapper) into an {@link Iterator}
+	 * Finds the first predicate-matching value (according to mapper) into an {@link Iterator}
 	 *
 	 * @param iterator the {@link Iterator} to scan
 	 * @param mapper the mapper to extract the value to test
