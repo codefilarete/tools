@@ -2,6 +2,7 @@ package org.gama.lang.bean;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.function.Function;
 
 import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.java.junit.dataprovider.DataProviderRunner;
@@ -36,13 +37,7 @@ public class FieldIteratorTest {
 	@UseDataProvider("testNextMethodsData")
 	public void testNextMethods(Class clazz, List<Field> expectedFields) throws Exception {
 		FieldIterator testInstance = new FieldIterator(clazz);
-		assertEquals(expectedFields, Iterables.visit(testInstance, new Iterables.ForEach<Field, Field>() {
-			
-			@Override
-			public Field visit(Field field) {
-				return field;
-			}
-		}));
+		assertEquals(expectedFields, Iterables.collectToList(() -> testInstance, Function.identity()));
 	}
 	
 	static class X {

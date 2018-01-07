@@ -6,7 +6,6 @@ import java.util.NoSuchElementException;
 
 import org.gama.lang.Reflections;
 import org.gama.lang.collection.Iterables;
-import org.gama.lang.collection.Iterables.Finder;
 import org.gama.lang.collection.ReadOnlyIterator;
 
 /**
@@ -66,13 +65,7 @@ public abstract class Exceptions {
 	 * @return null if not found
 	 */
 	public static Throwable findExceptionInHierarchy(Throwable t, final IExceptionFilter filter) {
-		Finder<Throwable> finder = new Finder<Throwable>() {
-			@Override
-			public boolean accept(Throwable t) {
-				return filter.accept(t);
-			}
-		};
-		return Iterables.filter(new ExceptionHierarchyIterator(t), finder);
+		return Iterables.stream(new ExceptionHierarchyIterator(t)).filter(filter::accept).findAny().orElse(null);
 	}
 	
 	/**

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.RandomAccess;
+import java.util.function.Function;
 
 import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.java.junit.dataprovider.DataProviderRunner;
@@ -25,7 +26,7 @@ import static org.junit.Assert.assertEquals;
 public class InterfaceIteratorTest {
 	
 	@DataProvider
-	public static Object[][] testNextMethodsData() throws NoSuchFieldException {
+	public static Object[][] testNextMethodsData() {
 		return new Object[][] {
 				// test for no direct annotation
 				{ Object.class, Arrays.asList() },
@@ -47,14 +48,8 @@ public class InterfaceIteratorTest {
 	
 	@Test
 	@UseDataProvider("testNextMethodsData")
-	public void testNextMethods(Class clazz, List<Class> expectedInterfaces) throws Exception {
+	public void testNextMethods(Class clazz, List<Class> expectedInterfaces) {
 		InterfaceIterator testInstance = new InterfaceIterator(clazz);
-		assertEquals(expectedInterfaces, Iterables.visit(testInstance, new Iterables.ForEach<Class, Class>() {
-			
-			@Override
-			public Class visit(Class interfazz) {
-				return interfazz;
-			}
-		}));
+		assertEquals(expectedInterfaces, Iterables.collectToList(() -> testInstance, Function.identity()));
 	}
 }

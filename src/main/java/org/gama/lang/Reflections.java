@@ -5,7 +5,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -15,8 +14,6 @@ import java.util.function.Supplier;
 import org.gama.lang.bean.FieldIterator;
 import org.gama.lang.bean.MethodIterator;
 import org.gama.lang.collection.Iterables;
-import org.gama.lang.collection.Iterables.Finder;
-import org.gama.lang.collection.Iterables.Mapper;
 import org.gama.lang.exception.Exceptions;
 import org.gama.lang.reflect.MemberPrinter;
 
@@ -69,13 +66,7 @@ public final class Reflections {
 	}
 	
 	public static Map<String, Field> mapFieldsOnName(Class clazz) {
-		Mapper<String, Field> fieldVisitor = new Mapper<String, Field>(new LinkedHashMap<>()) {
-			@Override
-			protected String getKey(Field field) {
-				return field.getName();
-			}
-		};
-		return Iterables.filter(new FieldIterator(clazz), fieldVisitor);
+		return Iterables.mapIdentity(() -> new FieldIterator(clazz), Field::getName);
 	}
 	
 	/**
@@ -86,13 +77,7 @@ public final class Reflections {
 	 * @return the found field, null possible
 	 */
 	public static Field findField(Class clazz, String name) {
-		Finder<Field> fieldVisitor = new Finder<Field>() {
-			@Override
-			public boolean accept(Field field) {
-				return field.getName().equals(name);
-			}
-		};
-		return Iterables.filter(new FieldIterator(clazz), fieldVisitor);
+		return Iterables.stream(new FieldIterator(clazz)).filter(field -> field.getName().equals(name)).findAny().orElse(null);
 	}
 	
 	/**
@@ -120,13 +105,9 @@ public final class Reflections {
 	 * @return the found method, null possible
 	 */
 	public static Method findMethod(Class clazz, String name, Class... argTypes) {
-		Finder<Method> methodVisitor = new Finder<Method>() {
-			@Override
-			public boolean accept(Method method) {
-				return method.getName().equals(name) && Arrays.equals(method.getParameterTypes(), argTypes);
-			}
-		};
-		return Iterables.filter(new MethodIterator(clazz), methodVisitor);
+		return Iterables.stream(new MethodIterator(clazz))
+				.filter(method -> method.getName().equals(name) && Arrays.equals(method.getParameterTypes(), argTypes))
+				.findAny().orElse(null);
 	}
 	
 	/**

@@ -2,6 +2,7 @@ package org.gama.lang.bean;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.function.Function;
 
 import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.java.junit.dataprovider.DataProviderRunner;
@@ -34,15 +35,9 @@ public class MethodIteratorTest {
 	
 	@Test
 	@UseDataProvider("testNextMethodsData")
-	public void testNextMethods(Class clazz, List<Method> expectedMethods) throws Exception {
+	public void testNextMethods(Class clazz, List<Method> expectedMethods) {
 		MethodIterator testInstance = new MethodIterator(clazz, Object.class);
-		assertEquals(expectedMethods, Iterables.visit(testInstance, new Iterables.ForEach<Method, Method>() {
-			
-			@Override
-			public Method visit(Method method) {
-				return method;
-			}
-		}));
+		assertEquals(expectedMethods, Iterables.collectToList(() -> testInstance, Function.identity()));
 	}
 	
 	static class X {

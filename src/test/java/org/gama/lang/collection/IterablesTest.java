@@ -9,22 +9,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.gama.lang.collection.Iterables.Filter;
-import org.gama.lang.collection.Iterables.Finder;
-import org.gama.lang.collection.Iterables.IVisitor;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * @author Guillaume Mary
@@ -106,81 +95,5 @@ public class IterablesTest {
 		// test against null
 		result = Iterables.find(strings, String::toUpperCase, o -> o.equals("c"));
 		assertNull(result);
-	}
-	
-	@Test
-	public void testVisit_iterable() {
-		// Creating a visitor that will go over all
-		IVisitor iVisitorMock = mock(IVisitor.class);
-		when(iVisitorMock.pursue()).thenReturn(true);
-		when(iVisitorMock.visit(any())).thenReturn(new Object());
-		
-		// basic test that counts main method invokation
-		List<String> strings = Arrays.asList("a", "b");
-		List<String> visitResult = Iterables.visit(strings, iVisitorMock);
-		verify(iVisitorMock, times(2)).visit(anyString());
-		assertEquals(visitResult.size(), 2);
-		
-		// test on empty list
-		reset(iVisitorMock);
-		visitResult = Iterables.visit(Arrays.asList(), iVisitorMock);
-		verify(iVisitorMock, times(0)).visit(anyString());
-		assertEquals(visitResult.size(), 0);
-		
-		// test against null
-		assertNull(Iterables.visit((Iterable) null, iVisitorMock));
-	}
-	
-	@Test
-	public void testVisit_iterator() {
-		// Creating a visitor that will go over all
-		IVisitor iVisitorMock = mock(IVisitor.class);
-		when(iVisitorMock.pursue()).thenReturn(true);
-		
-		// basic test that counts main method invokation
-		List<String> strings = Arrays.asList("a", "b");
-		List<String> visitResult = Iterables.visit(strings.iterator(), iVisitorMock);
-		verify(iVisitorMock, times(2)).visit(anyString());
-		assertEquals(visitResult.size(), 2);
-		
-		// test on empty list
-		reset(iVisitorMock);
-		visitResult = Iterables.visit(Arrays.asList().iterator(), iVisitorMock);
-		verify(iVisitorMock, times(0)).visit(anyString());
-		assertEquals(visitResult.size(), 0);
-	}
-	
-	@Test
-	public void testFilter_Filter() {
-		// Creating a visitor that will go over all
-		Filter<String> iVisitorMock = spy(new Filter<String>() {
-			@Override
-			public boolean accept(String s) {
-				return "b".equals(s);
-			}
-		});
-		
-		// basic test that counts main method invokation
-		List<String> strings = Arrays.asList("a", "b", "c", "b", "d");
-		List visitResult = Iterables.filter(strings, iVisitorMock);
-		verify(iVisitorMock, times(5)).visit(any());
-		assertEquals(visitResult, Arrays.asList("b", "b"));
-	}
-	
-	@Test
-	public void testFilter_Finder() {
-		// Creating a visitor that will go over all
-		Finder<String> iVisitorMock = spy(new Finder<String>() {
-			@Override
-			public boolean accept(String s) {
-				return "b".equals(s);
-			}
-		});
-		
-		// basic test that counts main method invokation
-		List<String> strings = Arrays.asList("a", "b", "c", "b", "d");
-		String visitResult = Iterables.filter(strings, iVisitorMock);
-		verify(iVisitorMock, times(2)).visit(any());
-		assertEquals(visitResult, "b");
 	}
 }
