@@ -31,6 +31,10 @@ public final class Reflections {
 	/** Possible values of {@link #FLAT_PACKAGES_OPTION_KEY} : disable, false, off */
 	public static final Set<String> DISABLE_FLAT_PACKAGES_OPTIONS = org.gama.lang.collection.Arrays.asTreeSet(String.CASE_INSENSITIVE_ORDER, "disable, false, off");
 	
+	public static final Function<Method, String> JAVA_BEAN_ACCESSOR_PREFIX_REMOVER = method -> method.getName().substring(3);
+	
+	public static final Function<Method, String> JAVA_BEAN_BOOLEAN_ACCESSOR_PREFIX_REMOVER = method -> method.getName().substring(2);
+	
 	/**
 	 * Printer for {@link #toString(Class)} and {@link #toString(Method)}.
 	 * Depends on {@link #FLAT_PACKAGES_OPTION_KEY} system property
@@ -150,6 +154,34 @@ public final class Reflections {
 		public MemberNotFoundException(String message) {
 			super(message);
 		}
+	}
+	
+	/**
+	 * Gives the field managed (get/set) by the given method.
+	 * Name is deduced from method's one (expected to be a Java bean compliant method), so there's no absolute guarantee that the method really
+	 * set or get this field.
+	 *
+	 * @param fieldWrapper the method supposed to get access to an attribute
+	 * @return the name of the attribute expected to be manage 
+	 * @see #findField(Class, String)
+	 */
+	public static Field wrappedField(Method fieldWrapper) {
+		String fieldName = propertyName(fieldWrapper);
+		return findField(fieldWrapper.getDeclaringClass(), fieldName);
+	}
+	
+	/**
+	 * Gives the name of the attribute expected to be managed (get/set) by the given method.
+	 * No existence is checked : name is deduced from method's one (expected to be a Java bean compliant method)
+	 *
+	 * @param fieldWrapper the method supposed to get access to an attribute
+	 * @return the name of the attribute expected to be manage 
+	 */
+	public static String propertyName(Method fieldWrapper) {
+		String propertyName = Reflections.onJavaBeanPropertyWrapperName(fieldWrapper,
+				JAVA_BEAN_ACCESSOR_PREFIX_REMOVER, JAVA_BEAN_ACCESSOR_PREFIX_REMOVER, JAVA_BEAN_BOOLEAN_ACCESSOR_PREFIX_REMOVER);
+		propertyName = Strings.uncapitalize(propertyName);
+		return propertyName;
 	}
 	
 	/**

@@ -149,6 +149,21 @@ public class ReflectionsTest {
 	}
 	
 	@Test
+	public void testWrappedField() throws NoSuchMethodException, NoSuchFieldException {
+		// simple case
+		Field field = Reflections.wrappedField(Toto.class.getDeclaredMethod("setB", String.class));
+		assertEquals(Toto.class.getDeclaredField("b"), field);
+		
+		// Tata.b hides Toto.b
+		field = Reflections.wrappedField(Tata.class.getDeclaredMethod("setB", String.class));
+		assertEquals(Tata.class.getDeclaredField("b"), field);
+		
+		// true override : Tata.setA overrides Toto.setA, field is in Toto
+		field = Reflections.wrappedField(Tata.class.getDeclaredMethod("setA", Integer.TYPE));
+		assertEquals(Toto.class.getDeclaredField("a"), field);
+	}
+	
+	@Test
 	public void testForName() throws ClassNotFoundException {
 		assertEquals(boolean.class, Reflections.forName("Z"));
 		assertEquals(int.class, Reflections.forName("I"));
@@ -188,10 +203,28 @@ public class ReflectionsTest {
 		
 		private void toto2() {
 		}
+		
+		public void setA(int a) {
+			this.a = a;
+		}
+		
+		public void setB(String b) {
+			this.b = b;
+		}
 	}
 	
 	private static class Tata extends Toto {
 		private String b;
+		
+		@Override
+		public void setA(int a) {
+			super.setA(a);
+		}
+		
+		@Override
+		public void setB(String b) {
+			this.b = b;
+		}
 	}
 	
 	private static class Titi extends Tata {
