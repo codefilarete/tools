@@ -1,6 +1,7 @@
 package org.gama.lang;
 
 import org.gama.lang.bean.Randomizer;
+import org.gama.lang.collection.Arrays;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -26,8 +27,9 @@ public class StringAppenderTest {
 				.cat("b")
 				.cat("c", "d")
 				.cat("e", "f", "g")
-				.cat("h", "i", "j", "k", "l");
-		assertEquals("abcdefghijkl", testInstance.toString());
+				.cat("h", "i", "j", "k", "l")
+				.cat(Arrays.asList("m", "n", "o", "p"));
+		assertEquals("abcdefghijklmnop", testInstance.toString());
 	}
 	
 	@Test
@@ -89,6 +91,13 @@ public class StringAppenderTest {
 	public void testCcat() {
 		StringAppender testInstance = new StringAppender();
 		testInstance.ccat("a", 1, "b", 2, ",");
+		assertEquals("a,1,b,2", testInstance.toString());
+	}
+	
+	@Test
+	public void testCcat_iterable() {
+		StringAppender testInstance = new StringAppender();
+		testInstance.ccat(Arrays.asList("a", 1, "b", 2), ",");
 		assertEquals("a,1,b,2", testInstance.toString());
 	}
 	

@@ -1,6 +1,7 @@
 package org.gama.lang;
 
 import java.io.Serializable;
+import java.util.Iterator;
 
 /**
  * Kind of StringBuilder aimed at being simpler by its API.
@@ -46,6 +47,13 @@ public class StringAppender implements Serializable, CharSequence {
 		return this;
 	}
 	
+	public StringAppender cat(Iterable ss) {
+		for (Object s : ss) {
+			cat(s);
+		}
+		return this;
+	}
+	
 	public StringAppender catAt(int index, Object... ss) {
 		// We make this method uses cat() to ensure that any override of cat() is also used by this method
 		// otherwise we could simply use appender.insert(..) 
@@ -70,6 +78,15 @@ public class StringAppender implements Serializable, CharSequence {
 	
 	public StringAppender ccat(Object... s) {
 		return ccat(s, s[s.length - 1], s.length - 1);
+	}
+	
+	public StringAppender ccat(Iterable ss, Object sep) {
+		Iterator iterator = ss.iterator();
+		while (iterator.hasNext()) {
+			Object s = iterator.next();
+			cat(s).catIf(iterator.hasNext(), sep);
+		}
+		return this;
 	}
 	
 	public StringAppender ccat(Object[] s, Object sep) {
