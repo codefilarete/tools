@@ -4,11 +4,13 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -251,6 +253,36 @@ public final class Iterables {
 			result.add(iterator.next());
 		}
 		return result;
+	}
+	
+	/**
+	 * Gives the intersection between two {@link Collection}s.
+	 * Implementation has no particular optimization, it is based on a {@link HashSet}.
+	 * 
+	 * @param c1 a {@link Collection}, not null
+	 * @param c2 a {@link Collection}, not null
+	 * @param <E> type of elements
+	 * @return the intersection betwenn two {@link Collection}s
+	 */
+	public static <E> Set<E> intersect(Collection<E> c1, Collection<E> c2) {
+		Set<E> copy = new HashSet<>(c1);
+		copy.retainAll(c2);
+		return copy; 
+	}
+	
+	/**
+	 * Gives the complement of c2 in c1 : all elements of c1 that are not member of c2
+	 * Implementation has no particular optimization, it is based on a {@link HashSet#removeAll(Collection)}.
+	 * 
+	 * @param c1 a {@link Collection}, not null
+	 * @param c2 a {@link Collection}, not null
+	 * @param <E> type of elements
+	 * @return the complement of c1 in c2
+	 */
+	public static <E> Set<E> minus(Collection<E> c1, Collection<E> c2) {
+		Set<E> copy = new HashSet<>(c1);
+		copy.removeAll(c2);
+		return copy; 
 	}
 	
 	public static <K, V> Map<K, V> pair(Iterable<K> keys, Iterable<V> values) {
