@@ -33,4 +33,16 @@ public class ModifiableBoolean {
 	public void setNull() {
 		this.value = null;
 	}
+	
+	public boolean isTrue() {
+		return Boolean.TRUE.equals(value);
+	}
+	
+	public boolean isFalse() {
+		return Boolean.FALSE.equals(value);
+	}
+	
+	public boolean isNull() {
+		return value == null;
+	}
 }
