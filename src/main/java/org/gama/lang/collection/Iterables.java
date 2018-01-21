@@ -190,7 +190,7 @@ public final class Iterables {
 	 * @param <O> the output type
 	 * @return the collection given by the supplier
 	 */
-	public static <I, O> List collectToList(Iterable<I> iterable, Function<I, O> mapper) {
+	public static <I, O> List<O> collectToList(Iterable<I> iterable, Function<I, O> mapper) {
 		return collect(iterable, mapper, ArrayList::new);
 	}
 	
