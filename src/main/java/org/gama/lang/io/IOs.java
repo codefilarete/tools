@@ -5,6 +5,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * Methods around {@link InputStream} and {@link OutputStream}.
@@ -12,6 +15,16 @@ import java.io.OutputStream;
  * @author Guillaume Mary
  */
 public final class IOs {
+	
+	public static long _1_Ko = 1024;
+	
+	public static long _8_Ko = 8 * _1_Ko;
+	
+	public static long _512_Ko = 512 * _1_Ko;
+	
+	public static long _1_Mo = 1024 * _1_Ko;
+	
+	public static long _1_Go = 1024 * _1_Mo;
 	
 	/**
 	 * Convert an {@link InputStream} as a {@link ByteArrayInputStream} by using a 1024 byte buffer.
@@ -84,5 +97,66 @@ public final class IOs {
 	}
 	
 	private IOs() {
+	}
+	
+	/**
+	 * A convenient class to iterate over an {@link InputStream} as an {@link Iterator}
+	 */
+	public static class InputStreamIterator implements Iterator<byte[]> {
+		
+		/**
+		 * Convenience method to create an {@link Iterable} from an {@link InputStream}
+		 * @param source the source of bytes
+		 * @param packetSize the size of returned packets
+		 * @return a new {@link Iterable} wrapping the given {@link InputStream}
+		 */
+		public static Iterable<byte[]> iterable(InputStream source, int packetSize) {
+			return () -> new InputStreamIterator(source, packetSize);
+		}
+		
+		private final InputStream source;
+		private final int packetSize;
+		private final byte[] buffer;
+		
+		/**
+		 * Creates an {@link Iterator} from an {@link InputStream}
+		 * 
+		 * @param source the source of bytes
+		 * @param packetSize the size of returned packets
+		 * @return a new {@link Iterable} wrapping the given {@link InputStream}
+		 */
+		public InputStreamIterator(InputStream source, int packetSize) {
+			this.source = source;
+			this.packetSize = packetSize;
+			this.buffer = new byte[packetSize];
+		}
+		
+		@Override
+		public boolean hasNext() {
+			try {
+				return source.available() != 0;
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		
+		@Override
+		public byte[] next() {
+			// compliance with next() specification
+			if (!hasNext()) {
+				throw new NoSuchElementException();
+			}
+			try {
+				int readBytesCount = source.read(buffer, 0, packetSize);
+				if (readBytesCount == buffer.length) {
+					return buffer;
+				} else {
+					// last packet may have a different size
+					return Arrays.copyOf(buffer, readBytesCount);
+				}
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
 	}
 }
