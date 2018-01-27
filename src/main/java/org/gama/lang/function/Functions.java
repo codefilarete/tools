@@ -1,11 +1,23 @@
 package org.gama.lang.function;
 
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * @author Guillaume Mary
  */
 public class Functions {
+	
+	/**
+	 * Converts a {@link Predicate} to {@link Function} returning a boolean
+	 *
+	 * @param predicate the one to be converted
+	 * @param <T> input type
+	 * @return a new (lambda) {@link Function} plugged onto {@link Predicate}
+	 */
+	public static <T> Function<T, Boolean> toFunction(Predicate<T> predicate) {
+		return predicate::test;
+	}
 	
 	/**
 	 * Chains several {@link Function}s taking null-returned values into account by skipping chain hence preventing NullPointerException.
