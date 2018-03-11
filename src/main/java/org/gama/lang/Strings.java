@@ -1,5 +1,9 @@
 package org.gama.lang;
 
+import javax.annotation.Nonnegative;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 /**
  * @author Guillaume Mary
  */
@@ -16,7 +20,7 @@ public abstract class Strings {
 	public static String capitalize(final CharSequence cs) {
 		return (String) doWithDelegate(cs, new DefaultNullOrEmptyDelegate() {
 			@Override
-			public CharSequence onNotNullNotEmpty() {
+			public CharSequence onNotNullNotEmpty(CharSequence cs) {
 				return Character.toUpperCase(cs.charAt(0)) + cs.subSequence(1, cs.length()).toString();
 			}
 		});
@@ -25,7 +29,7 @@ public abstract class Strings {
 	public static String uncapitalize(final CharSequence cs) {
 		return (String) doWithDelegate(cs, new DefaultNullOrEmptyDelegate() {
 			@Override
-			public CharSequence onNotNullNotEmpty() {
+			public CharSequence onNotNullNotEmpty(CharSequence cs) {
 				return Character.toLowerCase(cs.charAt(0)) + cs.subSequence(1, cs.length()).toString();
 			}
 		});
@@ -76,60 +80,73 @@ public abstract class Strings {
 		return result;
 	}
 		
-	public static CharSequence head(CharSequence cs, int headSize) {
+	public static CharSequence head(@Nullable CharSequence cs, @Nonnegative int headSize) {
 		return doWithDelegate(cs, new DefaultNullOrEmptyDelegate() {
 			@Override
-			public CharSequence onNotNullNotEmpty() {
+			public CharSequence onNotNullNotEmpty(@Nonnull CharSequence cs) {
 				return cs.subSequence(0, Math.min(cs.length(), preventNegative(headSize)));
 			}
 		});
 	}
 	
-	public static CharSequence cutHead(CharSequence cs, int headSize) {
+	public static CharSequence head(@Nullable String cs, @Nonnull String untilIncluded) {
 		return doWithDelegate(cs, new DefaultNullOrEmptyDelegate() {
 			@Override
-			public CharSequence onNotNullNotEmpty() {
+			public CharSequence onNotNullNotEmpty(@Nonnull CharSequence cs) {
+				return cs.subSequence(0, Math.min(cs.length(), ((String) cs).indexOf(untilIncluded)+1));
+			}
+		});
+	}
+	
+	public static CharSequence cutHead(@Nullable CharSequence cs, @Nonnegative int headSize) {
+		return doWithDelegate(cs, new DefaultNullOrEmptyDelegate() {
+			@Override
+			public CharSequence onNotNullNotEmpty(@Nonnull CharSequence cs) {
 				return cs.subSequence(Math.min(preventNegative(headSize), cs.length()), cs.length());
 			}
 		});
 	}
 	
-	public static CharSequence tail(CharSequence cs, int tailSize) {
+	public static CharSequence tail(@Nullable CharSequence cs, @Nonnegative int tailSize) {
 		return doWithDelegate(cs, new DefaultNullOrEmptyDelegate() {
 			@Override
-			public CharSequence onNotNullNotEmpty() {
+			public CharSequence onNotNullNotEmpty(@Nonnull CharSequence cs) {
 				return cs.subSequence(Math.max(0, cs.length() - preventNegative(tailSize)), cs.length());
 			}
 		});
 	}
 	
-	public static CharSequence cutTail(CharSequence cs, int tailSize) {
+	public static CharSequence cutTail(@Nullable CharSequence cs, @Nonnegative int tailSize) {
 		return doWithDelegate(cs, new DefaultNullOrEmptyDelegate() {
 			@Override
-			public CharSequence onNotNullNotEmpty() {
+			public CharSequence onNotNullNotEmpty(@Nonnull CharSequence cs) {
 				return cs.subSequence(0, preventNegative(cs.length() - preventNegative(tailSize)));
 			}
 		});
 	}
 	
+	/**
+	 * @param i any integer
+	 * @return 0 if i < 0
+	 */
 	private static int preventNegative(int i) {
 		return i < 0 ? 0 : i;
 	}
 	
-	private static CharSequence doWithDelegate(CharSequence cs, INullOrEmptyDelegate emptyDelegate) {
+	private static CharSequence doWithDelegate(@Nullable CharSequence cs, INullOrEmptyDelegate emptyDelegate) {
 		if (cs == null) {
 			return emptyDelegate.onNull();
 		} else if (cs.length() == 0) {
 			return emptyDelegate.onEmpty();
 		} else {
-			return emptyDelegate.onNotNullNotEmpty();
+			return emptyDelegate.onNotNullNotEmpty(cs);
 		}
 	}
 	
 	private interface INullOrEmptyDelegate {
 		CharSequence onNull();
 		CharSequence onEmpty();
-		CharSequence onNotNullNotEmpty();
+		CharSequence onNotNullNotEmpty(@Nonnull CharSequence cs);
 	}
 	
 	private static abstract class DefaultNullOrEmptyDelegate implements INullOrEmptyDelegate {

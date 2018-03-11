@@ -35,6 +35,14 @@ public class StringsTest {
 	}
 	
 	@Test
+	public void testHead_stringBoundary() {
+		assertEquals("sna", Strings.head("snake", "a"));
+		assertEquals("snak", Strings.head("snake", "k"));
+		assertEquals("", Strings.head("snake", "w"));
+		assertEquals(null, Strings.head(null, "z"));
+	}
+	
+	@Test
 	public void testCutHead() {
 		assertEquals("ake", Strings.cutHead("snake", 2));
 		assertEquals("ke", Strings.cutHead("snake", 3));
