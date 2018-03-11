@@ -90,6 +90,13 @@ public class Nullable<T> implements Supplier<T> {
 		return nullable(input).apply(f1).apply(f2);
 	}
 	
+	/**
+	 * @param <T> type of the {@link Nullable}
+	 * @return a {@link Nullable} of null
+	 */
+	public static <T> Nullable<T> empty() {
+		return Nullable.nullable(null);
+	}
 	
 	/** The payload, may be null itself or owned value may be null */
 	private Supplier<T> value;
@@ -124,7 +131,7 @@ public class Nullable<T> implements Supplier<T> {
 	 */
 	@Override
 	public T get() {
-		return value.get();
+		return value == null ? null : value.get();
 	}
 	
 	/**
@@ -242,6 +249,20 @@ public class Nullable<T> implements Supplier<T> {
 	 */
 	public Nullable<Boolean> test(Predicate<? super T> predicate) {
 		return nullable(ifPresent(Functions.toFunction(predicate)::apply));
+	}
+	
+	/**
+	 * Tests the value if present
+	 * 
+	 * @param predicate a predicate on value type
+	 * @return this if present and predicate matches, else a {@link Nullable} of null
+	 */
+	public Nullable<T> filter(Predicate<? super T> predicate) {
+		if (isPresent() && predicate.test(get())) {
+			return this;
+		} else {
+			return empty();
+		}
 	}
 	
 	/**

@@ -143,10 +143,21 @@ public class NullableTest {
 		// simple case
 		assertTrue(Nullable.nullable("Hello").test(o -> o.equals("Hello")).get());
 		// with null value
-		Nullable.nullable((Object) null).test(o -> {
+		assertNull(Nullable.nullable((Object) null).test(o -> {
 			fail("this code should not even be invoked");
 			return false;
-		});
+		}).get());
+	}
+	
+	@Test
+	public void testFilter() {
+		// simple case
+		assertEquals("Hello", Nullable.nullable("Hello").filter(o -> o.contains("ll")).get());
+		// with null value
+		assertNull(Nullable.nullable((Object) null).filter(o -> {
+			fail("this code should not even be invoked");
+			return false;
+		}).get());
 	}
 	
 	@Test
