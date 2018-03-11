@@ -39,7 +39,7 @@ public final class Reflections {
 	 * Printer for {@link #toString(Class)} and {@link #toString(Method)}.
 	 * Depends on {@link #FLAT_PACKAGES_OPTION_KEY} system property
 	 */
-	private static final MemberPrinter classPrinter = ((Supplier<MemberPrinter>) () -> {
+	private static final MemberPrinter MEMBER_PRINTER = ((Supplier<MemberPrinter>) () -> {
 		Optional<String> flattenPackageOption = Optional.ofNullable(System.getProperty(FLAT_PACKAGES_OPTION_KEY));
 		return flattenPackageOption.filter(DISABLE_FLAT_PACKAGES_OPTIONS::contains).isPresent()
 				? FULL_PACKAGE_PRINTER
@@ -256,12 +256,16 @@ public final class Reflections {
 		return Reflections.onJavaBeanPropertyWrapper(method, Method::getReturnType, m -> m.getParameterTypes()[0], m -> boolean.class);
 	}
 	
+	public static String toString(Field field) {
+		return MEMBER_PRINTER.toString(field);
+	}
+	
 	public static String toString(Method method) {
-		return classPrinter.toString(method);
+		return MEMBER_PRINTER.toString(method);
 	}
 	
 	public static String toString(Class clazz) {
-		return classPrinter.toString(clazz);
+		return MEMBER_PRINTER.toString(clazz);
 	}
 	
 	/**
