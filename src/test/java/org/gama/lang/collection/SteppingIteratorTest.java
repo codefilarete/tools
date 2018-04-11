@@ -2,11 +2,13 @@ package org.gama.lang.collection;
 
 import java.util.Iterator;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Guillaume Mary
@@ -14,7 +16,7 @@ import static org.mockito.Mockito.*;
 public class SteppingIteratorTest {
 	
 	@Test
-	public void testHasNext() throws Exception {
+	public void testHasNext() {
 		Iterator<String> iterator = mock(Iterator.class);
 		SteppingIterator testInstance = new SteppingIterator<String>(iterator, 10) {
 			@Override
@@ -31,7 +33,7 @@ public class SteppingIteratorTest {
 	}
 	
 	@Test
-	public void testNext() throws Exception {
+	public void testNext() {
 		Iterator<String> iterator = mock(Iterator.class);
 		SteppingIterator testInstance = new SteppingIterator<String>(iterator, 10) {
 			@Override
@@ -48,7 +50,7 @@ public class SteppingIteratorTest {
 	}
 	
 	@Test
-	public void testRemove() throws Exception {
+	public void testRemove() {
 		Iterator<String> iterator = mock(Iterator.class);
 		SteppingIterator testInstance = new SteppingIterator<String>(iterator, 10) {
 			@Override
@@ -65,7 +67,7 @@ public class SteppingIteratorTest {
 	}
 	
 	@Test
-	public void testOnStep() throws Exception {
+	public void testOnStep() {
 		Iterator<String> iterator = mock(Iterator.class);
 		when(iterator.hasNext()).thenReturn(true);
 		final int[] i= new int[1];
@@ -76,23 +78,23 @@ public class SteppingIteratorTest {
 			}
 		};
 		testInstance.hasNext();
-		Assert.assertEquals(0, i[0]);
+		assertEquals(0, i[0]);
 		testInstance.next();
 		testInstance.hasNext();
-		Assert.assertEquals(0, i[0]);
+		assertEquals(0, i[0]);
 		testInstance.next();
 		testInstance.hasNext();
-		Assert.assertEquals(1, i[0]);
+		assertEquals(1, i[0]);
 		testInstance.next();
 		testInstance.hasNext();
-		Assert.assertEquals(1, i[0]);
+		assertEquals(1, i[0]);
 		testInstance.next();
 		testInstance.hasNext();
-		Assert.assertEquals(2, i[0]);
+		assertEquals(2, i[0]);
 		
 		when(iterator.hasNext()).thenReturn(false);
 		testInstance.next();
 		testInstance.hasNext();
-		Assert.assertEquals(3, i[0]);
+		assertEquals(3, i[0]);
 	}
 }

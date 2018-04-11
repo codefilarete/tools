@@ -12,21 +12,21 @@
 		<encoding>UTF-8</encoding>
 		<jsr305.version>3.0.2</jsr305.version>
 		<mockito.version>2.7.13</mockito.version>
-		<junit.version>4.12</junit.version>
-		<junit-dataprovider.version>1.12.0</junit-dataprovider.version>
+		<junit.version>5.1.1</junit.version>
 	</properties>
 	
 	<dependencies>
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
 			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.tngtech.java</groupId>
-			<artifactId>junit-dataprovider</artifactId>
-			<version>${junit-dataprovider.version}</version>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-params</artifactId>
+			<version>${junit.version}</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>

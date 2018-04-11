@@ -2,9 +2,9 @@ package org.gama.lang;
 
 import org.gama.lang.bean.Randomizer;
 import org.gama.lang.collection.Arrays;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Guillaume Mary

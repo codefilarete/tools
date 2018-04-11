@@ -6,9 +6,10 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.gama.lang.io.IOs.InputStreamIterator;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Guillaume Mary
@@ -27,10 +28,10 @@ public class IOsTest {
 		assertArrayEquals(new Byte[] { 0, 1, 2, 3, 4 }, result.toArray(new Byte[5]));
 	}
 	
-	@Test(expected = NoSuchElementException.class)
+	@Test
 	public void testByteIterator_noSuchElementException() {
 		InputStreamIterator testInstance = new InputStreamIterator(new ByteArrayInputStream(new byte[] {}), 2);
-		testInstance.next();
+		assertThrows(NoSuchElementException.class, testInstance::next);
 	}
 	
 }

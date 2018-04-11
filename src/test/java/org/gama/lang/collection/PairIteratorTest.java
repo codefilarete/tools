@@ -5,22 +5,22 @@ import java.util.AbstractMap;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import com.tngtech.java.junit.dataprovider.DataProvider;
-import com.tngtech.java.junit.dataprovider.DataProviderRunner;
-import com.tngtech.java.junit.dataprovider.UseDataProvider;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Guillaume Mary
  */
-@RunWith(DataProviderRunner.class)
 public class PairIteratorTest {
 	
 	@Test
-	public void testHasNext() throws Exception {
+	public void testHasNext() {
 		PairIterator<Integer, String> testInstance = new PairIterator<>(Arrays.asList(1,2,3), Arrays.asList("a", "b"));
 		assertTrue(testInstance.hasNext());
 		assertEquals(testInstance.next(), new AbstractMap.SimpleEntry<>(1, "a"));
@@ -29,7 +29,6 @@ public class PairIteratorTest {
 		assertFalse(testInstance.hasNext());
 	}
 	
-	@DataProvider
 	public static Object[][] testNext_NoSuchElementExceptionData() {
 		PairIterator<Integer, String> startedIterator = new PairIterator<>(Arrays.asList(1), Arrays.asList("a"));
 		startedIterator.next();
@@ -41,14 +40,14 @@ public class PairIteratorTest {
 		};
 	}
 	
-	@Test(expected = NoSuchElementException.class)
-	@UseDataProvider("testNext_NoSuchElementExceptionData")
-	public void testNext_NoSuchElementException(PairIterator<Integer, String> testInstance) throws Exception {
-		testInstance.next();
+	@ParameterizedTest
+	@MethodSource("testNext_NoSuchElementExceptionData")
+	public void testNext_NoSuchElementException(PairIterator<Integer, String> testInstance) {
+		assertThrows(NoSuchElementException.class, testInstance::next);
 	}
 	
 	@Test
-	public void testRemove() throws Exception {
+	public void testRemove() {
 		List<Integer> integers = Arrays.asList(1, 2, 3);
 		List<String> strings = Arrays.asList("a", "b");
 		PairIterator<Integer, String> testInstance = new PairIterator<>(integers, strings);
@@ -60,7 +59,7 @@ public class PairIteratorTest {
 	}
 	
 	@Test
-	public void testInfiniteIterator() throws Exception {
+	public void testInfiniteIterator() {
 		List<Integer> integers = Arrays.asList(1, 2, 3);
 		List<String> strings = Arrays.asList("a");
 		PairIterator<Integer, String> testInstance = new PairIterator<>(integers.iterator(), new PairIterator.InfiniteIterator<>(strings.iterator()));

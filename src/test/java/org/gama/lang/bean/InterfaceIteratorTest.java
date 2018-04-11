@@ -9,23 +9,18 @@ import java.util.List;
 import java.util.RandomAccess;
 import java.util.function.Function;
 
-import com.tngtech.java.junit.dataprovider.DataProvider;
-import com.tngtech.java.junit.dataprovider.DataProviderRunner;
-import com.tngtech.java.junit.dataprovider.UseDataProvider;
 import org.gama.lang.collection.Arrays;
 import org.gama.lang.collection.Iterables;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Guillaume Mary
  */
-@RunWith(DataProviderRunner.class)
 public class InterfaceIteratorTest {
 	
-	@DataProvider
 	public static Object[][] testNextMethodsData() {
 		return new Object[][] {
 				// test for no direct annotation
@@ -46,8 +41,8 @@ public class InterfaceIteratorTest {
 		};
 	}
 	
-	@Test
-	@UseDataProvider("testNextMethodsData")
+	@ParameterizedTest
+	@MethodSource("testNextMethodsData")
 	public void testNextMethods(Class clazz, List<Class> expectedInterfaces) {
 		InterfaceIterator testInstance = new InterfaceIterator(clazz);
 		assertEquals(expectedInterfaces, Iterables.collectToList(() -> testInstance, Function.identity()));

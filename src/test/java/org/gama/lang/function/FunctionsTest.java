@@ -1,9 +1,10 @@
 package org.gama.lang.function;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Guillaume Mary
@@ -31,14 +32,14 @@ public class FunctionsTest {
 		assertEquals(2, (int) Functions.chain(Object::toString, Integer::parseInt).apply(new StringBuffer("2")));
 	}
 	
-	@Test(expected = NullPointerException.class)
+	@Test
 	public void testChain_throwNPE1() {
-		assertNull(Functions.chain(Object::toString, Object::toString).apply(null));
+		assertThrows(NullPointerException.class, () -> Functions.chain(Object::toString, Object::toString).apply(null));
 	}
 	
-	@Test(expected = NullPointerException.class)
+	@Test
 	public void testChain_throwNPE2() {
-		assertNull(Functions.chain(Object::toString, Object::toString).apply(new Object() {
+		assertThrows(NullPointerException.class, () -> Functions.chain(Object::toString, Object::toString).apply(new Object() {
 			@Override
 			public String toString() {
 				return null;

@@ -2,24 +2,20 @@ package org.gama.lang.bean;
 
 import java.util.List;
 
-import com.tngtech.java.junit.dataprovider.DataProvider;
-import com.tngtech.java.junit.dataprovider.DataProviderRunner;
-import com.tngtech.java.junit.dataprovider.UseDataProvider;
 import org.gama.lang.collection.Arrays;
 import org.gama.lang.collection.Iterables;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * @author Guillaume Mary
  */
-@RunWith(DataProviderRunner.class)
 public class ClassIteratorTest {
 	
-	@DataProvider
 	public static Object[][] testNextMethodsData() {
 		return new Object[][] {
 				{ X.class, Arrays.asList((Class) X.class, Object.class) },
@@ -27,9 +23,9 @@ public class ClassIteratorTest {
 		};
 	}
 	
-	@Test
-	@UseDataProvider("testNextMethodsData")
-	public void testNextMethods(Class clazz, List<Class> expectedClasses) throws Exception {
+	@ParameterizedTest
+	@MethodSource("testNextMethodsData")
+	public void testNextMethods(Class clazz, List<Class> expectedClasses) {
 		ClassIterator testInstance = new ClassIterator(clazz);
 		assertEquals(expectedClasses, Iterables.copy(testInstance));
 	}

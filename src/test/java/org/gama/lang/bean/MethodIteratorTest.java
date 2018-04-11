@@ -4,23 +4,18 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.function.Function;
 
-import com.tngtech.java.junit.dataprovider.DataProvider;
-import com.tngtech.java.junit.dataprovider.DataProviderRunner;
-import com.tngtech.java.junit.dataprovider.UseDataProvider;
 import org.gama.lang.collection.Arrays;
 import org.gama.lang.collection.Iterables;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Guillaume Mary
  */
-@RunWith(DataProviderRunner.class)
 public class MethodIteratorTest {
 	
-	@DataProvider
 	public static Object[][] testNextMethodsData() throws NoSuchMethodException {
 		Method xm1 = X.class.getDeclaredMethod("m1");
 		Method ym2 = Y.class.getDeclaredMethod("m2");
@@ -33,8 +28,8 @@ public class MethodIteratorTest {
 		};
 	}
 	
-	@Test
-	@UseDataProvider("testNextMethodsData")
+	@ParameterizedTest
+	@MethodSource("testNextMethodsData")
 	public void testNextMethods(Class clazz, List<Method> expectedMethods) {
 		MethodIterator testInstance = new MethodIterator(clazz, Object.class);
 		assertEquals(expectedMethods, Iterables.collectToList(() -> testInstance, Function.identity()));

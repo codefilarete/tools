@@ -4,21 +4,18 @@ import java.util.Collection;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import com.tngtech.java.junit.dataprovider.DataProvider;
-import com.tngtech.java.junit.dataprovider.DataProviderRunner;
-import com.tngtech.java.junit.dataprovider.UseDataProvider;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Guillaume Mary
  */
-@RunWith(DataProviderRunner.class)
 public class IteratorIteratorTest {
 	
-	@DataProvider
 	public static Object[][] test_data() {
 		return new Object[][] {
 				new Object[] { Arrays.asList(Arrays.asList("a"), Arrays.asList("b")), Arrays.asList("a", "b")},
@@ -30,8 +27,8 @@ public class IteratorIteratorTest {
 		};
 	}
 	
-	@Test
-	@UseDataProvider("test_data")
+	@ParameterizedTest
+	@MethodSource("test_data")
 	public void test(Collection<Iterable<String>> input, List<String> expectedResult) {
 		IteratorIterator<String> testInstance = new IteratorIterator<>(input.iterator());
 		assertEquals(expectedResult, Iterables.copy(testInstance));
@@ -43,10 +40,10 @@ public class IteratorIteratorTest {
 		assertEquals(Arrays.asList("a", "b", "c", "d"), Iterables.copy(testInstance));
 	}
 	
-	@Test(expected = NoSuchElementException.class)
+	@Test
 	public void testNoSuchElementException() {
 		IteratorIterator<String> testInstance = new IteratorIterator<>(Arrays.asList());
-		testInstance.next();
+		assertThrows(NoSuchElementException.class, testInstance::next);
 	}
 	
 	@Test

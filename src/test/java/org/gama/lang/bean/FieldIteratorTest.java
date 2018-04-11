@@ -4,23 +4,18 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.function.Function;
 
-import com.tngtech.java.junit.dataprovider.DataProvider;
-import com.tngtech.java.junit.dataprovider.DataProviderRunner;
-import com.tngtech.java.junit.dataprovider.UseDataProvider;
 import org.gama.lang.collection.Arrays;
 import org.gama.lang.collection.Iterables;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Guillaume Mary
  */
-@RunWith(DataProviderRunner.class)
 public class FieldIteratorTest {
 	
-	@DataProvider
 	public static Object[][] testNextMethodsData() throws NoSuchFieldException {
 		Field xf1 = X.class.getDeclaredField("f1");
 		Field yf2 = Y.class.getDeclaredField("f2");
@@ -33,8 +28,8 @@ public class FieldIteratorTest {
 		};
 	}
 	
-	@Test
-	@UseDataProvider("testNextMethodsData")
+	@ParameterizedTest
+	@MethodSource("testNextMethodsData")
 	public void testNextMethods(Class clazz, List<Field> expectedFields) throws Exception {
 		FieldIterator testInstance = new FieldIterator(clazz);
 		assertEquals(expectedFields, Iterables.collectToList(() -> testInstance, Function.identity()));

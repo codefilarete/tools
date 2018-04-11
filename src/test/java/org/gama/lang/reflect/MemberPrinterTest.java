@@ -7,12 +7,12 @@ import java.util.Properties;
 
 import org.gama.lang.Reflections;
 import org.gama.lang.ReflectionsTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.gama.lang.reflect.MemberPrinter.FLATTEN_PACKAGE_PRINTER;
 import static org.gama.lang.reflect.MemberPrinter.FULL_PACKAGE_PRINTER;
 import static org.gama.lang.reflect.MemberPrinter.WELL_KNOWN_FLATTEN_PACKAGE_PRINTER;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Guillaume Mary

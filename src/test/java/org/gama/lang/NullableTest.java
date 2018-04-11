@@ -7,14 +7,15 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.gama.lang.trace.IncrementableInt;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Guillaume Mary
@@ -171,21 +172,21 @@ public class NullableTest {
 		assertEquals(2, isCalled.getValue());
 	}
 	
-	@Test(expected = IOException.class)
-	public void testApplyThrowing() throws IOException {
-		Nullable.nullable(new ByteArrayOutputStream()).applyThrowing(b -> {
+	@Test
+	public void testApplyThrowing() {
+		assertThrows(IOException.class, () -> Nullable.nullable(new ByteArrayOutputStream()).applyThrowing(b -> {
 			b.write(0);
 			throw new IOException();
-		});
+		}));
 	}
 	
 	
-	@Test(expected = IOException.class)
-	public void testAcceptThrowing() throws IOException {
-		Nullable.nullable(new ByteArrayOutputStream()).acceptThrowing(b -> {
+	@Test
+	public void testAcceptThrowing() {
+		assertThrows(IOException.class, () -> Nullable.nullable(new ByteArrayOutputStream()).acceptThrowing(b -> {
 			b.write(0);
 			throw new IOException();
-		});
+		}));
 	}
 	
 	@Test
@@ -194,9 +195,9 @@ public class NullableTest {
 		assertEquals(value, Nullable.nullable(value).orThrow(new IOException()).get());
 	}
 	
-	@Test(expected = IOException.class)
-	public void testOrThrow_nullValue_exceptionIsThrown() throws IOException {
-		Nullable.nullable((Object) null).orThrow(new IOException());
+	@Test
+	public void testOrThrow_nullValue_exceptionIsThrown() {
+		assertThrows(IOException.class, () -> Nullable.nullable((Object) null).orThrow(new IOException()));
 	}
 	
 	@Test
@@ -205,9 +206,9 @@ public class NullableTest {
 		assertEquals(value, Nullable.nullable(value).getOrThrow(new IOException()));
 	}
 	
-	@Test(expected = IOException.class)
-	public void testGetOrThrow_nullValue_exceptionIsThrown() throws IOException {
-		Nullable.nullable((Object) null).getOrThrow(new IOException());
+	@Test
+	public void testGetOrThrow_nullValue_exceptionIsThrown() {
+		assertThrows(IOException.class, () -> Nullable.nullable((Object) null).getOrThrow(new IOException()));
 	}
 	
 }
