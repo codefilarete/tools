@@ -1,9 +1,11 @@
 package org.gama.lang;
 
+import javax.annotation.Nonnull;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
@@ -61,12 +63,59 @@ public final class Reflections {
 	 * @return the default constructor of the given class (never null)
 	 * @throws UnsupportedOperationException if the class doesn't have a default constructor
 	 */
-	public static <T> Constructor<T> getDefaultConstructor(Class<T> clazz) {
+	public static <T> Constructor<T> getDefaultConstructor(@Nonnull Class<T> clazz) {
 		try {
 			return clazz.getDeclaredConstructor();
 		} catch (NoSuchMethodException e) {
-			throw new UnsupportedOperationException("Class " + toString(clazz) + " doesn't have a default constructor");
+			String reason;
+			Optional<MissingDefaultConstructorReason> missingDefaultConstructorReason = giveMissingDefaultConstructorReason(clazz);
+			if (missingDefaultConstructorReason.isPresent()) {
+				switch (missingDefaultConstructorReason.get()) {
+					case INNER_CLASS:
+						reason = " because it is an inner non static class (needs an instance of the encosing class to be constructed)";
+						break;
+					case INTERFACE:
+						reason = " because it is an interface";
+						break;
+					case PRIMITIVE:
+						reason = " because it is a primitive type";
+						break;
+					case ARRAY:
+						reason = " because it is an array";
+						break;
+					default:
+						// to enhance in case of new reason
+						reason = " for undetermined reason";
+				} 
+			} else {
+				// no reason: default sentence is right
+				reason = "";
+			}
+			throw new UnsupportedOperationException("Class " + toString(clazz)
+					+ " has no default constructor" + reason);
 		}
+	}
+	
+	private static Optional<MissingDefaultConstructorReason> giveMissingDefaultConstructorReason(Class clazz) {
+		Optional<MissingDefaultConstructorReason> result = Optional.empty();
+		if (isInnerClass(clazz)) {
+			result = Optional.of(MissingDefaultConstructorReason.INNER_CLASS);
+		} else if (Modifier.isInterface(clazz.getModifiers())) {
+			result = Optional.of(MissingDefaultConstructorReason.INTERFACE);
+		} else if (clazz.isPrimitive()) {
+			result = Optional.of(MissingDefaultConstructorReason.PRIMITIVE);
+		} else if (clazz.isArray()) {
+			result = Optional.of(MissingDefaultConstructorReason.ARRAY);
+		}
+		return result;
+	}
+	
+	/**
+	 * @param clazz a class, not null
+	 * @return true is the given class is a non static inner class
+	 */
+	public static boolean isInnerClass(@Nonnull Class<?> clazz) {
+		return clazz.isMemberClass() && !Modifier.isStatic(clazz.getModifiers());
 	}
 	
 	public static Map<String, Field> mapFieldsOnName(Class clazz) {
@@ -145,7 +194,7 @@ public final class Reflections {
 			// safeguard for non-accessible accessor
 			defaultConstructor.setAccessible(true);
 			return defaultConstructor.newInstance();
-		} catch (Throwable t) {
+		} catch (ReflectiveOperationException t) {
 			throw Exceptions.asRuntimeException(t);
 		}
 	}
@@ -210,9 +259,9 @@ public final class Reflections {
 		int parameterCount = fieldWrapper.getParameterCount();
 		Class<?> returnType = fieldWrapper.getReturnType();
 		IllegalArgumentException exception = newEncapsulationException(fieldWrapper);
-		return onJavaBeanPropertyWrapperName(fieldWrapper, new getOrThrow<>(getterAction, () -> parameterCount == 0 && returnType != Void.class, () -> exception),
-				new getOrThrow<>(setterAction, () -> parameterCount == 1 && returnType == void.class, () -> exception),
-				new getOrThrow<>(booleanGetterAction, () -> parameterCount == 0 && returnType == boolean.class, () -> exception));
+		return onJavaBeanPropertyWrapperName(fieldWrapper, new GetOrThrow<>(getterAction, () -> parameterCount == 0 && returnType != Void.class, () -> exception),
+				new GetOrThrow<>(setterAction, () -> parameterCount == 1 && returnType == void.class, () -> exception),
+				new GetOrThrow<>(booleanGetterAction, () -> parameterCount == 0 && returnType == boolean.class, () -> exception));
 	}
 	
 	/**
@@ -309,13 +358,13 @@ public final class Reflections {
 		boolean check();
 	}
 	
-	private static class getOrThrow<E> implements Function<Method, E> {
+	private static class GetOrThrow<E> implements Function<Method, E> {
 		
 		private final Function<Method, E> surrogate;
 		private final Checker predicate;
 		private final Supplier<RuntimeException> throwableSupplier;
 		
-		private getOrThrow(Function<Method, E> surrogate, Checker predicate, Supplier<RuntimeException> s) {
+		private GetOrThrow(Function<Method, E> surrogate, Checker predicate, Supplier<RuntimeException> s) {
 			this.surrogate = surrogate;
 			this.predicate = predicate;
 			this.throwableSupplier = s;
@@ -330,4 +379,15 @@ public final class Reflections {
 			}
 		}
 	}
+	
+	/**
+	 * Simple enumeration for a class to not have a default contructor 
+	 */
+	private enum MissingDefaultConstructorReason {
+		INNER_CLASS,
+		INTERFACE,
+		PRIMITIVE,
+		ARRAY
+	}
+	
 }

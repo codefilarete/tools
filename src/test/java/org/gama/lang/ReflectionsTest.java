@@ -3,6 +3,8 @@ package org.gama.lang;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.URL;
+import java.util.AbstractMap;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -10,6 +12,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -21,6 +24,42 @@ public class ReflectionsTest {
 	public void testGetDefaultConstructor() {
 		Constructor<Toto> defaultConstructor = Reflections.getDefaultConstructor(Toto.class);
 		assertNotNull(defaultConstructor);
+	}
+	
+	@Test
+	public void testGetDefaultConstructor_closedClass() {
+		Constructor<ClosedClass> defaultConstructor = Reflections.getDefaultConstructor(ClosedClass.class);
+		assertNotNull(defaultConstructor);
+	}
+	@Test
+	public void testGetDefaultConstructor_innerStaticClass() {
+		Constructor<InnerStaticClass> defaultConstructor = Reflections.getDefaultConstructor(InnerStaticClass.class);
+		assertNotNull(defaultConstructor);
+	}
+	
+	@Test
+	public void testGetDefaultConstructor_abstractClass() {
+		Constructor<AbstractMap> defaultConstructor = Reflections.getDefaultConstructor(AbstractMap.class);
+		assertNotNull(defaultConstructor);
+	}
+	
+	
+	public static Object[][] testGetDefaultConstructor_throwingCases_data() {
+		return new Object[][] {
+				{ InnerClass.class, "Class o.g.l.InnerClass has no default constructor because it is an inner non static class" +
+						" (needs an instance of the encosing class to be constructed)" },
+				{ Integer.TYPE, "Class int has no default constructor because it is a primitive type" },
+				{ int[].class, "Class int[] has no default constructor because it is an array" },
+				{ CharSequence.class, "Class j.l.CharSequence has no default constructor because it is an interface" },
+				{ URL.class, "Class j.n.URL has no default constructor" }
+		};
+	}
+	
+	@ParameterizedTest
+	@MethodSource("testGetDefaultConstructor_throwingCases_data")
+	public void testGetDefaultConstructor_throwingCases(Class clazz, String expectedMessage) {
+		assertEquals(expectedMessage,
+				assertThrows(UnsupportedOperationException.class, () -> Reflections.getDefaultConstructor(clazz)).getMessage());
 	}
 	
 	public static Object[][] testGetFieldData() {
@@ -191,8 +230,8 @@ public class ReflectionsTest {
 		private void toto(int a) {
 		}
 		
-		// méthodes toto2() déclarées en ordre inverse des toto() pour tester la robustesse au jdk
-		// (open jdk ne renvoie pas dans le même ordre)  
+		// Method toto2() is declared in reverse order thant toto() ones to test Reflections on JDK robustness
+		// (open jdk doesn't return then in same order)
 		private void toto2(int a) {
 		}
 		
@@ -228,5 +267,13 @@ public class ReflectionsTest {
 	
 	private static class Tutu extends Titi {
 		// no field, no method, for no member traversal check
+	}
+	
+	private class InnerClass {
+		
+	}
+	
+	private static class InnerStaticClass {
+		
 	}
 }
