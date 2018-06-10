@@ -3,9 +3,11 @@ package org.gama.lang;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Objects;
 
-import org.gama.lang.collection.Iterables;
+import org.gama.lang.collection.Maps;
 
 /**
  * InvocationHandler that does nothing. Usefull to create no-operation proxy (for mocking services) or intercept a
@@ -16,7 +18,21 @@ import org.gama.lang.collection.Iterables;
  */
 public class InvocationHandlerSupport implements InvocationHandler {
 	
+	/**
+	 * Method handler that invoke method. Acts as an API bridge between {@link Method} and {@link InvocationHandler}
+	 */
 	public static final InvocationHandler METHOD_INVOKER = (proxy, method, args) -> method.invoke(proxy, args);
+	
+	/**
+	 * Method handler that ALWAYS RETURNS NULL, even for primitive type, which can leads to weird {@link NullPointerException}.
+	 * Prefer usage of {@link #PRIMITIVE_INVOCATION_HANDLER}
+	 */
+	public static final InvocationHandler NULL_INVOCATION_PROVIDER = (proxy, method, args) -> null;
+	
+	/**
+	 * Method handler that returns default primitive values when method returns primitive types, else will return null.
+	 */
+	public static final DefaultPrimitiveValueInvocationProvider PRIMITIVE_INVOCATION_HANDLER = new DefaultPrimitiveValueInvocationProvider(NULL_INVOCATION_PROVIDER);
 	
 	private final InvocationHandler defaultHandler;
 	
@@ -24,7 +40,7 @@ public class InvocationHandlerSupport implements InvocationHandler {
 	 * Will create a kind of mock since all method will do nothing and return null
 	 */
 	public InvocationHandlerSupport() {
-		this((proxy, method, args) -> null);
+		this(PRIMITIVE_INVOCATION_HANDLER);
 	}
 	
 	/**
@@ -50,11 +66,15 @@ public class InvocationHandlerSupport implements InvocationHandler {
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 		Object toReturn;
 		if (isEqualsMethod(method)) {
-			// Consider equal between objects.
+			// Consider equality between objects.
 			toReturn = Objects.equals(proxy, args[0]);
 		} else if (isHashCodeMethod(method)) {
 			// Use hashCode of reference proxy.
-			toReturn = System.identityHashCode(proxy);
+			if (proxy == null) {
+				throw new NullPointerException("hashCode() invoked on a null reference");
+			} else {
+				return proxy.hashCode();
+			}
 		} else {
 			toReturn = defaultHandler.invoke(proxy, method, args);
 		}
@@ -76,7 +96,9 @@ public class InvocationHandlerSupport implements InvocationHandler {
 	 * Determines whether the given method is the "equals" method.
 	 */
 	public static boolean isEqualsMethod(Method method) {
-		return method.getName().equals("equals") && Iterables.first(method.getParameterTypes()) == Object.class && method.getReturnType() == boolean.class;
+		return method.getName().equals("equals")
+				&& method.getParameterTypes().length == 1 && method.getParameterTypes()[0] == Object.class
+				&& method.getReturnType() == boolean.class;
 	}
 	
 	/**
@@ -85,4 +107,37 @@ public class InvocationHandlerSupport implements InvocationHandler {
 	public static boolean isHashCodeMethod(Method method) {
 		return method.getName().equals("hashCode") && method.getParameterTypes().length == 0 && method.getReturnType() == int.class;
 	}
+	
+	/**
+	 * {@link InvocationHandler} that returns default primitve values for method returning primitive types, else fallbacks to its surrogate
+	 */
+	public static class DefaultPrimitiveValueInvocationProvider implements InvocationHandler {
+		
+		private static final Map<Class, Object> PRIMITIVE_DEFAULT_VALUES = Collections.unmodifiableMap(Maps
+				.asHashMap((Class) boolean.class, (Object) false)
+				.add(char.class, '\u0000')
+				.add(byte.class, (byte) 0)
+				.add(short.class, (short) 0)
+				.add(int.class, 0)
+				.add(long.class, 0L)
+				.add(float.class, 0F)
+				.add(double.class, 0D)
+		);
+		
+		private final InvocationHandler surrogate;
+		
+		public DefaultPrimitiveValueInvocationProvider(InvocationHandler surrogate) {
+			this.surrogate = surrogate;
+		}
+		
+		@Override
+		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+			if (PRIMITIVE_DEFAULT_VALUES.containsKey(method.getReturnType())) {
+				return PRIMITIVE_DEFAULT_VALUES.get(method.getReturnType());
+			} else {
+				return surrogate.invoke(proxy, method, args);
+			}
+		}
+	}
+	
 }
