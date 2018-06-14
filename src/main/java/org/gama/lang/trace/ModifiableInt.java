@@ -1,19 +1,19 @@
 package org.gama.lang.trace;
 
 /**
- * A simple incrementable int. Not thread-safe. Prefer {@link java.util.concurrent.atomic.AtomicInteger} for thread safety.
+ * A simple modifiable int. Not thread-safe. Prefer {@link java.util.concurrent.atomic.AtomicInteger} for thread safety.
  *
  * @author Guillaume Mary
  */
-public class IncrementableInt {
+public class ModifiableInt {
 	
 	private int value;
 	
-	public IncrementableInt() {
+	public ModifiableInt() {
 		this(0);
 	}
 	
-	public IncrementableInt(int value) {
+	public ModifiableInt(int value) {
 		this.value = value;
 	}
 	

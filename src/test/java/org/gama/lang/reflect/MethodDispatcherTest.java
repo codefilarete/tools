@@ -4,7 +4,7 @@ import java.sql.SQLException;
 import java.util.function.Supplier;
 
 import org.gama.lang.function.Hanger;
-import org.gama.lang.trace.IncrementableInt;
+import org.gama.lang.trace.ModifiableInt;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -17,7 +17,7 @@ public class MethodDispatcherTest {
 	
 	@Test
 	public void testBuild_defaultCase() {
-		IncrementableInt hanger = new IncrementableInt();
+		ModifiableInt hanger = new ModifiableInt();
 		Holder1 testInstance = new MethodDispatcher()
 				.redirect(Supplier.class, () -> "Hello world !")
 				.redirect(Hanger.class, (Hanger<Integer>) hanger::increment)
@@ -59,7 +59,7 @@ public class MethodDispatcherTest {
 	
 	@Test
 	public void testWhenInvokedMethodThrowsAnException_exceptionMustBeThrownWithoutWrapping() {
-		IncrementableInt hanger = new IncrementableInt();
+		ModifiableInt hanger = new ModifiableInt();
 		Holder2 testInstance = new MethodDispatcher()
 				.redirect(Supplier.class, () -> "Hello world !")
 				// this will produce ClassCastException because Holder2 implements Hanger<String> whereas we used Hanger accepts Integer

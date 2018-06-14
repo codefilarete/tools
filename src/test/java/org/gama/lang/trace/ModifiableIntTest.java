@@ -7,11 +7,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Guillaume Mary
  */
-public class IncrementableIntTest {
+public class ModifiableIntTest {
 	
 	@Test
 	public void testIncrement() {
-		IncrementableInt testInstance = new IncrementableInt();
+		ModifiableInt testInstance = new ModifiableInt();
 		
 		testInstance.increment();
 		assertEquals(1, testInstance.getValue());
@@ -25,7 +25,7 @@ public class IncrementableIntTest {
 	
 	@Test
 	public void testConstructor() {
-		IncrementableInt testInstance = new IncrementableInt(2);
+		ModifiableInt testInstance = new ModifiableInt(2);
 		
 		assertEquals(2, testInstance.getValue());
 		

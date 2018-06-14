@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import org.gama.lang.trace.IncrementableInt;
+import org.gama.lang.trace.ModifiableInt;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -164,7 +164,7 @@ public class NullableTest {
 	@Test
 	public void testAccept() {
 		String value = "hello";
-		IncrementableInt isCalled = new IncrementableInt();
+		ModifiableInt isCalled = new ModifiableInt();
 		Consumer<String> dummyFunction = s -> isCalled.increment();
 		Nullable.nullable(value).accept(dummyFunction);
 		assertEquals(1, isCalled.getValue());
