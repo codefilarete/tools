@@ -91,8 +91,7 @@ public final class Reflections {
 				// no reason: default sentence is right
 				reason = "";
 			}
-			throw new UnsupportedOperationException("Class " + toString(clazz)
-					+ " has no default constructor" + reason);
+			throw new UnsupportedOperationException("Class " + toString(clazz) + " has no default constructor" + reason);
 		}
 	}
 	
