@@ -27,6 +27,23 @@ public class FunctionsTest {
 	}
 	
 	@Test
+	public void testLink_andThen() {
+		assertEquals("2", Functions.link(Object::toString, Integer::parseInt).andThen(i -> String.valueOf(i+1)).apply(new Object() {
+			@Override
+			public String toString() {
+				return "1";
+			}
+		}));
+		// Testing the andThen(..) method that must be null-pointer-proof too
+		assertNull(Functions.link(Object::toString, Integer::parseInt).andThen(String::valueOf).apply(new Object() {
+			@Override
+			public String toString() {
+				return null;
+			}
+		}));
+	}
+	
+	@Test
 	public void testChain() {
 		// StringBuffer is transformed to a "2" String, then parsed to a 2 int
 		assertEquals(2, (int) Functions.chain(Object::toString, Integer::parseInt).apply(new StringBuffer("2")));
@@ -45,6 +62,11 @@ public class FunctionsTest {
 				return null;
 			}
 		}));
+	}
+	
+	@Test
+	public void testChain_andThen_throwNPE() {
+		assertThrows(NullPointerException.class, () -> Functions.chain(Object::toString, Object::toString).andThen(String::valueOf).apply(null));
 	}
 	
 }
