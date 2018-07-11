@@ -135,7 +135,7 @@ public class Nullable<T> implements Supplier<T> {
 	}
 	
 	/**
-	 * Gives another value is current is null
+	 * Gives another value if current is null
 	 * 
 	 * @param anotherValue the other value to return in case of current one is null
 	 * @return {@link #get} or anotherValue if non present value
@@ -145,7 +145,7 @@ public class Nullable<T> implements Supplier<T> {
 	}
 	
 	/**
-	 * Gives another value is current is null
+	 * Gives another value if current is null
 	 *
 	 * @param anotherValue the supplier called in case of current null value
 	 * @return {@link #get} or anotherValue.get() if non present value
