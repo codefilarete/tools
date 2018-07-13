@@ -6,15 +6,24 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
+import org.gama.lang.Duo;
 import org.junit.jupiter.api.Test;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
-import static org.gama.lang.collection.Arrays.*;
-import static org.gama.lang.collection.Iterables.*;
+import static org.gama.lang.collection.Arrays.asHashSet;
+import static org.gama.lang.collection.Arrays.asList;
+import static org.gama.lang.collection.Iterables.collect;
+import static org.gama.lang.collection.Iterables.collectToList;
+import static org.gama.lang.collection.Iterables.copy;
+import static org.gama.lang.collection.Iterables.find;
+import static org.gama.lang.collection.Iterables.first;
+import static org.gama.lang.collection.Iterables.firstValue;
+import static org.gama.lang.collection.Iterables.intersect;
+import static org.gama.lang.collection.Iterables.last;
+import static org.gama.lang.collection.Iterables.minus;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -115,9 +124,9 @@ public class IterablesTest {
 	@Test
 	public void testFind() {
 		List<String> strings = asList("a", "b");
-		Entry<String, String> result = find(strings, String::toUpperCase, o -> o.equals("B"));
-		assertEquals("b", result.getKey());
-		assertEquals("B", result.getValue());
+		Duo<String, String> result = find(strings, String::toUpperCase, o -> o.equals("B"));
+		assertEquals("b", result.getLeft());
+		assertEquals("B", result.getRight());
 		// test against null
 		result = find(strings, String::toUpperCase, o -> o.equals("c"));
 		assertNull(result);

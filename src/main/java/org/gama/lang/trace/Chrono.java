@@ -1,11 +1,9 @@
 package org.gama.lang.trace;
 
-import java.util.AbstractMap.SimpleEntry;
 import java.util.EnumSet;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
+import org.gama.lang.Duo;
 import org.gama.lang.StringAppender;
 
 /**
@@ -76,18 +74,18 @@ public class Chrono {
 		StringAppender sb = new StringAppender();
 		Set<TimeConstant> constantsToUse = TimeConstant.getTimeConstantsToUse(millis);
 		for (TimeConstant timeConstant : constantsToUse) {
-			Entry<Long, Long> divide = divide(millis, timeConstant.millisCount);
-			long quotient = divide.getKey();
+			Duo<Long, Long> divide = divide(millis, timeConstant.millisCount);
+			long quotient = divide.getLeft();
 			// on affiche que ce qui est nécessaire
 			sb.catIf(quotient != 0, Long.toString(quotient), timeConstant.timeUnit, " ");
-			millis = divide.getValue();
+			millis = divide.getRight();
 		}
 		sb.cutTail(1);
 		return sb.toString();
 	}
 	
-	private static Map.Entry<Long, Long> divide(long millis, int divisor) {
-		return new SimpleEntry<>(millis / divisor, millis%divisor);
+	private static Duo<Long, Long> divide(long millis, int divisor) {
+		return new Duo<>(millis / divisor, millis%divisor);
 	}
 	
 	/**

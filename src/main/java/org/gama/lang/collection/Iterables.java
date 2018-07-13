@@ -1,6 +1,5 @@
 package org.gama.lang.collection;
 
-import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -18,6 +17,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import org.gama.lang.Duo;
 import org.gama.lang.collection.PairIterator.UntilBothIterator;
 
 /**
@@ -291,7 +291,7 @@ public final class Iterables {
 	
 	public static <K, V, M extends Map<K, V>> M pair(Iterable<K> keys, Iterable<V> values, Supplier<M> target) {
 		UntilBothIterator<K, V> bothIterator = new UntilBothIterator<>(keys, values);
-		return map(() -> bothIterator, Entry::getKey, Entry::getValue, target);
+		return map(() -> bothIterator, Duo::getLeft, Duo::getRight, target);
 	}
 	
 	/**
@@ -338,7 +338,7 @@ public final class Iterables {
 	 * @param mapper the mapper to extract the value to test
 	 * @return null if no mapped values matches the predicate
 	 */
-	public static <I, O> Entry<I, O> find(Iterable<I> iterable, Function<I, O> mapper, Predicate<O> predicate) {
+	public static <I, O> Duo<I, O> find(Iterable<I> iterable, Function<I, O> mapper, Predicate<O> predicate) {
 		return find(iterable.iterator(), mapper, predicate);
 	}
 	
@@ -351,14 +351,14 @@ public final class Iterables {
 	 * @param <O> output type
 	 * @return null if no mapped values matches the predicate
 	 */
-	public static <I, O> Entry<I, O> find(Iterator<I> iterator, Function<I, O> mapper, Predicate<O> predicate) {
-		Entry<I, O> result = null;
+	public static <I, O> Duo<I, O> find(Iterator<I> iterator, Function<I, O> mapper, Predicate<O> predicate) {
+		Duo<I, O> result = null;
 		boolean found = false;
 		while (iterator.hasNext() && !found) {
 			I step = iterator.next();
 			O mapperResult = mapper.apply(step);
 			if (found = predicate.test(mapperResult)) {
-				result = new SimpleEntry<>(step, mapperResult);
+				result = new Duo<>(step, mapperResult);
 			}
 		}
 		return result;

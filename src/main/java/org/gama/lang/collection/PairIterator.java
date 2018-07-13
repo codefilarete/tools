@@ -1,9 +1,10 @@
 package org.gama.lang.collection;
 
-import java.util.AbstractMap.SimpleEntry;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
+
+import org.gama.lang.Duo;
 
 /**
  * {@link Iterator} of 2 others by giving {@link Entry}. Gives elements while 2 Iterators have elements together.
@@ -12,7 +13,7 @@ import java.util.NoSuchElementException;
  * @param <V>
  * @author Guillaume Mary
  */
-public class PairIterator<K, V> implements Iterator<Entry<K, V>> {
+public class PairIterator<K, V> implements Iterator<Duo<K, V>> {
 	
 	protected Iterator<K> iterator1;
 	protected Iterator<V> iterator2;
@@ -32,8 +33,8 @@ public class PairIterator<K, V> implements Iterator<Entry<K, V>> {
 	}
 	
 	@Override
-	public Entry<K, V> next() {
-		return new SimpleEntry<>(iterator1.next(), iterator2.next());
+	public Duo<K, V> next() {
+		return new Duo<>(iterator1.next(), iterator2.next());
 	}
 	
 	@Override
@@ -66,7 +67,7 @@ public class PairIterator<K, V> implements Iterator<Entry<K, V>> {
 		}
 		
 		@Override
-		public Entry<K, V> next() {
+		public Duo<K, V> next() {
 			K val1;
 			if (iterator1.hasNext()) {
 				val1 = iterator1.next();
@@ -79,7 +80,7 @@ public class PairIterator<K, V> implements Iterator<Entry<K, V>> {
 			} else {
 				val2 = getMissingValue();
 			}
-			return new SimpleEntry<>(val1, val2);
+			return new Duo<>(val1, val2);
 		}
 		
 		public K getMissingKey() {

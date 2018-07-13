@@ -1,10 +1,10 @@
 package org.gama.lang.collection;
 
 
-import java.util.AbstractMap;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import org.gama.lang.Duo;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -23,9 +23,9 @@ public class PairIteratorTest {
 	public void testHasNext() {
 		PairIterator<Integer, String> testInstance = new PairIterator<>(Arrays.asList(1,2,3), Arrays.asList("a", "b"));
 		assertTrue(testInstance.hasNext());
-		assertEquals(testInstance.next(), new AbstractMap.SimpleEntry<>(1, "a"));
+		assertEquals(testInstance.next(), new Duo<>(1, "a"));
 		assertTrue(testInstance.hasNext());
-		assertEquals(testInstance.next(), new AbstractMap.SimpleEntry<>(2, "b"));
+		assertEquals(testInstance.next(), new Duo<>(2, "b"));
 		assertFalse(testInstance.hasNext());
 	}
 	
@@ -64,11 +64,11 @@ public class PairIteratorTest {
 		List<String> strings = Arrays.asList("a");
 		PairIterator<Integer, String> testInstance = new PairIterator<>(integers.iterator(), new PairIterator.InfiniteIterator<>(strings.iterator()));
 		assertTrue(testInstance.hasNext());
-		assertEquals(testInstance.next(), new AbstractMap.SimpleEntry<>(1, "a"));
+		assertEquals(testInstance.next(), new Duo<>(1, "a"));
 		assertTrue(testInstance.hasNext());
-		assertEquals(testInstance.next(), new AbstractMap.SimpleEntry<>(2, null));
+		assertEquals(testInstance.next(), new Duo<>(2, null));
 		assertTrue(testInstance.hasNext());
-		assertEquals(testInstance.next(), new AbstractMap.SimpleEntry<>(3, null));
+		assertEquals(testInstance.next(), new Duo<>(3, null));
 		assertFalse(testInstance.hasNext());
 	}
 }
