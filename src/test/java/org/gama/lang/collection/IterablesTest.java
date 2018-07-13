@@ -1,9 +1,11 @@
 package org.gama.lang.collection;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,18 +17,26 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static org.gama.lang.collection.Arrays.asHashSet;
 import static org.gama.lang.collection.Arrays.asList;
+import static org.gama.lang.collection.Iterables.asIterable;
 import static org.gama.lang.collection.Iterables.collect;
 import static org.gama.lang.collection.Iterables.collectToList;
+import static org.gama.lang.collection.Iterables.contains;
 import static org.gama.lang.collection.Iterables.copy;
+import static org.gama.lang.collection.Iterables.filter;
 import static org.gama.lang.collection.Iterables.find;
 import static org.gama.lang.collection.Iterables.first;
 import static org.gama.lang.collection.Iterables.firstValue;
 import static org.gama.lang.collection.Iterables.intersect;
 import static org.gama.lang.collection.Iterables.last;
 import static org.gama.lang.collection.Iterables.minus;
+import static org.gama.lang.collection.Iterables.pair;
+import static org.gama.lang.collection.Iterables.reverseIterator;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Guillaume Mary
@@ -35,6 +45,28 @@ public class IterablesTest {
 	
 	@Test
 	public void testFirst_iterable() {
+		Iterable<String> strings = asList("a", "b");
+		assertEquals(first(strings), "a");
+		strings = asList("a");
+		assertEquals(first(strings), "a");
+		// test against null
+		assertNull(first(asList()));
+		assertNull(first((Iterable) null));
+	}
+	
+	@Test
+	public void testFirst_iterator() {
+		Iterator<String> strings = asList("a", "b").iterator();
+		assertEquals(first(strings), "a");
+		strings = asList("a").iterator();
+		assertEquals(first(strings), "a");
+		// test against null
+		assertNull(first(asList()));
+		assertNull(first((Iterable) null));
+	}
+	
+	@Test
+	public void testFirst_list() {
 		List<String> strings = asList("a", "b");
 		assertEquals(first(strings), "a");
 		strings = asList("a");
@@ -42,6 +74,17 @@ public class IterablesTest {
 		// test against null
 		assertNull(first(asList()));
 		assertNull(first((Iterable) null));
+	}
+	
+	@Test
+	public void testFirst_array() {
+		String[] strings = new String[] { "a", "b" };
+		assertEquals(first(strings), "a");
+		strings = new String[] { "a" };
+		assertEquals(first(strings), "a");
+		// test against null
+		assertNull(first(new Object[] {}));
+		assertNull(first((Object[]) null));
 	}
 	
 	@Test
@@ -74,20 +117,53 @@ public class IterablesTest {
 		assertEquals(last(strings), "a");
 		// test against null
 		assertNull(last(emptyList()));
-		assertNull(last((List) null));
+		assertNull(last(null));
 	}
 	
 	@Test
 	public void testCopy() {
 		// test with content
-		Set<String> aSet = new LinkedHashSet<>();
-		aSet.add("d");
-		aSet.add("a");
+		Set<String> aSet = Arrays.asSet("d", "a");
 		assertEquals(asList("d", "a"), copy(aSet));
 		// test that copy is not the same instance than the original
 		assertNotSame(aSet, copy(aSet));
 		// test on corner case: empty content
 		assertEquals(asList(), copy(asList()));
+	}
+	
+	@Test
+	public void testCopy_iterator() {
+		// test with content
+		ArrayIterator<String> iterator = new ArrayIterator<>("d", "a");
+		assertEquals(asList("d", "a"), copy(iterator, new ArrayList<>()));
+		// test that copy is the same instance as the given one
+		ArrayList<String> result = new ArrayList<>();
+		assertSame(result, copy(iterator, result));
+		// test on corner case: empty content
+		assertEquals(asList(), copy(new ArrayIterator<>()));
+	}
+	
+	@Test
+	public void testCopy_iterable() {
+		// test with content
+		Iterable<String> iterable = asIterable(new ArrayIterator<>("d", "a"));
+		assertEquals(asList("d", "a"), copy(iterable, new ArrayList<>()));
+		// test for optimization when Iterable is a Collection
+		List<String> strings = Arrays.asList("d", "a");
+		Collection[] addedCollection = new Collection[1];
+		assertEquals(asList("d", "a"), copy((Iterable) strings, new ArrayList<String>() {
+			@Override
+			public boolean addAll(Collection<? extends String> c) {
+				addedCollection[0] = c;
+				return super.addAll(c);
+			}
+		}));
+		assertSame(strings, addedCollection[0]);
+		// test that copy is the same instance as the given one
+		ArrayList<String> result = new ArrayList<>();
+		assertSame(result, copy(iterable, result));
+		// test on corner case: empty content
+		assertEquals(asList(), copy(new ArrayIterator<>()));
 	}
 	
 	@Test
@@ -124,11 +200,59 @@ public class IterablesTest {
 	@Test
 	public void testFind() {
 		List<String> strings = asList("a", "b");
+		String result = find(strings, o -> o.equalsIgnoreCase("B"));
+		assertEquals("b", result);
+		// test against null
+		result = find(strings, o -> o.equalsIgnoreCase("C"));
+		assertNull(result);
+	}
+	
+	@Test
+	public void testFind_mapped() {
+		List<String> strings = asList("a", "b");
 		Duo<String, String> result = find(strings, String::toUpperCase, o -> o.equals("B"));
 		assertEquals("b", result.getLeft());
 		assertEquals("B", result.getRight());
 		// test against null
 		result = find(strings, String::toUpperCase, o -> o.equals("c"));
 		assertNull(result);
+	}
+	
+	@Test
+	public void testContains() {
+		List<String> strings = asList("a", "b");
+		assertTrue(contains(strings.iterator(), s -> s.equalsIgnoreCase("B")));
+		assertFalse(contains(strings.iterator(), s -> s.equalsIgnoreCase("C")));
+	}
+	
+	@Test
+	public void testContains_mapped() {
+		List<String> strings = asList("a", "b");
+		assertTrue(contains(strings.iterator(), String::toUpperCase, s -> s.equals("B")));
+		assertFalse(contains(strings.iterator(), String::toUpperCase, s -> s.equals("C")));
+	}
+	
+	@Test
+	public void testPair() {
+		List<String> strings = asList("a", "b");
+		List<Integer> integers = asList(1, 2);
+		assertEquals(Maps.asMap("a", 1).add("b", 2), pair(strings, integers));
+		
+		strings = asList("a", "b", "c");
+		assertEquals(Maps.asMap("a", 1).add("b", 2).add("c", null), pair(strings, integers));
+		
+		integers = asList(1, 2, 3, 4, 5);
+		assertEquals(Maps.asMap("a", 1).add("b", 2).add("c", 3).add(null, 5), pair(strings, integers));
+	}
+	
+	@Test
+	public void testFilter() {
+		List<String> strings = Arrays.asList("a", "ab", "b");
+		assertEquals(Arrays.asList("a", "ab"), filter(strings, s -> s.startsWith("a")));
+	}
+	
+	@Test
+	public void testReverseListIterator() {
+		assertEquals(Arrays.asList("k", "z", "d", "a"), copy(reverseIterator(Arrays.asList("a", "d", "z", "k"))));
 	}
 }

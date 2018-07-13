@@ -1,5 +1,7 @@
 package org.gama.lang.collection;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -26,7 +28,8 @@ import org.gama.lang.collection.PairIterator.UntilBothIterator;
 public final class Iterables {
 	
 	/**
-	 * Transform an {@link Iterator} to an {@link Iterable}
+	 * Transforms an {@link Iterator} to an {@link Iterable}
+	 * 
 	 * @param iterator the surrogate
 	 * @param <E> the content typed of the {@link Iterator}
 	 * @return an {@link Iterable} whose {@link Iterable#iterator()} returns the given {@link Iterator}
@@ -36,15 +39,18 @@ public final class Iterables {
 	}
 	
 	/**
-	 * Renvoie la première valeur d'une Iterable
-	 * 
-	 * @return null s'il n'y a pas de valeur dans l'Iterable
+	 * @param iterable a nullable {@link Iterable}
+	 * @return the first element of the argument or null if argument is empty
 	 */
-	public static <E> E first(Iterable<E> iterable) {
+	public static <E> E first(@Nullable Iterable<E> iterable) {
 		return first(iterable, null);
 	}
 	
-	public static <E> E first(Iterable<E> iterable, E defaultValue) {
+	/**
+	 * @param iterable a nullable {@link Iterable}
+	 * @return the first element of the argument or the given default value if argument is empty
+	 */
+	public static <E> E first(@Nullable Iterable<E> iterable, E defaultValue) {
 		if (iterable == null) {
 			return defaultValue;
 		} else {
@@ -52,18 +58,38 @@ public final class Iterables {
 		}
 	}
 	
+	/**
+	 * @param iterator a nullable {@link Iterator}
+	 * @return the first element of the argument or null if argument is empty
+	 */
 	public static <E> E first(Iterator<E> iterator) {
 		return first(iterator, null);
 	}
 	
+	/**
+	 * @param iterator a nullable {@link Iterator}
+	 * @return the first element of the argument or the given default value if argument is empty
+	 */
 	public static <E> E first(Iterator<E> iterator, E defaultValue) {
-		return iterator.hasNext() ? iterator.next() : defaultValue;
+		return iterator != null && iterator.hasNext() ? iterator.next() : defaultValue;
 	}
 	
+	/**
+	 * Optimized version of {@link #first(Iterable)} for {@link List} : will use {@code get(0)} on the list to get first element (instead of hasNext())
+	 *
+	 * @param iterable a nullable {@link List}
+	 * @return the first element of the argument or null if argument is empty
+	 */
 	public static <E> E first(List<E> iterable) {
 		return first(iterable, null);
 	}
 	
+	/**
+	 * Optimized version of {@link #first(Iterable)} for {@link List} : will use {@code get(0)} on the list to get first element (instead of hasNext())
+	 * 
+	 * @param iterable a nullable {@link List}
+	 * @return the first element of the argument or the given default value if argument is empty
+	 */
 	public static <E> E first(List<E> iterable, E defaultValue) {
 		if (Collections.isEmpty(iterable)) {
 			return defaultValue;
@@ -72,29 +98,47 @@ public final class Iterables {
 		}
 	}
 	
-	public static <E> E first(E[] iterable) {
-		return first(iterable, null);
+	/**
+	 * Optimized version of {@link #first(Iterable)} for arrays : will use {@code [0]} on the array to get first element (instead of hasNext())
+	 *
+	 * @param array a nullable array
+	 * @return the first element of the argument or null if argument is empty
+	 */
+	public static <E> E first(E[] array) {
+		return first(array, null);
 	}
 	
-	public static <E> E first(E[] iterable, E defaultValue) {
-		if (Arrays.isEmpty(iterable)) {
+	/**
+	 * Optimized version of {@link #first(Iterable)} for arrays : will use {@code [0]} on the array to get first element (instead of hasNext())
+	 *
+	 * @param array a nullable array
+	 * @return the first element of the argument or the given default value if argument is empty
+	 */
+	public static <E> E first(E[] array, E defaultValue) {
+		if (Arrays.isEmpty(array)) {
 			return defaultValue;
 		} else {
-			return iterable[0];
+			return array[0];
 		}
 	}
 	
 	/**
-	 * Renvoie la première entrée d'une Map, intéressant pour une {@link SortedMap} ou une {@link LinkedHashMap}
+	 * Returns the first entry of a {@link Map}, meaningfull on a {@link SortedMap} or a {@link LinkedHashMap}
 	 * 
-	 * @param iterable une Map, SortedMap ou LinkedHashMap sinon ça n'a pas d'intérêt
-	 * @return la première entrée de la Map, null si iterable est null
+	 * @param iterable a Map : Sorted or Linked (else it has no purpose)
+	 * @return the first {@link Entry} of the Map, or null if argument is empty or null
 	 */
-	public static <K, V> Map.Entry<K, V> first(Map<K, V> iterable) {
+	public static <K, V> Map.Entry<K, V> first(@Nullable Map<K, V> iterable) {
 		return first(iterable, null);
 	}
 	
-	public static <K, V> Map.Entry<K, V> first(Map<K, V> iterable, Map.Entry<K, V> defaultValue) {
+	/**
+	 * Returns the first entry of a {@link Map}, meaningfull on a {@link SortedMap} or a {@link LinkedHashMap}
+	 *
+	 * @param iterable a Map : Sorted or Linked (else it has no purpose)
+	 * @return the first {@link Entry} of the Map, or the given default {@link Entry} if argument is empty or null
+	 */
+	public static <K, V> Map.Entry<K, V> first(@Nullable Map<K, V> iterable, Map.Entry<K, V> defaultValue) {
 		if (iterable == null) {
 			return defaultValue;
 		} else {
@@ -103,30 +147,51 @@ public final class Iterables {
 	}
 	
 	/**
-	 * Renvoie la première valeur d'une Map, intéressant pour une {@link SortedMap} ou une {@link LinkedHashMap}
-	 * 
-	 * @param iterable une Map, SortedMap ou LinkedHashMap sinon ça n'a pas d'intérêt
-	 * @return la première valeur de la Map, null si iterable est null ou s'il n'y a pas d'entrée dans la Map
+	 * Returns the first value of a {@link Map}, meaningfull on a {@link SortedMap} or a {@link LinkedHashMap}
+	 *
+	 * @param iterable a Map : Sorted or Linked (else it has no purpose)
+	 * @return the first value of the Map, null if argument is null
 	 */
-	public static <V> V firstValue(Map<?, V> iterable) {
+	public static <V> V firstValue(@Nullable Map<?, V> iterable) {
 		return firstValue(iterable, null);
 	}
 	
-	public static <V> V firstValue(Map<?, V> iterable, V defaultValue) {
+	/**
+	 * Returns the first value of a {@link Map}, meaningfull on a {@link SortedMap} or a {@link LinkedHashMap}
+	 *
+	 * @param iterable a Map : Sorted or Linked (else it has no purpose)
+	 * @return the first value of the Map, or the given default value if argument is empty or null
+	 */
+	public static <V> V firstValue(@Nullable Map<?, V> iterable, V defaultValue) {
 		Entry<?, V> firstEntry = first(iterable);
 		return firstEntry == null ? defaultValue : firstEntry.getValue();
 	}
 	
-	public static boolean isEmpty(Iterable iterable) {
+	/**
+	 * Indicates if an {@link Iterable} is empty or not.
+	 * Implementation is optimized for {@link Collection}s by using {@link Collection#isEmpty()}, else will use {@link Iterator#hasNext()}.
+	 * 
+	 * @param iterable a nullable {@link Iterable}
+	 * @return true if given argument is null or has no element
+	 */
+	public static boolean isEmpty(@Nullable Iterable iterable) {
 		return iterable == null
 				|| ((iterable instanceof Collection) ? ((Collection) iterable).isEmpty() : iterable.iterator().hasNext()) ;
 	}
 	
-	public static <E> E last(List<E> iterable) {
+	/**
+	 * @param iterable a nullable {@link List}
+	 * @return the last element of the argument or null if argument is empty or null
+	 */
+	public static <E> E last(@Nullable List<E> iterable) {
 		return last(iterable, null);
 	}
 	
-	public static <E> E last(List<E> iterable, E defaultValue) {
+	/**
+	 * @param iterable a nullable {@link List}
+	 * @return the last element of the argument or the given default value if argument is empty or null
+	 */
+	public static <E> E last(@Nullable List<E> iterable, E defaultValue) {
 		if (iterable == null || iterable.isEmpty()) {
 			return defaultValue;
 		} else {
@@ -218,7 +283,7 @@ public final class Iterables {
 	 * @return a new {@link List}<E> containing all elements of <t>iterable</t>
 	 */
 	public static <E> List<E> copy(Iterable<E> iterable) {
-		return (iterable instanceof Collection) ? new ArrayList<>((Collection<E>) iterable) : copy(iterable.iterator());
+		return copy(iterable, new ArrayList<>());
 	}
 	
 	/**
@@ -232,23 +297,27 @@ public final class Iterables {
 	}
 	
 	/**
-	 * Copies an {@link Iterator} to a given {@link List}
-	 * 
-	 * @param iterator an {@link Iterator}, not null
+	 * Copies an {@link Iterable} to a given {@link Collection}
+	 *
+	 * @param iterable an {@link Iterable}, not null
 	 * @return the given {@link List}
 	 */
-	public static <E> List<E> copy(Iterator<E> iterator, List<E> result) {
-		while (iterator.hasNext()) {
-			result.add(iterator.next());
+	public static <E, C extends Collection<E>> C copy(@Nonnull Iterable<E> iterable, C result) {
+		if (iterable instanceof Collection) {
+			result.addAll((Collection<E>) iterable);
+		} else {
+			copy(iterable.iterator(), result);
 		}
 		return result;
 	}
 	
-	public static <E, C extends Collection<E>> C copy(Iterable<E> iterable, C result) {
-		return copy(iterable.iterator(), result);
-	}
-	
-	public static <E, C extends Collection<E>> C copy(Iterator<E> iterator, C result) {
+	/**
+	 * Copies an {@link Iterator} to a given {@link List}
+	 *
+	 * @param iterator an {@link Iterator}, not null
+	 * @return the given {@link List}
+	 */
+	public static <E, C extends Collection<E>> C copy(@Nonnull Iterator<E> iterator, C result) {
 		while (iterator.hasNext()) {
 			result.add(iterator.next());
 		}
@@ -285,10 +354,35 @@ public final class Iterables {
 		return copy; 
 	}
 	
-	public static <K, V> Map<K, V> pair(Iterable<K> keys, Iterable<V> values) {
+	/**
+	 * Puts 2 {@link Iterator}s side by side as a {@link Map}.
+	 * If {@link Iterator}s are not of same length then null elements will be used into the {@link Map}.
+	 * This leads to a cumulative null key if {@code values} {@link Iterator} is larger than {@code keys} {@link Iterator} because all overflowing
+	 * elements will be put onto a null key.
+	 * 
+	 * @param keys {@link Iterator} whom elements will be used as keys
+	 * @param values {@link Iterator} whom elements will be used as values
+	 * @param <K> type of keys
+	 * @param <V> type of values
+	 * @return a new {@link HashMap} composed of keys and values from both {@link Iterator}s
+	 */
+	public static <K, V> Map<K, V> pair(@Nonnull Iterable<K> keys, @Nonnull Iterable<V> values) {
 		return pair(keys, values, HashMap::new);
 	}
 	
+	/**
+	 * Puts 2 {@link Iterator}s side by side as a {@link Map}.
+	 * If {@link Iterator}s are not of same length then null elements will be used into the {@link Map}.
+	 * This leads to a cumulative null key if {@code values} {@link Iterator} is larger than {@code keys} {@link Iterator} because all overflowing
+	 * elements will be put onto a null key.
+	 *
+	 * @param keys {@link Iterator} whom elements will be used as keys
+	 * @param values {@link Iterator} whom elements will be used as values
+	 * @param target a provider of a {@link Map}
+	 * @param <K> type of keys
+	 * @param <V> type of values
+	 * @return a new {@link HashMap} composed of keys and values from both {@link Iterator}s
+	 */
 	public static <K, V, M extends Map<K, V>> M pair(Iterable<K> keys, Iterable<V> values, Supplier<M> target) {
 		UntilBothIterator<K, V> bothIterator = new UntilBothIterator<>(keys, values);
 		return map(() -> bothIterator, Duo::getLeft, Duo::getRight, target);
@@ -317,7 +411,15 @@ public final class Iterables {
 		return StreamSupport.stream(iterable.spliterator(), false);
 	}
 	
-	public static <E> Iterable<E> filter(Iterable<E> iterable, Predicate<E> predicate) {
+	/**
+	 * Keep elements of an {@link Iterable} that match a {@link Predicate}
+	 * 
+	 * @param iterable any {@link Iterable}
+	 * @param predicate any {@link Predicate}
+	 * @param <E> type of elements
+	 * @return given iterable without elements that doesn't match the given predicate
+	 */
+	public static <E> Iterable<E> filter(@Nonnull Iterable<E> iterable, @Nonnull Predicate<E> predicate) {
 		Iterator<E> iterator = iterable.iterator();
 		while (iterator.hasNext()) {
 			E e = iterator.next();
@@ -330,12 +432,42 @@ public final class Iterables {
 	}
 	
 	/**
-	 * Finds the first predicate-matching value (according to mapper) into the {@link Iterator} of an {@link Iterable}
+	 * Finds the first predicate-matching element into an {@link Iterable}
 	 *
+	 * @param iterable the {@link Iterable} to scan
 	 * @param <I> input type
-	 * @param <O> output type
+	 * @return null if no element matches the predicate
+	 */
+	public static <I> I find(Iterable<I> iterable, Predicate<I> predicate) {
+		return find(iterable.iterator(), predicate);
+	}
+	
+	/**
+	 * Finds the first predicate-matching element into an {@link Iterator}
+	 *
+	 * @param iterator the {@link Iterator} to scan
+	 * @param <I> input type
+	 * @return null if no element matches the predicate
+	 */
+	public static <I> I find(Iterator<I> iterator, Predicate<I> predicate) {
+		I result = null;
+		boolean found = false;
+		while (iterator.hasNext() && !found) {
+			I step = iterator.next();
+			if (found = predicate.test(step)) {
+				result = step;
+			}
+		}
+		return result;
+	}
+	
+	/**
+	 * Finds the first predicate-matching element (according to mapper) into the {@link Iterator} of an {@link Iterable}
+	 *
 	 * @param iterable the {@link Iterable} to scan
 	 * @param mapper the mapper to extract the value to test
+	 * @param <I> input type
+	 * @param <O> output type
 	 * @return null if no mapped values matches the predicate
 	 */
 	public static <I, O> Duo<I, O> find(Iterable<I> iterable, Function<I, O> mapper, Predicate<O> predicate) {
@@ -343,7 +475,7 @@ public final class Iterables {
 	}
 	
 	/**
-	 * Finds the first predicate-matching value (according to mapper) into an {@link Iterator}
+	 * Finds the first predicate-matching element (according to mapper) into an {@link Iterator}
 	 * 
 	 * @param iterator the {@link Iterator} to scan
 	 * @param mapper the mapper to extract the value to test
@@ -365,7 +497,18 @@ public final class Iterables {
 	}
 	
 	/**
-	 * Finds the first predicate-matching value (according to mapper) into an {@link Iterator}
+	 * Finds the first predicate-matching element into an {@link Iterator}
+	 *
+	 * @param iterator the {@link Iterator} to scan
+	 * @param <I> input type
+	 * @return true if a value that matches the {@link Predicate} is found
+	 */
+	public static <I> boolean contains(Iterator<I> iterator, Predicate<I> predicate) {
+		return find(iterator, predicate) != null;
+	}
+	
+	/**
+	 * Finds the first predicate-matching element (according to mapper) into an {@link Iterator}
 	 *
 	 * @param iterator the {@link Iterator} to scan
 	 * @param mapper the mapper to extract the value to test
