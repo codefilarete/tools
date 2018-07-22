@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.function.BiConsumer;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -42,6 +44,7 @@ public final class Iterables {
 	 * @param iterable a nullable {@link Iterable}
 	 * @return the first element of the argument or null if argument is empty
 	 */
+	@Nullable
 	public static <E> E first(@Nullable Iterable<E> iterable) {
 		return first(iterable, null);
 	}
@@ -62,6 +65,7 @@ public final class Iterables {
 	 * @param iterator a nullable {@link Iterator}
 	 * @return the first element of the argument or null if argument is empty
 	 */
+	@Nullable
 	public static <E> E first(Iterator<E> iterator) {
 		return first(iterator, null);
 	}
@@ -80,6 +84,7 @@ public final class Iterables {
 	 * @param iterable a nullable {@link List}
 	 * @return the first element of the argument or null if argument is empty
 	 */
+	@Nullable
 	public static <E> E first(List<E> iterable) {
 		return first(iterable, null);
 	}
@@ -104,6 +109,7 @@ public final class Iterables {
 	 * @param array a nullable array
 	 * @return the first element of the argument or null if argument is empty
 	 */
+	@Nullable
 	public static <E> E first(E[] array) {
 		return first(array, null);
 	}
@@ -128,6 +134,7 @@ public final class Iterables {
 	 * @param iterable a Map : Sorted or Linked (else it has no purpose)
 	 * @return the first {@link Entry} of the Map, or null if argument is empty or null
 	 */
+	@Nullable
 	public static <K, V> Map.Entry<K, V> first(@Nullable Map<K, V> iterable) {
 		return first(iterable, null);
 	}
@@ -152,6 +159,7 @@ public final class Iterables {
 	 * @param iterable a Map : Sorted or Linked (else it has no purpose)
 	 * @return the first value of the Map, null if argument is null
 	 */
+	@Nullable
 	public static <V> V firstValue(@Nullable Map<?, V> iterable) {
 		return firstValue(iterable, null);
 	}
@@ -162,6 +170,7 @@ public final class Iterables {
 	 * @param iterable a Map : Sorted or Linked (else it has no purpose)
 	 * @return the first value of the Map, or the given default value if argument is empty or null
 	 */
+	@Nullable
 	public static <V> V firstValue(@Nullable Map<?, V> iterable, V defaultValue) {
 		Entry<?, V> firstEntry = first(iterable);
 		return firstEntry == null ? defaultValue : firstEntry.getValue();
@@ -183,6 +192,7 @@ public final class Iterables {
 	 * @param iterable a nullable {@link List}
 	 * @return the last element of the argument or null if argument is empty or null
 	 */
+	@Nullable
 	public static <E> E last(@Nullable List<E> iterable) {
 		return last(iterable, null);
 	}
@@ -354,6 +364,23 @@ public final class Iterables {
 		return copy; 
 	}
 	
+	public static <E> boolean equals(Iterable<E> it1, Iterable<E> it2, BiPredicate<E, E> predicate) {
+		if (it1 == it2)
+			return true;
+		
+		Iterator<E> e1 = it1.iterator();
+		Iterator<E> e2 = it2.iterator();
+		while (e1.hasNext() && e2.hasNext()) {
+			E o1 = e1.next();
+			E o2 = e2.next();
+			if ((o1 == null ^ o2 == null) || !predicate.test(o1, o2)) {
+				return false;
+			}
+		}
+		return !(e1.hasNext() || e2.hasNext());
+	}
+	
+	
 	/**
 	 * Puts 2 {@link Iterator}s side by side as a {@link Map}.
 	 * If {@link Iterator}s are not of same length then null elements will be used into the {@link Map}.
@@ -435,6 +462,7 @@ public final class Iterables {
 	 * Finds the first predicate-matching element into an {@link Iterable}
 	 *
 	 * @param iterable the {@link Iterable} to scan
+	 * @param predicate the test to execute for equality
 	 * @param <I> input type
 	 * @return null if no element matches the predicate
 	 */
@@ -446,6 +474,7 @@ public final class Iterables {
 	 * Finds the first predicate-matching element into an {@link Iterator}
 	 *
 	 * @param iterator the {@link Iterator} to scan
+	 * @param predicate the test to execute for equality
 	 * @param <I> input type
 	 * @return null if no element matches the predicate
 	 */
@@ -466,6 +495,7 @@ public final class Iterables {
 	 *
 	 * @param iterable the {@link Iterable} to scan
 	 * @param mapper the mapper to extract the value to test
+	 * @param predicate the test to execute for equality
 	 * @param <I> input type
 	 * @param <O> output type
 	 * @return null if no mapped values matches the predicate
@@ -479,6 +509,7 @@ public final class Iterables {
 	 * 
 	 * @param iterator the {@link Iterator} to scan
 	 * @param mapper the mapper to extract the value to test
+	 * @param predicate the test to execute for equality
 	 * @param <I> input type
 	 * @param <O> output type
 	 * @return null if no mapped values matches the predicate
@@ -494,6 +525,37 @@ public final class Iterables {
 			}
 		}
 		return result;
+	}
+	
+	/**
+	 * Consumes all predicate-matching elements of an {@link Iterable}
+	 *
+	 * @param iterable the {@link Iterable} to scan
+	 * @param predicate the test to execute for equality
+	 * @param foundConsumer will be called with every mathing element and its index
+	 * @param <I> input type
+	 */
+	public static <I> void consumeAll(Iterable<I> iterable, Predicate<I> predicate, BiConsumer<I, Integer> foundConsumer) {
+		consumeAll(iterable.iterator(), predicate, foundConsumer);
+	}
+	
+	/**
+	 * Finds all predicate-matching elements into an {@link Iterator}
+	 *
+	 * @param iterator the {@link Iterator} to scan
+	 * @param predicate the test to execute for equality
+	 * @param foundConsumer will be called with every mathing element and its index
+	 * @param <I> input type
+	 */
+	public static <I> void consumeAll(Iterator<I> iterator, Predicate<I> predicate, BiConsumer<I, Integer> foundConsumer) {
+		int index = 0;
+		while (iterator.hasNext()) {
+			I step = iterator.next();
+			if (predicate.test(step)) {
+				foundConsumer.accept(step, index);
+			}
+			index++;
+		}
 	}
 	
 	/**

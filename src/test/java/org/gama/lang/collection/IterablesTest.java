@@ -12,11 +12,14 @@ import java.util.Set;
 
 import org.gama.lang.Duo;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static org.gama.lang.collection.Arrays.asHashSet;
 import static org.gama.lang.collection.Arrays.asList;
+import static org.gama.lang.collection.Arrays.asSet;
 import static org.gama.lang.collection.Iterables.asIterable;
 import static org.gama.lang.collection.Iterables.collect;
 import static org.gama.lang.collection.Iterables.collectToList;
@@ -189,6 +192,21 @@ public class IterablesTest {
 	}
 	
 	@Test
+	public void testEquals() {
+		assertFalse(Iterables.equals(asList(1, 2, 3, 4, 5), asList(2, 3, 6), Object::equals));
+		assertFalse(Iterables.equals(asList(1, 2, 3, 4, 5), emptyList(), Object::equals));
+		assertFalse(Iterables.equals(emptyList(), asList(1, 2, 3, 4, 5), Object::equals));
+		List<Integer> c1 = asList(1, 2, 3, 4, 5);
+		List<Integer> c2 = asList(1, 2, 3, 4, 5);
+		assertTrue(Iterables.equals(c1, c2, Object::equals));
+		// test with striclty same instance
+		assertTrue(Iterables.equals(c1, c1, Object::equals));
+		
+		// check with another Predicate
+		assertFalse(Iterables.equals(c1, c2, (i1, i2) -> false));
+	}
+	
+	@Test
 	public void testCollect() {
 		// test with content
 		List<Integer> aSet = asList(1, 2, 1);
@@ -216,6 +234,25 @@ public class IterablesTest {
 		// test against null
 		result = find(strings, String::toUpperCase, o -> o.equals("c"));
 		assertNull(result);
+	}
+	
+	public static Object[][] testConsumeAll() {
+		return new Object[][] {
+				{ asList("a", "b"), "a", asSet(0) },
+				{ asList("a", "b"), "b", asSet(1) },
+				{ asList("a", "b", "b"), "b", asSet(1, 2) },
+				{ asList("a", "b", "a", "b"), "b", asSet(1, 3) },
+				{ asList("a", "b", "a", "b"), "a", asSet(0, 2) },
+				{ asList(), "a", asSet() },
+		};
+	}
+	
+	@ParameterizedTest
+	@MethodSource("testConsumeAll")
+	public void testConsumeAll(List<String> input, String lookupElement, Set<Integer> expected) {
+		Set<Integer> collectedIndexes = new HashSet<>();
+		Iterables.consumeAll(input, lookupElement::equals, (s, i) -> collectedIndexes.add(i));
+		assertEquals(expected, collectedIndexes);
 	}
 	
 	@Test
