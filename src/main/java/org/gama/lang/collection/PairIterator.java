@@ -1,16 +1,15 @@
 package org.gama.lang.collection;
 
 import java.util.Iterator;
-import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 
 import org.gama.lang.Duo;
 
 /**
- * {@link Iterator} of 2 others by giving {@link Entry}. Gives elements while 2 Iterators have elements together.
+ * {@link Iterator} of 2 others by giving {@link Duo}s. Gives elements while 2 Iterators have elements together.
  * 
- * @param <K>
- * @param <V>
+ * @param <K> type of first {@link Iterator}'s element
+ * @param <V> type of second {@link Iterator}'s element
  * @author Guillaume Mary
  */
 public class PairIterator<K, V> implements Iterator<Duo<K, V>> {
@@ -46,10 +45,11 @@ public class PairIterator<K, V> implements Iterator<Duo<K, V>> {
 	/**
 	 * {@link Iterator} which continues while one of the surrogate {@link Iterator} still has elements. So it stops when both {@link Iterator}s are
 	 * drained.
-	 * Gives the pair as an {@link Entry}
-	 * 
-	 * @param <K>
-	 * @param <V>
+	 * Gives the pair as a {@link Duo}.
+	 * Missing values are overridable throught {@link #getMissingKey()} and {@link #getMissingValue()}.
+	 *
+	 * @param <K> type of first {@link Iterator}'s element
+	 * @param <V> type of second {@link Iterator}'s element
 	 */
 	public static class UntilBothIterator<K, V> extends PairIterator<K, V> {
 		
