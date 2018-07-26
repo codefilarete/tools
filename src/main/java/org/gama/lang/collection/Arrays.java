@@ -1,6 +1,7 @@
 package org.gama.lang.collection;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -33,6 +34,12 @@ public class Arrays {
 	public static <T> TreeSet<T> asTreeSet(Comparator<T> comparator, T ... a) {
 		TreeSet<T> toReturn = new TreeSet<>(comparator);
 		java.util.Collections.addAll(toReturn, a);
+		return toReturn;
+	}
+	
+	public static <T> TreeSet<T> asTreeSet(Comparator<T> comparator, Collection<? extends T> a) {
+		TreeSet<T> toReturn = new TreeSet<>(comparator);
+		toReturn.addAll(a);
 		return toReturn;
 	}
 	
@@ -74,5 +81,9 @@ public class Arrays {
 	
 	public static <C> C last(C[] args) {
 		return args[args.length-1];
+	}
+	
+	private Arrays() {
+		// tools class
 	}
 }
