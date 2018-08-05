@@ -1,18 +1,22 @@
 package org.gama.lang.collection;
 
-import org.gama.lang.bean.IFactory;
-
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+
+import org.gama.lang.bean.IFactory;
 
 /**
  * Map that self puts a newly created value when the requested ({@link #get(Object)}) key is not found (null is
- * returned. {@link #createInstance) must be implemented.
+ * returned). {@link #createInstance} must be implemented.
+ * Quite similar to Java 8 {@link Map#computeIfAbsent(Object, Function)}, but prevent caller to use {@link #computeIfAbsent(Object, Function)}
+ * just by calling {@link #get(Object)}.
  * 
- * Acts as a wrapper for another concrete Map instance in order to have full control over Map storage algorithm.
+ * Acts as a wrapper for another concrete Map instance in order to have full control over Map storage algorithm (see contructor).
  * 
  * @author Guillaume Mary
+ * @see ValueFactoryHashMap
  */
 public class ValueFactoryMap<K, V> implements Map<K, V>, IFactory<K, V> {
 	
@@ -21,7 +25,8 @@ public class ValueFactoryMap<K, V> implements Map<K, V>, IFactory<K, V> {
 	private final IFactory<K, V> factoryDelegate;
 	
 	/**
-	 *
+	 * Constructor with mandatory elements
+	 * 
 	 * @param delegate the wrapped instance
 	 * @param factoryDelegate the wrapped factory instance
 	 */
