@@ -8,6 +8,7 @@ import org.gama.lang.trace.ModifiableInt;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -85,33 +86,22 @@ public class MethodDispatcherTest {
 				.fallbackOn("toto")
 				.build(Holder2.class);
 		
-		Throwable thrownThrowable = null;
-		try {
-			// Object is not an instance of declaring class: expected java.util.function.Supplier but was java.lang.String
-			// because "toto" doesn't implement get()
-			testInstance.get();
-		} catch (IllegalArgumentException e) {
-			thrownThrowable = e;
-		}
-		
-		assertTrue(thrownThrowable.getMessage().contains("object is not an instance of declaring class"));
+		// Object is not an instance of declaring class: expected java.util.function.Supplier but was java.lang.String
+		// because "toto" doesn't implement get()
+		assertTrue(assertThrows(IllegalArgumentException.class, testInstance::get).getMessage()
+				.contains("Wrong given instance"));
 	}
 	
 	@Test
 	public void testBuild_targetClassDoesntImplementRedirectingClasses_exceptionIsThrown() {
 		MethodDispatcher methodDispatcher = new MethodDispatcher()
 				.redirect(Supplier.class, () -> "Hello world !");
-		Throwable thrownThrowable = null;
-		try {
-			// Exception is thrown here, else we could do successfully
-			// Method get = Reflections.findMethod(Supplier.class, "get");
-			// assertEquals("Hello world !", get.invoke(testInstance));
-			methodDispatcher.build(CharSequence.class);
-		} catch (IllegalArgumentException e) {
-			thrownThrowable = e;
-		}
 		
-		assertTrue(thrownThrowable.getMessage().contains(" doesn't implement "));
+		// Exception is thrown here, else we could do successfully
+		// Method get = Reflections.findMethod(Supplier.class, "get");
+		// assertEquals("Hello world !", get.invoke(testInstance));
+		assertTrue(assertThrows(IllegalArgumentException.class, () -> methodDispatcher.build(CharSequence.class)).getMessage()
+				.contains(" doesn't implement "));
 	}
 	
 	@Test
@@ -127,8 +117,8 @@ public class MethodDispatcherTest {
 		} catch (ClassCastException e) {
 			thrownThrowable = e;
 		}
-		assertTrue(thrownThrowable.getMessage().equals("org.gama.lang.reflect.MethodDispatcherTest$FluentInterfaceSupport cannot be cast" +
-				" to org.gama.lang.reflect.MethodDispatcherTest$DummyFluentInterface"));
+		assertEquals(thrownThrowable.getMessage(), "org.gama.lang.reflect.MethodDispatcherTest$FluentInterfaceSupport cannot be cast" +
+				" to org.gama.lang.reflect.MethodDispatcherTest$DummyFluentInterface");
 	}
 	
 	@Test
@@ -139,6 +129,31 @@ public class MethodDispatcherTest {
 		
 		// This will work because we ask to return the proxy after FluentInterfaceSupport invocations
 		testInstance.doSomething().doSomethingElse();
+	}
+	
+	@Test
+	public void testRedirect_proxyHasMultilpleInheritanceWithAccurateType() {
+		SubclassNotAwareFluentInterfaceSupport testInstance = new MethodDispatcher()
+				.redirect(SubSubclassNotAwareFluentInterface.class, new SubSubclassNotAwareFluentInterface() {
+					@Override
+					public SubSubclassNotAwareFluentInterface doSomething() {
+						return null;
+					}
+					
+					@Override
+					public SubSubclassNotAwareFluentInterface doSomethingElse() {
+						return null;
+					}
+					
+					@Override
+					public SubSubclassNotAwareFluentInterface doEvenMore() {
+						return null;
+					}
+				}, true)
+				.build(SubclassNotAwareFluentInterfaceSupport.class);
+		
+		// This will work because we ask to return the proxy after FluentInterfaceSupport invocations
+		testInstance.doSomething().doSomethingElse().doEvenMore();
 	}
 	
 	@Test
@@ -198,5 +213,36 @@ public class MethodDispatcherTest {
 		public SubclassAwareFluentInterface doSomethingElse() {
 			return this;
 		}
+	}
+	
+	/**
+	 * An interface which methods strongly types their return, at the opposit of {@link SubclassAwareFluentInterface} 
+	 */
+	private interface SubclassNotAwareFluentInterface {
+		
+		SubclassNotAwareFluentInterface doSomething();
+		
+		SubclassNotAwareFluentInterface doSomethingElse();
+	}
+	
+	/**
+	 * This is the same as {@link SubclassNotAwareFluentInterface} but with refined return types
+	 */
+	private interface SubSubclassNotAwareFluentInterface extends SubclassNotAwareFluentInterface {
+		
+		@Override
+		SubSubclassNotAwareFluentInterface doSomething();
+		
+		@Override
+		SubSubclassNotAwareFluentInterface doSomethingElse();
+		
+		SubSubclassNotAwareFluentInterface doEvenMore();
+	}
+	
+	/**
+	 * An interface which inherits from 2 close interfaces
+	 */
+	private interface SubclassNotAwareFluentInterfaceSupport extends SubclassNotAwareFluentInterface, SubSubclassNotAwareFluentInterface {
+		
 	}
 }

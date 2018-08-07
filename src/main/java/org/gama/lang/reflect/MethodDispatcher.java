@@ -5,12 +5,16 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.gama.lang.InvocationHandlerSupport;
 import org.gama.lang.Reflections;
+import org.gama.lang.StringAppender;
+import org.gama.lang.bean.InterfaceIterator;
+import org.gama.lang.bean.MethodIterator;
 
 /**
  * A class aimed at creating proxy that will redirect some interface methods to some concrete implementation, fallbacking non-redirecting method
@@ -47,11 +51,38 @@ public class MethodDispatcher {
 	 * @return this
 	 */
 	public <X> MethodDispatcher redirect(Class<X> interfazz, X extensionSurrogate, boolean returnProxy) {
+		Set<String> signatures = new HashSet<>();
 		for (Method method : interfazz.getMethods()) {
 			methodsToBeIntercepted.put(method, extensionSurrogate);
 			methodsReturningProxy.put(method, returnProxy);
+			signatures.add(giveSignature(method));
+		}
+		// we add super methods with same name (and arguments) to take "polymorphism" into account, more precisely in multiple inheritance case
+		// with same method signature, only differing in return type
+		// all of this is done by comparing "signatures" (lightweight one)
+		MethodIterator x = new MethodIterator(new InterfaceIterator(interfazz));
+		while (x.hasNext()) {
+			Method next = x.next();
+			if (signatures.contains(giveSignature(next))) {
+				// the method is cancidate to polymorphism, we should trap it
+				methodsToBeIntercepted.put(next, extensionSurrogate);
+				methodsReturningProxy.put(next, returnProxy);
+			}
 		}
 		return this;
+	}
+	
+	/**
+	 * Gives a very ligth signature of a method (no return type, no modifiers) : only name and arguments
+	 * 
+	 * @param method a method to get a signature
+	 * @return a lightweight version of the signature of the given method
+	 */
+	private String giveSignature(Method method) {
+		StringAppender signature = new StringAppender();
+		signature.cat(method.getName());
+		signature.ccat(method.getParameterTypes(), ",");
+		return signature.toString();
 	}
 	
 	public <X> X build(Class<X> interfazz) {
@@ -131,12 +162,12 @@ public class MethodDispatcher {
 			throw e.getCause();
 		} catch (IllegalArgumentException e) {
 			// See ExceptionConverter for some code correlation
-			String message = "object is not an instance of declaring class";
 			IllegalArgumentException result = e;
-			if (message.equals(e.getMessage())) {
+			if ("object is not an instance of declaring class".equals(e.getMessage())) {
 				Class<?> declaringClass = method.getDeclaringClass();
-				message += ": expected " + declaringClass.getName() + " but " + target.getClass().getName() + " was given";
-				result = new IllegalArgumentException(message);
+				String message = "Wrong given instance while invoking " + Reflections.toString(method);
+				message += ": expected " + declaringClass.getName() + " but " + target + " was given";
+				result = new IllegalArgumentException(message, e);
 			}
 			throw result;
 		}
