@@ -27,7 +27,7 @@ public class InterfaceIterator extends InheritedElementIterator<Class> {
 		List<Class> result = Iterables.copy(new ArrayIterator<>(interfaces));
 		// getting all (parent) interfaces of previous interfaces: we use our own class since getInterfaces() returns super interfaces of an interface
 		InterfaceIterator interfaceIterator = new InterfaceIterator(new ArrayIterator<>(interfaces));
-		result = Iterables.copy(interfaceIterator, result);
-		return result.toArray(new Class[result.size()]);
+		Iterables.copy(interfaceIterator, result);
+		return result.toArray(new Class[0]);
 	}
 }
