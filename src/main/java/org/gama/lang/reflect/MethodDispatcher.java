@@ -8,13 +8,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.gama.lang.InvocationHandlerSupport;
 import org.gama.lang.Reflections;
 import org.gama.lang.StringAppender;
-import org.gama.lang.bean.InterfaceIterator;
-import org.gama.lang.bean.MethodIterator;
+
+import static org.gama.lang.collection.Iterables.collect;
+import static org.gama.lang.function.Functions.chain;
 
 /**
  * A class aimed at creating proxy that will redirect some interface methods to some concrete implementation, fallbacking non-redirecting method
@@ -25,8 +25,12 @@ import org.gama.lang.bean.MethodIterator;
  */
 public class MethodDispatcher {
 	
-	private final Map<Method, Object /* target */> methodsToBeIntercepted = new HashMap<>();
-	private final Map<Method, Boolean> methodsReturningProxy = new HashMap<>();
+	/**
+	 * Methods (and its config) to be invoked according to effective method call.
+	 * These are stored per a light signature to take polymorphism and multiple inheritance into account.
+	 * Indeed, the light signature doesn't contain declaring class nor return type : only method name and arguments types.
+	 */
+	private final Map<String /* simple method signature */, Interceptor> interceptors = new HashMap<>();
 	
 	private Object fallback;
 	
@@ -51,23 +55,8 @@ public class MethodDispatcher {
 	 * @return this
 	 */
 	public <X> MethodDispatcher redirect(Class<X> interfazz, X extensionSurrogate, boolean returnProxy) {
-		Set<String> signatures = new HashSet<>();
 		for (Method method : interfazz.getMethods()) {
-			methodsToBeIntercepted.put(method, extensionSurrogate);
-			methodsReturningProxy.put(method, returnProxy);
-			signatures.add(giveSignature(method));
-		}
-		// we add super methods with same name (and arguments) to take "polymorphism" into account, more precisely in multiple inheritance case
-		// with same method signature, only differing in return type
-		// all of this is done by comparing "signatures" (lightweight one)
-		MethodIterator x = new MethodIterator(new InterfaceIterator(interfazz));
-		while (x.hasNext()) {
-			Method next = x.next();
-			if (signatures.contains(giveSignature(next))) {
-				// the method is cancidate to polymorphism, we should trap it
-				methodsToBeIntercepted.put(next, extensionSurrogate);
-				methodsReturningProxy.put(next, returnProxy);
-			}
+			interceptors.put(giveSignature(method), new Interceptor(method, extensionSurrogate, returnProxy));
 		}
 		return this;
 	}
@@ -95,15 +84,25 @@ public class MethodDispatcher {
 		// we don't use the Thread one because it can live forever so it might lead to memory leak
 		// we don't use fallback because it can be null
 		ClassLoader classLoader = getClass().getClassLoader();
-		Set<Class<?>> targetInterfaces = methodsToBeIntercepted.keySet().stream().map(Method::getDeclaringClass).collect(Collectors.toSet());
+		Set<Class<?>> targetInterfaces = collect(interceptors.values(), chain(Interceptor::getMethod, Method::getDeclaringClass), HashSet::new);
 		// we must add the X interface to the list that will be proxied, else we'll get a "com.sun.proxy.$Proxy4 cannot be cast to X"
 		targetInterfaces.add(interfazz);
 		// building invocationHandler : we create a holder for the proxy because it must be referenced in some cases
 		Object[] proxyHolder = new Object[1];
 		InvocationHandler dispatcher = new InvocationHandlerSupport((input, method, args) -> {
-			Object targetInstance = methodsToBeIntercepted.getOrDefault(method, fallback);
+			// looking for method to be really invoked
+			Interceptor interceptor = interceptors.get(giveSignature(method));
+			Object targetInstance = fallback;
+			boolean returnProxy = false;
+			if (interceptor != null) {
+				// NB: the method finally invoked may not be the same as the one invoked
+				// in polymorphism and multiple inheritance cases
+				method = interceptor.getMethod();
+				targetInstance = interceptor.getMethodTarget();
+				returnProxy = interceptor.isReturnProxy();
+			}
 			Object result = invoke(targetInstance, method, args);
-			if (methodsReturningProxy.getOrDefault(method, false)) {
+			if (returnProxy) {
 				result = proxyHolder[0];
 			}
 			return result;
@@ -113,18 +112,18 @@ public class MethodDispatcher {
 	}
 	
 	private <X> void assertClassImplementsInterceptingInterface(Class<X> interfazz) {
-		methodsToBeIntercepted.keySet().forEach(m -> {
-			if (!m.getDeclaringClass().isAssignableFrom(interfazz)) {
+		interceptors.values().forEach(m -> {
+			if (!m.getMethod().getDeclaringClass().isAssignableFrom(interfazz)) {
 				throw new IllegalArgumentException(
-						Reflections.toString(interfazz) + " doesn't implement " + Reflections.toString(m.getDeclaringClass()));
+						Reflections.toString(interfazz) + " doesn't implement " + Reflections.toString(m.getMethod().getDeclaringClass()));
 			}
 		});
 	}
 	
 	private void assertInterceptingMethodsAreFromInterfaces() {
-		methodsToBeIntercepted.keySet().forEach(m -> {
-			if (!m.getDeclaringClass().isInterface()) {
-				throw new IllegalArgumentException("Cannot intercept concrete method : " + Reflections.toString(m));
+		interceptors.values().forEach(m -> {
+			if (!m.getMethod().getDeclaringClass().isInterface()) {
+				throw new IllegalArgumentException("Cannot intercept concrete method : " + Reflections.toString(m.getMethod()));
 			}
 		});
 	}
@@ -188,6 +187,31 @@ public class MethodDispatcher {
 		@Override
 		public String toString() {
 			return interfazz.getName() + "@" + Integer.toHexString(hashCode());
+		}
+	}
+	
+	private static class Interceptor {
+		
+		private final Method method;
+		private final Object methodTarget;
+		private final boolean returnProxy;
+		
+		public Interceptor(Method method, Object methodTarget, boolean returnProxy) {
+			this.method = method;
+			this.methodTarget = methodTarget;
+			this.returnProxy = returnProxy;
+		}
+		
+		public Method getMethod() {
+			return method;
+		}
+		
+		public Object getMethodTarget() {
+			return methodTarget;
+		}
+		
+		public boolean isReturnProxy() {
+			return returnProxy;
 		}
 	}
 }

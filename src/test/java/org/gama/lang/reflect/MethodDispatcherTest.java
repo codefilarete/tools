@@ -132,7 +132,7 @@ public class MethodDispatcherTest {
 	}
 	
 	@Test
-	public void testRedirect_proxyHasMultilpleInheritanceWithAccurateType() {
+	public void testRedirect_proxyHasMultilpleInheritanceWithRefinedType() {
 		SubclassNotAwareFluentInterfaceSupport testInstance = new MethodDispatcher()
 				.redirect(SubSubclassNotAwareFluentInterface.class, new SubSubclassNotAwareFluentInterface() {
 					@Override
@@ -154,6 +154,32 @@ public class MethodDispatcherTest {
 		
 		// This will work because we ask to return the proxy after FluentInterfaceSupport invocations
 		testInstance.doSomething().doSomethingElse().doEvenMore();
+	}
+	
+	@Test
+	public void testRedirect_proxyHasMultilpleInheritanceWithRefinedType2() {
+		MultipleInheritanceTestSupport testInstance = new MethodDispatcher()
+				.redirect(SubclassNotAwareFluentInterface.class, new SubclassNotAwareFluentInterface() {
+					@Override
+					public SubclassNotAwareFluentInterface doSomething() {
+						return null;
+					}
+					
+					@Override
+					public SubclassNotAwareFluentInterface doSomethingElse() {
+						return null;
+					}
+				}, true)
+				.redirect(ASimpleContract.class, new ASimpleContract() {
+					@Override
+					public void simpleContractMethod() {
+						
+					}
+				}, true)
+				.build(MultipleInheritanceTestSupport.class);
+		
+		// This will work because we ask to return the proxy after FluentInterfaceSupport invocations
+		testInstance.doSomething().simpleContractMethod();
 	}
 	
 	@Test
@@ -242,7 +268,21 @@ public class MethodDispatcherTest {
 	/**
 	 * An interface which inherits from 2 close interfaces
 	 */
-	private interface SubclassNotAwareFluentInterfaceSupport extends SubclassNotAwareFluentInterface, SubSubclassNotAwareFluentInterface {
+	private interface SubclassNotAwareFluentInterfaceSupport extends SubclassNotAwareFluentInterface, SubSubclassNotAwareFluentInterface, ASimpleContract {
+		
+	}
+	
+	private interface ASimpleContract {
+		
+		void simpleContractMethod();
+	}
+	
+	private interface MultipleInheritanceTestSupport extends SubclassNotAwareFluentInterface, ASimpleContract {
+		@Override
+		MultipleInheritanceTestSupport doSomething();
+		
+		@Override
+		MultipleInheritanceTestSupport doSomethingElse();
 		
 	}
 }
