@@ -9,7 +9,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 /**
- * Fake Set that keeps insertion order
+ * Set that keeps insertion order. Made for clearer intention (by its name) than {@link LinkedHashSet} (which is the surrogate)
  * 
  * @author Guillaume Mary
  */
@@ -96,8 +96,7 @@ public class KeepOrderSet<E> implements Set<E> {
 	}
 	
 	/**
-	 * Renvoie l'équivalent de cette instance sous la forme d'un vrai Set (cloné)
-	 * @return le contenu de cette instance dans un LinkedHashSet
+	 * @return a copy of its content as a {@link LinkedHashSet}
 	 */
 	public LinkedHashSet<E> asSet() {
 		return new LinkedHashSet<>(delegate);
