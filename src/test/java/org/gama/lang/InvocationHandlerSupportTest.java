@@ -1,6 +1,8 @@
 package org.gama.lang;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.function.Supplier;
 
 import org.gama.lang.InvocationHandlerSupport.DefaultPrimitiveValueInvocationProvider;
 import org.junit.jupiter.api.Test;
@@ -9,6 +11,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -42,8 +45,8 @@ public class InvocationHandlerSupportTest {
 	@Test
 	public void testInvoke() throws Throwable {
 		InvocationHandlerSupport testInstance = new InvocationHandlerSupport((proxy, method, args) -> "Hello");
-		// 42.toString() => "Hello" !
-		assertEquals("Hello", testInstance.invoke(42, Reflections.findMethod(Object.class, "toString"), new Object[0]));
+		// 42.get() => "Hello" !
+		assertEquals("Hello", testInstance.invoke(42, Reflections.findMethod(Supplier.class, "get"), new Object[0]));
 	}
 	
 	@Test
@@ -53,6 +56,23 @@ public class InvocationHandlerSupportTest {
 		assertTrue((boolean) testInstance.invoke(42, Reflections.findMethod(Object.class, "equals", Object.class), new Object[] { 42 }));
 		// null == 42 ?
 		assertFalse((boolean) testInstance.invoke(null, Reflections.findMethod(Object.class, "equals", Object.class), new Object[] { 42 }));
+		// 42 == null ?
+		assertFalse((boolean) testInstance.invoke(42, Reflections.findMethod(Object.class, "equals", Object.class), new Object[] { null }));
+	}
+	
+	/** Mainly tested for non StackOverflowError */
+	@Test
+	public void testInvokeEquals_onProxiedInstance() {
+		InvocationHandlerSupport testInstance = new InvocationHandlerSupport();
+		Object proxy = Proxy.newProxyInstance(getClass().getClassLoader(), new Class[] { CharSequence.class }, testInstance);
+		assertEquals(proxy, proxy);
+		assertNotEquals(proxy, new Object());
+		assertNotEquals(new Object(), proxy);
+		assertNotEquals(testInstance, proxy);
+		assertNotEquals(proxy, testInstance);
+		assertEquals(testInstance, testInstance);
+		assertNotEquals(testInstance, new Object());
+		assertNotEquals(new Object(), testInstance);
 	}
 	
 	@Test
@@ -63,10 +83,32 @@ public class InvocationHandlerSupportTest {
 	}
 	
 	@Test
-	public void testInvokeHashCode_onNullReference_throwsNPE() throws Throwable {
+	public void testInvokeHashCode_onNullReference_throwsNPE() {
 		InvocationHandlerSupport testInstance = new InvocationHandlerSupport();
 		// null.hasCode()
 		assertThrows(NullPointerException.class, () -> testInstance.invoke(null, Reflections.findMethod(Integer.class, "hashCode"), new Object[0]));
+	}
+	
+	/** Mainly tested for non StackOverflowError */
+	@Test
+	public void testInvokeHashCode_onProxiedInstance() {
+		InvocationHandlerSupport testInstance = new InvocationHandlerSupport();
+		Object proxy = Proxy.newProxyInstance(getClass().getClassLoader(), new Class[] { CharSequence.class }, testInstance);
+		assertEquals(testInstance.hashCode(), proxy.hashCode());
+	}
+	
+	@Test
+	public void testInvokeToString() {
+		InvocationHandlerSupport testInstance = new InvocationHandlerSupport();
+		assertTrue(testInstance.toString().contains(InvocationHandlerSupport.class.getSimpleName()));
+	}
+	
+	/** Mainly tested for non StackOverflowError */
+	@Test
+	public void testInvokeToString_onProxiedInstance() {
+		InvocationHandlerSupport testInstance = new InvocationHandlerSupport();
+		Object proxy = Proxy.newProxyInstance(getClass().getClassLoader(), new Class[] { CharSequence.class }, testInstance);
+		assertEquals(testInstance.toString(), proxy.toString());
 	}
 	
 	private interface AllPrimitiveTypesMethods {

@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 
+import org.gama.lang.collection.Iterables;
 import org.gama.lang.collection.Maps;
 
 /**
@@ -17,11 +18,6 @@ import org.gama.lang.collection.Maps;
  * @see #mock(Class)
  */
 public class InvocationHandlerSupport implements InvocationHandler {
-	
-	/**
-	 * Method handler that invoke method. Acts as an API bridge between {@link Method} and {@link InvocationHandler}
-	 */
-	public static final InvocationHandler METHOD_INVOKER = (proxy, method, args) -> method.invoke(proxy, args);
 	
 	/**
 	 * Method handler that ALWAYS RETURNS NULL, even for primitive type, which can leads to weird {@link NullPointerException}.
@@ -67,13 +63,27 @@ public class InvocationHandlerSupport implements InvocationHandler {
 		Object toReturn;
 		if (isEqualsMethod(method)) {
 			// Consider equality between objects.
-			toReturn = Objects.equals(proxy, args[0]);
+			Object other = args[0];
+			if (other != null && proxy != null && Proxy.isProxyClass(proxy.getClass()) && Proxy.getInvocationHandler(proxy) == this) {
+				return Proxy.isProxyClass(other.getClass()) && Proxy.getInvocationHandler(other) == this;
+			} else {
+				return Objects.equals(proxy, other);
+			}
 		} else if (isHashCodeMethod(method)) {
-			// Use hashCode of reference proxy.
 			if (proxy == null) {
 				throw new NullPointerException("hashCode() invoked on a null reference");
 			} else {
-				return proxy.hashCode();
+				if (Proxy.isProxyClass(proxy.getClass()) && Proxy.getInvocationHandler(proxy) == this) {
+					return this.hashCode();
+				} else {
+					return proxy.hashCode();
+				}
+			}
+		} else if (isToStringMethod(method)) {
+			if (proxy == null) {
+				throw new NullPointerException("toString() invoked on a null reference");
+			} else {
+				return this.toString();
 			}
 		} else {
 			toReturn = defaultHandler.invoke(proxy, method, args);
@@ -96,9 +106,7 @@ public class InvocationHandlerSupport implements InvocationHandler {
 	 * Determines whether the given method is the "equals" method.
 	 */
 	public static boolean isEqualsMethod(Method method) {
-		return method.getName().equals("equals")
-				&& method.getParameterTypes().length == 1 && method.getParameterTypes()[0] == Object.class
-				&& method.getReturnType() == boolean.class;
+		return method.getName().equals("equals") && Iterables.first(method.getParameterTypes()) == Object.class && method.getReturnType() == boolean.class;
 	}
 	
 	/**
@@ -106,6 +114,13 @@ public class InvocationHandlerSupport implements InvocationHandler {
 	 */
 	public static boolean isHashCodeMethod(Method method) {
 		return method.getName().equals("hashCode") && method.getParameterTypes().length == 0 && method.getReturnType() == int.class;
+	}
+	
+	/**
+	 * Determines whether the given method is the "toString" method.
+	 */
+	public static boolean isToStringMethod(Method method) {
+		return method.getName().equals("toString") && method.getParameterTypes().length == 0 && method.getReturnType() == String.class;
 	}
 	
 	/**
