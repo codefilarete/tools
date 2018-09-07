@@ -43,7 +43,7 @@ public abstract class Exceptions {
 		if (detailMessageAccessor == null) {
 			synchronized (Exceptions.class) {
 				MESSAGE_ACCESSOR = new SoftReference<>(Reflections.findField(Throwable.class, "detailMessage"));
-				MESSAGE_ACCESSOR.get().setAccessible(true);
+				Reflections.ensureAccessible(MESSAGE_ACCESSOR.get());
 			}
 		}
 		return MESSAGE_ACCESSOR.get();

@@ -16,7 +16,6 @@ import java.util.function.Supplier;
 import org.gama.lang.bean.FieldIterator;
 import org.gama.lang.bean.MethodIterator;
 import org.gama.lang.collection.Iterables;
-import org.gama.lang.exception.Exceptions;
 import org.gama.lang.reflect.MemberPrinter;
 
 import static org.gama.lang.reflect.MemberPrinter.FLATTEN_PACKAGE_PRINTER;
@@ -53,7 +52,10 @@ public final class Reflections {
 	 * @param accessibleObject the object to be set accessible
 	 */
 	public static void ensureAccessible(AccessibleObject accessibleObject) {
-		accessibleObject.setAccessible(true);
+		// we check accessibility first because setting it is a little costy
+		if (!accessibleObject.isAccessible()) {
+			accessibleObject.setAccessible(true);
+		}
 	}
 	
 	/**
@@ -191,10 +193,10 @@ public final class Reflections {
 		try {
 			Constructor<E> defaultConstructor = getDefaultConstructor(clazz);
 			// safeguard for non-accessible accessor
-			defaultConstructor.setAccessible(true);
+			Reflections.ensureAccessible(defaultConstructor);
 			return defaultConstructor.newInstance();
-		} catch (ReflectiveOperationException t) {
-			throw Exceptions.asRuntimeException(t);
+		} catch (ReflectiveOperationException e) {
+			throw new RuntimeException("Class " + clazz.getName() + " can't be instanciated", e);
 		}
 	}
 	
@@ -345,7 +347,7 @@ public final class Reflections {
 				return void.class;
 			default:
 				if (typeName.startsWith("L")) {
-					typeName = typeName.substring(1, typeName.length());
+					typeName = typeName.substring(1);
 					typeName = typeName.replace("/", ".");
 				}
 				return Class.forName(typeName);
