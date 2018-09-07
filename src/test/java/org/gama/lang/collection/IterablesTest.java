@@ -216,6 +216,15 @@ public class IterablesTest {
 	}
 	
 	@Test
+	public void testCollect_filter() {
+		// test with content
+		List<Integer> aSet = asList(1, 2, 1);
+		assertEquals(asHashSet("1"), collect(aSet, i -> i.equals(1), Object::toString, HashSet::new));
+		assertEquals(asHashSet("2"), collect(aSet, i -> i.equals(2), Object::toString, HashSet::new));
+		assertEquals(asHashSet("1", "2"), collect(aSet, i -> true, Object::toString, HashSet::new));
+	}
+	
+	@Test
 	public void testFind() {
 		List<String> strings = asList("a", "b");
 		String result = find(strings, o -> o.equalsIgnoreCase("B"));

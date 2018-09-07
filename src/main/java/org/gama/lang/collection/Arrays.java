@@ -1,5 +1,6 @@
 package org.gama.lang.collection;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -14,6 +15,8 @@ import java.util.function.Supplier;
  * @author Guillaume Mary
  */
 public class Arrays {
+	
+	private static final Integer[] EMPTY_INTEGER_ARRAY = {};
 	
 	public static <T> List<T> asList(T... a) {
 		return new ArrayList<>(java.util.Arrays.asList(a));
@@ -45,6 +48,28 @@ public class Arrays {
 	
 	public static boolean isEmpty(Object[] array) {
 		return array == null || array.length == 0;
+	}
+	
+	/**
+	 * Tranforms an array of primitive integers to an array of Object integers to overcome the impossibility to cast a {@code int[]} to a {@code Integer[]}
+	 * in the Java language.
+	 * 
+	 * @param integers any {@code int[]), null included
+	 * @return a new {@code Integer[]} that contains all values of passed argument
+	 */
+	@Nullable
+	public static Integer[] fromPrimitive(@Nullable int[] integers) {
+		if (integers == null) {
+			return null;
+		} else if (integers.length == 0) {
+			return EMPTY_INTEGER_ARRAY;
+		} else {
+			Integer[] result = new Integer[integers.length];
+			for (int i = 0; i < integers.length; i++) {
+				result[i] = integers[i];
+			}
+			return result;
+		}
 	}
 	
 	/**

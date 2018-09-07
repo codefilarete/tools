@@ -68,6 +68,11 @@ public class ArraysTest {
 	}
 	
 	@Test
+	public void testFromPrimitive() {
+		assertArrayEquals(new Integer[] {1, 2, 3, 4}, Arrays.fromPrimitive(new int[] {1, 2, 3, 4}));
+	}
+	
+	@Test
 	public void get() {
 		String[] testData = { "a", "b", "c" };
 		assertEquals("a", Arrays.get(0).apply(testData));

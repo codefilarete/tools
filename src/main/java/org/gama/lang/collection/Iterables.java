@@ -270,7 +270,7 @@ public final class Iterables {
 	}
 	
 	/**
-	 * Applies a mapper over an iterable to collect information and put each result into a collection.
+	 * Applies a mapper over an {@link Iterable} to collect information and put each result into a collection.
 	 * 
 	 * @param iterable the source
 	 * @param mapper the mapping function
@@ -281,8 +281,28 @@ public final class Iterables {
 	 * @return the collection given by the supplier
 	 */
 	public static <I, O, C extends Collection<O>> C collect(Iterable<I> iterable, Function<I, O> mapper, Supplier<C> target) {
+		return collect(iterable, i -> true, mapper, target);
+	}
+	
+	/**
+	 * Applies a filter and a mapper over an {@link Iterable} to collect information and put each result into a collection.
+	 *
+	 * @param iterable the source
+	 * @param acceptFilter the accepting condition
+	 * @param mapper the mapping function
+	 * @param target the supplier of resulting collection
+	 * @param <I> the input type
+	 * @param <O> the output type
+	 * @param <C> the collecting type
+	 * @return the collection given by the supplier
+	 */
+	public static <I, O, C extends Collection<O>> C collect(Iterable<I> iterable, Predicate<I> acceptFilter, Function<I, O> mapper, Supplier<C> target) {
 		C result = target.get();
-		iterable.forEach(i -> result.add(mapper.apply(i)));
+		for (I pawn : iterable) {
+			if (acceptFilter.test(pawn)) {
+				result.add(mapper.apply(pawn));
+			}
+		}
 		return result;
 	}
 	

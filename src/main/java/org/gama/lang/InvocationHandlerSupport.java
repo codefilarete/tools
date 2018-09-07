@@ -3,12 +3,9 @@ package org.gama.lang;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.Collections;
-import java.util.Map;
 import java.util.Objects;
 
 import org.gama.lang.collection.Iterables;
-import org.gama.lang.collection.Maps;
 
 /**
  * InvocationHandler that does nothing. Usefull to create no-operation proxy (for mocking services) or intercept a
@@ -128,17 +125,6 @@ public class InvocationHandlerSupport implements InvocationHandler {
 	 */
 	public static class DefaultPrimitiveValueInvocationProvider implements InvocationHandler {
 		
-		private static final Map<Class, Object> PRIMITIVE_DEFAULT_VALUES = Collections.unmodifiableMap(Maps
-				.asHashMap((Class) boolean.class, (Object) false)
-				.add(char.class, '\u0000')
-				.add(byte.class, (byte) 0)
-				.add(short.class, (short) 0)
-				.add(int.class, 0)
-				.add(long.class, 0L)
-				.add(float.class, 0F)
-				.add(double.class, 0D)
-		);
-		
 		private final InvocationHandler surrogate;
 		
 		public DefaultPrimitiveValueInvocationProvider(InvocationHandler surrogate) {
@@ -147,8 +133,8 @@ public class InvocationHandlerSupport implements InvocationHandler {
 		
 		@Override
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-			if (PRIMITIVE_DEFAULT_VALUES.containsKey(method.getReturnType())) {
-				return PRIMITIVE_DEFAULT_VALUES.get(method.getReturnType());
+			if (Reflections.PRIMITIVE_DEFAULT_VALUES.containsKey(method.getReturnType())) {
+				return Reflections.PRIMITIVE_DEFAULT_VALUES.get(method.getReturnType());
 			} else {
 				return surrogate.invoke(proxy, method, args);
 			}

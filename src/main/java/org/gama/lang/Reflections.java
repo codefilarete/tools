@@ -7,6 +7,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -16,6 +17,7 @@ import java.util.function.Supplier;
 import org.gama.lang.bean.FieldIterator;
 import org.gama.lang.bean.MethodIterator;
 import org.gama.lang.collection.Iterables;
+import org.gama.lang.collection.Maps;
 import org.gama.lang.reflect.MemberPrinter;
 
 import static org.gama.lang.reflect.MemberPrinter.FLATTEN_PACKAGE_PRINTER;
@@ -35,6 +37,17 @@ public final class Reflections {
 	public static final Function<Method, String> JAVA_BEAN_ACCESSOR_PREFIX_REMOVER = method -> method.getName().substring(3);
 	
 	public static final Function<Method, String> JAVA_BEAN_BOOLEAN_ACCESSOR_PREFIX_REMOVER = method -> method.getName().substring(2);
+	
+	public static final Map<Class, Object> PRIMITIVE_DEFAULT_VALUES = Collections.unmodifiableMap(Maps
+			.asHashMap((Class) boolean.class, (Object) false)
+			.add(char.class, '\u0000')
+			.add(byte.class, (byte) 0)
+			.add(short.class, (short) 0)
+			.add(int.class, 0)
+			.add(long.class, 0L)
+			.add(float.class, 0F)
+			.add(double.class, 0D)
+	);
 	
 	/**
 	 * Printer for {@link #toString(Class)} and {@link #toString(Method)}.
