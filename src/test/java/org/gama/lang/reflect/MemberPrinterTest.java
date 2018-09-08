@@ -37,6 +37,9 @@ public class MemberPrinterTest {
 		Method equalsIgnoreCaseMethod = Reflections.getMethod(String.class, "equalsIgnoreCase", String.class);
 		assertEquals("boolean j.l.String.equalsIgnoreCase(j.l.String)", FLATTEN_PACKAGE_PRINTER.toString(equalsIgnoreCaseMethod));
 		assertEquals("boolean java.lang.String.equalsIgnoreCase(java.lang.String)", FULL_PACKAGE_PRINTER.toString(equalsIgnoreCaseMethod));
+		Method substringMethod = Reflections.getMethod(String.class, "substring", int.class, int.class);
+		assertEquals("j.l.String j.l.String.substring(int, int)", FLATTEN_PACKAGE_PRINTER.toString(substringMethod));
+		assertEquals("java.lang.String java.lang.String.substring(int, int)", FULL_PACKAGE_PRINTER.toString(substringMethod));
 	}
 	
 	@Test
