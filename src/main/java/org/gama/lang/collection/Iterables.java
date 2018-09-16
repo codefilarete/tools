@@ -560,7 +560,7 @@ public final class Iterables {
 	}
 	
 	/**
-	 * Finds all predicate-matching elements into an {@link Iterator}
+	 * Consumes all predicate-matching elements of an {@link Iterator}
 	 *
 	 * @param iterator the {@link Iterator} to scan
 	 * @param predicate the test to execute for equality
