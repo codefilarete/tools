@@ -3,12 +3,18 @@ package org.gama.lang.bean;
 import java.lang.reflect.Method;
 import java.util.Iterator;
 
+import org.gama.lang.collection.ArrayIterator;
+import org.gama.lang.collection.Iterables;
+
 /**
  * Iterator over (declared) methods of a class hierarchy
  * 
  * @author Guillaume Mary
  */
 public class MethodIterator extends InheritedElementIterator<Method> {
+	
+	/** Jacoco (code coverage tool) synthetic method name so it can be removed of method list because it breaks some tests */
+	private static final String JACOCO_METHOD_NAME = "$jacocoInit";
 	
 	public MethodIterator(Class fromClass) {
 		this(fromClass, null);
@@ -31,7 +37,9 @@ public class MethodIterator extends InheritedElementIterator<Method> {
 	 */
 	@Override
 	protected Method[] getElements(Class clazz) {
-		return clazz.getDeclaredMethods();
+		return Iterables.stream(new ArrayIterator<>(clazz.getDeclaredMethods()))
+				// we exclude Jacoco method
+				.filter(declaredField -> !JACOCO_METHOD_NAME.equals(declaredField.getName())).toArray(Method[]::new);
 	}
 	
 }
