@@ -28,7 +28,7 @@ public class MethodDispatcherTest {
 		assertEquals("Hello world !", testInstance.get());
 		testInstance.set(42);
 		assertEquals(42, hanger.getValue());
-		assertEquals("666", testInstance.toString());
+		assertEquals("Dispatcher to 666", testInstance.toString());
 	}
 	
 	@Test
@@ -38,23 +38,17 @@ public class MethodDispatcherTest {
 		
 		methodDispatcher.fallbackOn(null);
 		Holder1 builtInstance = methodDispatcher.build(Holder1.class);
+		System.out.println(builtInstance.toString());
 		assertTrue(builtInstance.toString().contains(Holder1.class.getName()));
 	}
 	
 	@Test
-	public void testBuild_noFallbackInstance_throwsException2() throws Exception {
+	public void testBuild_noFallbackInstance_throwsException2() {
 		Holder3 testInstance = new MethodDispatcher()
 				.redirect(AutoCloseable.class, () -> { throw new SQLException(); })
 				.build(Holder3.class);
 		
-		Throwable thrownThrowable = null;
-		try {
-			testInstance.close();
-		} catch (Throwable e) {
-			thrownThrowable = e;
-		}
-
-		assertTrue(thrownThrowable instanceof SQLException);
+		assertThrows(SQLException.class, testInstance::close);
 	}
 	
 	
@@ -68,16 +62,11 @@ public class MethodDispatcherTest {
 				.build(Holder2.class);
 		
 		assertEquals("Hello world !", testInstance.get());
-		Throwable thrownThrowable = null;
-		try {
-			// This can't be successfull because hanger instance expects an Integer so it will throw a ClassCastException
-			// This test checks that the exception is not wrapped in a UndeclaredThrowableException or InvocationTargetException
-			testInstance.set("sqds");
-		} catch (ClassCastException e) {
-			thrownThrowable = e;
-		}
-		
-		assertEquals("java.lang.String cannot be cast to java.lang.Integer", thrownThrowable.getMessage());
+		assertEquals("java.lang.String cannot be cast to java.lang.Integer",
+				assertThrows(ClassCastException.class, () ->
+				// This can't be successfull because hanger instance expects an Integer so it will throw a ClassCastException
+				// This test checks that the exception is not wrapped in a UndeclaredThrowableException or InvocationTargetException
+				testInstance.set("sqds")).getMessage());
 	}
 	
 	@Test
@@ -110,15 +99,11 @@ public class MethodDispatcherTest {
 				.redirect(SubclassAwareFluentInterface.class, new FluentInterfaceSupport())
 				.build(DummyFluentInterface.class);
 		
-		Throwable thrownThrowable = null;
-		try {
-			// This won't work because FluentInterfaceSupport returns itself which doesn't match DummyFluentInterface : they are dissociated subclasses.
-			testInstance.doSomething().doSomethingElse();
-		} catch (ClassCastException e) {
-			thrownThrowable = e;
-		}
-		assertEquals(thrownThrowable.getMessage(), "org.gama.lang.reflect.MethodDispatcherTest$FluentInterfaceSupport cannot be cast" +
-				" to org.gama.lang.reflect.MethodDispatcherTest$DummyFluentInterface");
+		assertEquals("org.gama.lang.reflect.MethodDispatcherTest$FluentInterfaceSupport cannot be cast" +
+				" to org.gama.lang.reflect.MethodDispatcherTest$DummyFluentInterface",
+				assertThrows(ClassCastException.class,
+				// This won't work because FluentInterfaceSupport returns itself which doesn't match DummyFluentInterface : they are dissociated subclasses.
+				() -> testInstance.doSomething().doSomethingElse()).getMessage());
 	}
 	
 	@Test
@@ -170,11 +155,8 @@ public class MethodDispatcherTest {
 						return null;
 					}
 				}, true)
-				.redirect(ASimpleContract.class, new ASimpleContract() {
-					@Override
-					public void simpleContractMethod() {
-						
-					}
+				.redirect(ASimpleContract.class, () -> {
+					
 				}, true)
 				.build(MultipleInheritanceTestSupport.class);
 		
@@ -187,14 +169,10 @@ public class MethodDispatcherTest {
 		MethodDispatcher testInstance = new MethodDispatcher()
 				.redirect(String.class, "abc");
 		
-		Throwable thrownThrowable = null;
-		try {
-			// This won't work because FluentInterfaceSupport returns itself which doesn't match DummyFluentInterface : they are dissociated subclasses.
-			testInstance.build(CharSequence.class);
-		} catch (IllegalArgumentException e) {
-			thrownThrowable = e;
-		}
-		assertTrue(thrownThrowable.getMessage().contains("Cannot intercept concrete method"));
+		assertTrue(assertThrows(IllegalArgumentException.class,
+				// This won't work because FluentInterfaceSupport returns itself which doesn't match DummyFluentInterface : they are dissociated subclasses.
+				() -> testInstance.build(CharSequence.class)).getMessage()
+				.contains("Cannot intercept concrete method"));
 	}
 	
 	private interface Holder1 extends Supplier<String>, Hanger<Integer> {

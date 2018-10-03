@@ -32,6 +32,7 @@ public class MethodDispatcher {
 	 */
 	private final Map<String /* simple method signature */, Interceptor> interceptors = new HashMap<>();
 	
+	/** Final target when no interceptor handled method, not null after {@link #build(Class)} invokation */
 	private Object fallback;
 	
 	/**
@@ -106,7 +107,13 @@ public class MethodDispatcher {
 				result = proxyHolder[0];
 			}
 			return result;
-		});
+		}) {
+			/** We handle toString() to had some message indicating who we are to avoid "ghost" behavior and hard debug */
+			@Override
+			public String toString() {
+				return "Dispatcher to " + fallback.toString();
+			}
+		};
 		proxyHolder[0] = Proxy.newProxyInstance(classLoader, targetInterfaces.toArray(new Class[0]), dispatcher);
 		return (X) proxyHolder[0];
 	}
