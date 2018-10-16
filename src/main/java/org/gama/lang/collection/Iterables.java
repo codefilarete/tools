@@ -34,7 +34,7 @@ public final class Iterables {
 	 * 
 	 * @param iterator the surrogate
 	 * @param <E> the content typed of the {@link Iterator}
-	 * @return an {@link Iterable} whose {@link Iterable#iterator()} returns the given {@link Iterator}
+	 * @return an {@link Iterable} which {@link Iterable#iterator()} returns the given {@link Iterator}
 	 */
 	public static <E> Iterable<E> asIterable(Iterator<E> iterator) {
 		return () -> iterator;
@@ -407,8 +407,8 @@ public final class Iterables {
 	 * This leads to a cumulative null key if {@code values} {@link Iterator} is larger than {@code keys} {@link Iterator} because all overflowing
 	 * elements will be put onto a null key.
 	 * 
-	 * @param keys {@link Iterator} whom elements will be used as keys
-	 * @param values {@link Iterator} whom elements will be used as values
+	 * @param keys {@link Iterator} which elements will be used as keys
+	 * @param values {@link Iterator} which elements will be used as values
 	 * @param <K> type of keys
 	 * @param <V> type of values
 	 * @return a new {@link HashMap} composed of keys and values from both {@link Iterator}s
@@ -423,8 +423,8 @@ public final class Iterables {
 	 * This leads to a cumulative null key if {@code values} {@link Iterator} is larger than {@code keys} {@link Iterator} because all overflowing
 	 * elements will be put onto a null key.
 	 *
-	 * @param keys {@link Iterator} whom elements will be used as keys
-	 * @param values {@link Iterator} whom elements will be used as values
+	 * @param keys {@link Iterator} which elements will be used as keys
+	 * @param values {@link Iterator} which elements will be used as values
 	 * @param target a provider of a {@link Map}
 	 * @param <K> type of keys
 	 * @param <V> type of values

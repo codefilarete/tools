@@ -21,7 +21,7 @@ public abstract class Exceptions {
 	 *
 	 * @param t any kinf of exception
 	 * @return the {@link Throwable} itself if it's already a {@link RuntimeException},
-	 * 			else a {@link RuntimeException} whose cause is the {@link Throwable} argument
+	 * 			else a {@link RuntimeException} which cause is the {@link Throwable} argument
 	 */
 	public static RuntimeException asRuntimeException(Throwable t) {
 		if (t instanceof RuntimeException) {
