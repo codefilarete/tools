@@ -2,7 +2,7 @@ package org.gama.lang.collection;
 
 import java.util.HashMap;
 
-import org.gama.lang.bean.IFactory;
+import org.gama.lang.bean.Factory;
 
 /**
  * Specialized {@link ValueFactoryMap} for HashMap.
@@ -11,15 +11,15 @@ import org.gama.lang.bean.IFactory;
  */
 public class ValueFactoryHashMap<K, V> extends ValueFactoryMap<K, V> {
 
-	public ValueFactoryHashMap(IFactory<K, V> factory) {
+	public ValueFactoryHashMap(Factory<K, V> factory) {
 		super(new HashMap<>(), factory);
 	}
 
-	public ValueFactoryHashMap(int initialCapacity, IFactory<K, V> factory) {
+	public ValueFactoryHashMap(int initialCapacity, Factory<K, V> factory) {
 		super(new HashMap<>(initialCapacity), factory);
 	}
 
-	public ValueFactoryHashMap(int initialCapacity, float loadFactor, IFactory<K, V> factory) {
+	public ValueFactoryHashMap(int initialCapacity, float loadFactor, Factory<K, V> factory) {
 		super(new HashMap<>(initialCapacity, loadFactor), factory);
 	}
 }

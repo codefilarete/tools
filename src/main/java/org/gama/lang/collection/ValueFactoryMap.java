@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
-import org.gama.lang.bean.IFactory;
+import org.gama.lang.bean.Factory;
 
 /**
  * Map that self puts a newly created value when the requested ({@link #get(Object)}) key is not found (null is
@@ -18,11 +18,11 @@ import org.gama.lang.bean.IFactory;
  * @author Guillaume Mary
  * @see ValueFactoryHashMap
  */
-public class ValueFactoryMap<K, V> implements Map<K, V>, IFactory<K, V> {
+public class ValueFactoryMap<K, V> implements Map<K, V>, Factory<K, V> {
 	
 	private final Map<K, V> delegate;
 	
-	private final IFactory<K, V> factoryDelegate;
+	private final Factory<K, V> factoryDelegate;
 	
 	/**
 	 * Constructor with mandatory elements
@@ -30,7 +30,7 @@ public class ValueFactoryMap<K, V> implements Map<K, V>, IFactory<K, V> {
 	 * @param delegate the wrapped instance
 	 * @param factoryDelegate the wrapped factory instance
 	 */
-	public ValueFactoryMap(Map<K, V> delegate, IFactory<K, V> factoryDelegate) {
+	public ValueFactoryMap(Map<K, V> delegate, Factory<K, V> factoryDelegate) {
 		this.delegate = delegate;
 		this.factoryDelegate = factoryDelegate;
 	}
