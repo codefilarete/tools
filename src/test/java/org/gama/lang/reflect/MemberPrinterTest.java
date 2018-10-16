@@ -1,5 +1,6 @@
 package org.gama.lang.reflect;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collection;
@@ -30,6 +31,16 @@ public class MemberPrinterTest {
 		assertEquals("boolean", testInstance.toString(Boolean.TYPE));
 		assertEquals("void", testInstance.toString(Void.TYPE));
 		assertEquals("j.l.Comparable[]", testInstance.toString(Comparable[].class));
+	}
+	
+	@Test
+	public void testToStringConstructor() {
+		Constructor stringWithStringArgConstructor = Reflections.getConstructor(String.class, String.class);
+		assertEquals("j.l.String(j.l.String)", FLATTEN_PACKAGE_PRINTER.toString(stringWithStringArgConstructor));
+		assertEquals("java.lang.String(java.lang.String)", FULL_PACKAGE_PRINTER.toString(stringWithStringArgConstructor));
+		Constructor stringWithCharIntIntArgsConstructor = Reflections.getConstructor(String.class, char[].class, int.class, int.class);
+		assertEquals("j.l.String(char[], int, int)", FLATTEN_PACKAGE_PRINTER.toString(stringWithCharIntIntArgsConstructor));
+		assertEquals("java.lang.String(char[], int, int)", FULL_PACKAGE_PRINTER.toString(stringWithCharIntIntArgsConstructor));
 	}
 	
 	@Test

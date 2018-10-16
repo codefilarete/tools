@@ -6,12 +6,14 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.AbstractMap;
 
+import org.gama.lang.Reflections.MemberNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -111,6 +113,17 @@ public class ReflectionsTest {
 		assertEquals(exectedParameterCount, method.getParameterTypes().length);
 	}
 	
+	@Test
+	public void testGetConstructor() throws NoSuchMethodException {
+		assertEquals(String.class.getConstructor(String.class), Reflections.getConstructor(String.class, String.class));
+		assertThrows(MemberNotFoundException.class, () -> Reflections.getConstructor(String.class, Reflections.class));
+	}
+	
+	@Test
+	public void testFindConstructor() throws NoSuchMethodException {
+		assertEquals(String.class.getConstructor(String.class), Reflections.findConstructor(String.class, String.class));
+		assertNull(Reflections.findConstructor(String.class, Reflections.class));
+	}
 	
 	@Test
 	public void testOnJavaBeanPropertyWrapperName_getterIsRecognized() throws NoSuchMethodException {
@@ -210,7 +223,7 @@ public class ReflectionsTest {
 		assertEquals(void.class, Reflections.forName("V"));
 		assertEquals(String.class, Reflections.forName(String.class.getName()));
 		assertEquals(Object[].class, Reflections.forName("[Ljava.lang.Object;"));
-		assertEquals(Object.class, Reflections.forName("Ljava/lang/Object"));
+		assertEquals(Object.class, Reflections.forName("java.lang.Object"));
 		assertEquals(boolean[].class, Reflections.forName("[Z"));
 		assertEquals(boolean[][].class, Reflections.forName("[[Z"));
 	}

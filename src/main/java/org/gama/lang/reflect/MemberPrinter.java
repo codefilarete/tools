@@ -1,5 +1,6 @@
 package org.gama.lang.reflect;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collection;
@@ -77,6 +78,11 @@ public class MemberPrinter {
 		} else {
 			return packageName + "." + aClass.getSimpleName();
 		}
+	}
+	
+	public String toString(Constructor constructor) {
+		return new ClassAppender().cat(constructor.getDeclaringClass())
+				.cat("(").ccat(constructor.getParameterTypes(), ", ").cat(")").toString();
 	}
 	
 	public String toString(Method method) {

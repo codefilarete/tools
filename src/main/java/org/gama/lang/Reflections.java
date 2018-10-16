@@ -64,6 +64,7 @@ public final class Reflections {
 	 * Shortcut for {@link AccessibleObject#setAccessible(boolean)}
 	 * @param accessibleObject the object to be set accessible
 	 */
+	@SuppressWarnings("squid:S3011")	// "Changing accessibility is security sensitive" : the goal of this method is the exact opposit of this rule 
 	public static void ensureAccessible(AccessibleObject accessibleObject) {
 		// we check accessibility first because setting it is a little costy
 		if (!accessibleObject.isAccessible()) {
@@ -196,6 +197,38 @@ public final class Reflections {
 	}
 	
 	/**
+	 * Returns the constructor with the given signature elements. 
+	 * 
+	 * @param clazz the class of the method
+	 * @param argTypes the argument types of the method
+	 * @return the found method, null possible
+	 */
+	public static Constructor findConstructor(Class clazz, Class... argTypes) {
+		try {
+			return Reflections.getConstructor(clazz, argTypes);
+		} catch (MemberNotFoundException e) {
+			return null;
+		}
+	}
+	
+	/**
+	 * Same as {@link #findConstructor(Class, Class[])} but throws a {@link org.gama.lang.Reflections.MemberNotFoundException}
+	 * if the constructor is not found.
+	 * 
+	 * @param clazz the class of the method
+	 * @param argTypes the argument types of the method
+	 * @return the found method, never null
+	 */
+	public static Constructor getConstructor(Class clazz, Class... argTypes) {
+		try {
+			return clazz.getConstructor(argTypes);
+		} catch (NoSuchMethodException e) {
+			throw new MemberNotFoundException("Constructor of " + toString(clazz) + " with arguments ("
+					+ new StringAppender().ccat(argTypes, ", ").toString() + ") was not found");
+		}
+	}
+	
+	/**
 	 * Instanciates a class from its default contructor
 	 * 
 	 * @param clazz the target intance class
@@ -323,6 +356,10 @@ public final class Reflections {
 		return MEMBER_PRINTER.toString(field);
 	}
 	
+	public static String toString(Constructor constructor) {
+		return MEMBER_PRINTER.toString(constructor);
+	}
+	
 	public static String toString(Method method) {
 		return MEMBER_PRINTER.toString(method);
 	}
@@ -359,10 +396,6 @@ public final class Reflections {
 			case "V":
 				return void.class;
 			default:
-				if (typeName.startsWith("L")) {
-					typeName = typeName.substring(1);
-					typeName = typeName.replace("/", ".");
-				}
 				return Class.forName(typeName);
 		}
 	}
