@@ -271,7 +271,8 @@ public final class Reflections {
 	 * No existence is checked : name is deduced from method's one (expected to be a Java bean compliant method)
 	 *
 	 * @param fieldWrapper the method supposed to get access to an attribute
-	 * @return the name of the attribute expected to be manage 
+	 * @return the name of the attribute expected to be manage
+	 * @throws MemberNotFoundException if property name can't be determined (method is not a conventional getter/setter)
 	 */
 	public static String propertyName(Method fieldWrapper) {
 		String propertyName = Reflections.onJavaBeanPropertyWrapperName(fieldWrapper,
@@ -305,14 +306,14 @@ public final class Reflections {
 	public static <E> E onJavaBeanPropertyWrapper(Method fieldWrapper, Function<Method, E> getterAction, Function<Method, E> setterAction, Function<Method, E> booleanGetterAction) {
 		int parameterCount = fieldWrapper.getParameterCount();
 		Class<?> returnType = fieldWrapper.getReturnType();
-		IllegalArgumentException exception = newEncapsulationException(fieldWrapper);
+		MemberNotFoundException exception = newEncapsulationException(fieldWrapper);
 		return onJavaBeanPropertyWrapperName(fieldWrapper, new GetOrThrow<>(getterAction, () -> parameterCount == 0 && returnType != Void.class, () -> exception),
 				new GetOrThrow<>(setterAction, () -> parameterCount == 1 && returnType == void.class, () -> exception),
 				new GetOrThrow<>(booleanGetterAction, () -> parameterCount == 0 && returnType == boolean.class, () -> exception));
 	}
 	
 	/**
-	 * Calls a {@link Supplier} according to the detected kind of getter or setter a method is. This implementation only tests on method name
+	 * Calls a {@link Supplier} according to the detected kind of getter or setter a method is. This implementation only tests method name
 	 * (or method return type for boolean getter). So it does not ensure that a real field matches the wrapped method.
 	 * 
 	 * @param fieldWrapper the method to test against getter, setter
@@ -335,10 +336,10 @@ public final class Reflections {
 		}
 	}
 	
-	private static IllegalArgumentException newEncapsulationException(Method method) {
-		return new IllegalArgumentException("Field wrapper "
+	private static MemberNotFoundException newEncapsulationException(Method method) {
+		return new MemberNotFoundException("Field wrapper "
 				+ toString(method)
-				+ " doesn't feet encapsulation naming convention");
+				+ " doesn't fit encapsulation naming convention");
 	}
 	
 	/**

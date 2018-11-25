@@ -211,6 +211,20 @@ public class ReflectionsTest {
 	}
 	
 	@Test
+	public void testPropertyName() throws NoSuchMethodException {
+		// simple case
+		String propertyName = Reflections.propertyName(Toto.class.getDeclaredMethod("setB", String.class));
+		assertEquals("b", propertyName);
+	}
+	
+	@Test
+	public void testPropertyName_methodDoesntFitJavaBeanConvention_exceptionIsThrown() throws NoSuchMethodException {
+		Method fixBMethod = Toto.class.getDeclaredMethod("fixB", String.class);
+		assertEquals("Field wrapper void o.g.l.Toto.fixB(j.l.String) doesn't fit encapsulation naming convention",
+				assertThrows(MemberNotFoundException.class, () -> Reflections.propertyName(fixBMethod)).getMessage());
+	}
+	
+	@Test
 	public void testForName() throws ClassNotFoundException {
 		assertEquals(boolean.class, Reflections.forName("Z"));
 		assertEquals(int.class, Reflections.forName("I"));
@@ -257,6 +271,11 @@ public class ReflectionsTest {
 		
 		public void setB(String b) {
 			this.b = b;
+		}
+		
+		/** Non conventional setter */
+		public void fixB(String b) {
+			setB(b);
 		}
 	}
 	
