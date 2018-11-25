@@ -39,6 +39,12 @@
 			<artifactId>jsr305</artifactId>
 			<version>${jsr305.version}</version>
 		</dependency>
+		<!-- To benefit from VisibleForTesting -->
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava-annotations</artifactId>
+			<version>r03</version>
+		</dependency>
 	</dependencies>
 	
 	<build>

@@ -1,26 +1,35 @@
 package org.gama.lang.trace;
 
+import javax.annotation.Nonnegative;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.gama.lang.Duo;
 import org.gama.lang.StringAppender;
 
 /**
- * Classe pour mesurer l'écoulement du temps entre 2 appels de méthodes.
- *
+ * Class aimed at mesuring time between 2 events.
+ * Basic implementation and use case : start it (done at instanciation time), then printing throught {@link #toString()}.
+ * One can reset it with {@link #start()}.
+ * 
  * @author Guillaume Mary
  */
 public class Chrono {
-
-	private static final int MILLIS_MAX = 1000;
-	private static final int SEC_MAX = 60*MILLIS_MAX;
-	private static final int MIN_MAX = 60*SEC_MAX;
-	private static final int H_MAX = 24*MIN_MAX;
+	
+	@VisibleForTesting
+	static final int MILLIS_MAX = 1000;
+	@VisibleForTesting
+	static final int SEC_MAX = 60 * MILLIS_MAX;
+	@VisibleForTesting
+	static final int MIN_MAX = 60 * SEC_MAX;
+	@VisibleForTesting
+	static final int H_MAX = 24 * MIN_MAX;
 
 	private enum TimeConstant {
-		DAY(H_MAX, "j"),
-		HOUR(MIN_MAX, ":"),
+		DAY(H_MAX, "d"),
+		HOUR(MIN_MAX, "h"),
 		MINUTE(SEC_MAX, "min"),
 		SECOND(MILLIS_MAX, "s"),
 		MILLIS(1, "ms");
@@ -33,20 +42,19 @@ public class Chrono {
 			this.timeUnit = timeUnit;
 		}
 		
-		private static final EnumSet<TimeConstant> MILLIS_TIME = EnumSet.of(MILLIS);
-		private static final EnumSet<TimeConstant> SECOND_TIME = EnumSet.of(SECOND, MILLIS);
-		private static final EnumSet<TimeConstant> MINUTE_TIME = EnumSet.of(MINUTE, SECOND, MILLIS);
-		private static final EnumSet<TimeConstant> HOUR_TIME = EnumSet.of(HOUR, MINUTE, SECOND, MILLIS);
-		private static final EnumSet<TimeConstant> DAY_TIME = EnumSet.of(DAY, HOUR, MINUTE, SECOND, MILLIS);
+		private static final Set<TimeConstant> MILLIS_TIME = Collections.unmodifiableSet(EnumSet.of(MILLIS));
+		private static final Set<TimeConstant> SECOND_TIME = Collections.unmodifiableSet(EnumSet.of(SECOND, MILLIS));
+		private static final Set<TimeConstant> MINUTE_TIME = Collections.unmodifiableSet(EnumSet.of(MINUTE, SECOND, MILLIS));
+		private static final Set<TimeConstant> HOUR_TIME = Collections.unmodifiableSet(EnumSet.of(HOUR, MINUTE, SECOND, MILLIS));
+		private static final Set<TimeConstant> DAY_TIME = Collections.unmodifiableSet(EnumSet.of(DAY, HOUR, MINUTE, SECOND, MILLIS));
 		
 		/**
-		 * Donne les constantes (dans l'ordre) à utiliser pour formater des millisecondes.
-		 * Utilisé comme optimisation car si on les parcourt toutes systématiquement les perf de formatage sont moins bonnes
-		 * dans la plupart des cas vu qu'on mesure très souvent des secondes ou millisecondes
-		 * @param millis
-		 * @return
+		 * Gives constants (in decreasing order) necessary to format given milliseconds.
+		 * 
+		 * @param millis any (non null) millisecond
+		 * @return a set of {@link TimeConstant} in decreasing order (from biggest unit to smallest)
 		 */
-		private static Set<TimeConstant> getTimeConstantsToUse(long millis) {
+		private static Set<TimeConstant> getTimeConstantsToUse(@Nonnegative long millis) {
 			Set<TimeConstant> constantsToUse;
 			if (millis < MILLIS_MAX) {
 				constantsToUse = TimeConstant.MILLIS_TIME;
@@ -65,23 +73,23 @@ public class Chrono {
 	}
 	
 	/**
-	 * Formatte un instant sous la forme "1:02min 24s 103ms" (chaque valeur est optionnelle si elle n'a pas de valeur)
+	 * Formats an instant such as "1:02min 24s 103ms" (each value is optional)
 	 * 
-	 * @param millis
-	 * @return le temps affichable
+	 * @param millis any (non null) millisecond
+	 * @return a printable representation of {@code millis} 
 	 */
 	public static String format(long millis) {
-		StringAppender sb = new StringAppender();
+		StringAppender result = new StringAppender();
 		Set<TimeConstant> constantsToUse = TimeConstant.getTimeConstantsToUse(millis);
 		for (TimeConstant timeConstant : constantsToUse) {
 			Duo<Long, Long> divide = divide(millis, timeConstant.millisCount);
 			long quotient = divide.getLeft();
-			// on affiche que ce qui est nécessaire
-			sb.catIf(quotient != 0, Long.toString(quotient), timeConstant.timeUnit, " ");
+			// we print only what's necessary
+			result.catIf(quotient != 0, Long.toString(quotient), timeConstant.timeUnit, " ");
 			millis = divide.getRight();
 		}
-		sb.cutTail(1);
-		return sb.toString();
+		// removing last space before returning
+		return result.cutTail(1).toString();
 	}
 	
 	private static Duo<Long, Long> divide(long millis, int divisor) {
@@ -89,9 +97,9 @@ public class Chrono {
 	}
 	
 	/**
-	 * Renvoie l'instant présent
+	 * Gives current instant
 	 * 
-	 * @return le temps en ms
+	 * @return current time in milliscond (see {@link System#currentTimeMillis()}
 	 */
 	public static long now() {
 		return System.currentTimeMillis();
@@ -105,31 +113,31 @@ public class Chrono {
 	}
 	
 	/**
-	 * Renvoie l'instant de départ
-	 * @return le temps en milliseconde
+	 * Returns start time
+	 * @return start time (in milliseconds)
 	 */
 	public long getStartTime() {
 		return this.startTime;
 	}
 	
 	/**
-	 * Démarre le chronomètre
-	 * @return l'instant de démarrage
+	 * Starts this chronometer
+	 * @return start time (which means now !)
 	 */
 	public long start() {
 		return startTime = now();
 	}
 	
 	/**
-	 * Donne le temps écoulé depuis le démarrage du chronomètre
-	 * @return la différence de millisecondes entre maintenant et l'instant de démarrage
+	 * Gives spent time since this chronometer starts
+	 * @return the difference between start time and now, in millis
 	 */
 	public long getElapsedTime() {
 		return now() - startTime;
 	}
 	
 	/**
-	 * Formatte le temps écoulé depuis l'instant de départ
+	 * Format spent time since this chronometer's start time
 	 * @see Chrono#format
 	 * @see Chrono#getElapsedTime
 	 */
