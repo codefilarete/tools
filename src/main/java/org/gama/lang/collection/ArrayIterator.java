@@ -1,5 +1,7 @@
 package org.gama.lang.collection;
 
+import java.util.NoSuchElementException;
+
 /**
  * Wraps an array into an Iterator. Allows reuse of an array in the Iterators API.
  * 
@@ -23,6 +25,10 @@ public class ArrayIterator<O> extends ReadOnlyIterator<O> {
 
 	@Override
 	public O next() {
-		return this.array[currentIndex++];
+		try {
+			return this.array[currentIndex++];
+		} catch (ArrayIndexOutOfBoundsException e) {
+			throw new NoSuchElementException();
+		}
 	}
 }

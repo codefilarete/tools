@@ -1,5 +1,7 @@
 package org.gama.lang.bean;
 
+import java.util.NoSuchElementException;
+
 import org.gama.lang.collection.ReadOnlyIterator;
 
 /**
@@ -37,7 +39,12 @@ public class ClassIterator extends ReadOnlyIterator<Class> {
 	@Override
 	public Class next() {
 		Class next = currentClass;
-		currentClass = currentClass.getSuperclass();
+		try {
+			currentClass = currentClass.getSuperclass();
+		} catch (NullPointerException e) {
+			// this is necessary to be compliant with Iterator#next(..) contract
+			throw new NoSuchElementException();
+		}
 		return next;
 	}
 }

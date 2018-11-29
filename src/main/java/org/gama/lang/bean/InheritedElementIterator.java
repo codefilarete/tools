@@ -2,6 +2,7 @@ package org.gama.lang.bean;
 
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import org.gama.lang.collection.ArrayIterator;
 import org.gama.lang.collection.ReadOnlyIterator;
@@ -45,6 +46,9 @@ public abstract class InheritedElementIterator<T> extends ReadOnlyIterator<T> {
 	
 	@Override
 	public T next() {
+		if (!hasNext()) {
+			throw new NoSuchElementException();
+		}
 		return inheritedElementIterator.next();
 	}
 	
