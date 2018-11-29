@@ -1,10 +1,7 @@
 package org.gama.lang.exception;
 
-import java.lang.ref.SoftReference;
-import java.lang.reflect.Field;
 import java.util.NoSuchElementException;
 
-import org.gama.lang.Reflections;
 import org.gama.lang.collection.Iterables;
 import org.gama.lang.collection.ReadOnlyIterator;
 
@@ -12,7 +9,7 @@ import org.gama.lang.collection.ReadOnlyIterator;
  * 
  * @author Guillaume Mary 
  */
-public abstract class Exceptions {
+public interface Exceptions {
 	
 	/**
 	 * Convert a {@link Throwable} into a {@link RuntimeException}. Do nothing if the {@link Throwable} is already a {@link RuntimeException},
@@ -23,7 +20,7 @@ public abstract class Exceptions {
 	 * @return the {@link Throwable} itself if it's already a {@link RuntimeException},
 	 * 			else a {@link RuntimeException} which cause is the {@link Throwable} argument
 	 */
-	public static RuntimeException asRuntimeException(Throwable t) {
+	static RuntimeException asRuntimeException(Throwable t) {
 		if (t instanceof RuntimeException) {
 			return  (RuntimeException) t;
 		} else {
@@ -31,49 +28,33 @@ public abstract class Exceptions {
 		}
 	}
 	
-	private static volatile SoftReference<Field> MESSAGE_ACCESSOR;
-	
-	/**
-	 * Return the {@link Throwable#detailMessage} accessor. It's sometimes necessary to have it when Exception's subclasses override
-	 * {@link Throwable#getMessage()} which then disallow access to the original error message.
-	 * @return the {@link Field} that represents {@link Throwable#getMessage()}
-	 */
-	public static Field getDetailMessageGetter() {
-		Field detailMessageAccessor = MESSAGE_ACCESSOR == null ? null : MESSAGE_ACCESSOR.get();
-		if (detailMessageAccessor == null) {
-			synchronized (Exceptions.class) {
-				MESSAGE_ACCESSOR = new SoftReference<>(Reflections.findField(Throwable.class, "detailMessage"));
-				Reflections.ensureAccessible(MESSAGE_ACCESSOR.get());
-			}
-		}
-		return MESSAGE_ACCESSOR.get();
-	}
-	
-	public static <T> T findExceptionInHierarchy(Throwable t, Class<T> throwableClass) {
+	static <T> T findExceptionInHierarchy(Throwable t, Class<T> throwableClass) {
 		return (T) findExceptionInHierarchy(t, new ClassExceptionFilter<>(throwableClass));
 	}
 	
-	public static <T> T findExceptionInHierarchy(Throwable t, Class<T> throwableClass, String message) {
+	static <T> T findExceptionInHierarchy(Throwable t, Class<T> throwableClass, String message) {
 		return (T) findExceptionInHierarchy(t, new ClassAndMessageExceptionFilter<>(throwableClass, message));
 	}
 	
 	/**
-	 * Look up a {@link Throwable} in the causes hierarchy of the {@link Throwable} argument according to a {@link IExceptionFilter} 
+	 * Look up a {@link Throwable} in the causes hierarchy of the {@link Throwable} argument according to a {@link ExceptionFilter} 
 	 *
 	 * @param t the initial stack error
 	 * @param filter a filter
 	 * @return null if not found
 	 */
-	public static Throwable findExceptionInHierarchy(Throwable t, final IExceptionFilter filter) {
+	static Throwable findExceptionInHierarchy(Throwable t, final ExceptionFilter filter) {
 		return Iterables.stream(new ExceptionHierarchyIterator(t)).filter(filter::accept).findAny().orElse(null);
 	}
 	
 	/**
-	 * Iterator on {@link Throwable} causes
+	 * Iterator on {@link Throwable} causes (and itself)
 	 */
-	public static class ExceptionHierarchyIterator extends ReadOnlyIterator<Throwable> {
+	class ExceptionHierarchyIterator extends ReadOnlyIterator<Throwable> {
 		
 		private Throwable currentThrowable;
+		
+		private boolean hasNext = false;
 		
 		public ExceptionHierarchyIterator(Throwable throwable) {
 			this.currentThrowable = throwable;
@@ -81,25 +62,26 @@ public abstract class Exceptions {
 		
 		@Override
 		public boolean hasNext() {
-			return currentThrowable.getCause() != null;
+			return hasNext = currentThrowable != null;
 		}
 		
 		@Override
 		public Throwable next() {
-			try {
-				currentThrowable = currentThrowable.getCause();
-			} catch (NullPointerException e) {
+			if (!hasNext) {
+				// this is necessary to be compliant with Iterator#next(..) contract
 				throw new NoSuchElementException();
 			}
-			return currentThrowable;
+			Throwable next = currentThrowable;
+			currentThrowable = currentThrowable.getCause();
+			return next;
 		}
 	}
 	
-	public interface IExceptionFilter {
+	interface ExceptionFilter {
 		boolean accept(Throwable t);
 	}
 	
-	public static class ClassExceptionFilter<T> implements IExceptionFilter {
+	class ClassExceptionFilter<T> implements ExceptionFilter {
 		
 		private final Class<T> targetClass;
 		
@@ -112,7 +94,7 @@ public abstract class Exceptions {
 		}
 	}
 	
-	private static class ClassAndMessageExceptionFilter<T> extends ClassExceptionFilter<T> {
+	class ClassAndMessageExceptionFilter<T> extends ClassExceptionFilter<T> {
 		
 		private final String targetMessage;
 		
@@ -123,13 +105,7 @@ public abstract class Exceptions {
 		
 		@Override
 		public boolean accept(Throwable t) {
-			String throwableMessage;
-			try {
-				throwableMessage = (String) getDetailMessageGetter().get(t);
-			} catch (IllegalAccessException e) {
-				throw Exceptions.asRuntimeException(e);
-			}
-			return super.accept(t) && targetMessage.equalsIgnoreCase(throwableMessage);
+			return super.accept(t) && targetMessage.equalsIgnoreCase(t.getMessage());
 		}
 	}
 	
