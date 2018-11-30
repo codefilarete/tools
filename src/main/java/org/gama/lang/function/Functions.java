@@ -1,8 +1,12 @@
 package org.gama.lang.function;
 
+import java.lang.reflect.Method;
 import java.util.Objects;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+
+import org.gama.lang.Reflections;
 
 /**
  * @author Guillaume Mary
@@ -18,6 +22,21 @@ public class Functions {
 	 */
 	public static <T> Function<T, Boolean> toFunction(Predicate<T> predicate) {
 		return predicate::test;
+	}
+	
+	/**
+	 * Converts a {@link Method} to a {@link BiConsumer}
+	 *
+	 * @param setter any method taking one argument
+	 * @param <I> target instance type
+	 * @param <O> argument type
+	 * @return a new (lambda) {@link Function} plugged onto {@link Predicate}
+	 */
+	public static <I, O> BiConsumer<I, O> toBiConsumer(Method setter) {
+		if (setter.getParameterCount() == 0) {
+			throw new IllegalArgumentException("Method is expected to have at least 1 argument but has none :" + setter);
+		}
+		return (target, args) -> Reflections.invoke(setter, target, args);
 	}
 	
 	/**

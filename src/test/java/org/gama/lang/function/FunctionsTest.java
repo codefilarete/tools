@@ -1,15 +1,35 @@
 package org.gama.lang.function;
 
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Guillaume Mary
  */
 public class FunctionsTest {
+	
+	@Test
+	public void testToFunction_predicate() {
+		Function<Object, Boolean> predicateAsFunction = Functions.toFunction("hello"::equals);
+		assertTrue(predicateAsFunction.apply("hello"));
+		assertFalse(predicateAsFunction.apply("coucou"));
+	}
+	
+	@Test
+	public void testToBiConsumer_method() throws NoSuchMethodException {
+		BiConsumer<Object, Object> methodAsBiConsumer = Functions.toBiConsumer(StringBuilder.class.getDeclaredMethod("append", int.class));
+		StringBuilder target = new StringBuilder();
+		methodAsBiConsumer.accept(target, 1);
+		assertEquals("1", target.toString());
+	}
 	
 	@Test
 	public void testLink() {

@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.AbstractMap;
 
+import org.gama.lang.Reflections.InvokationRuntimeException;
 import org.gama.lang.Reflections.MemberNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -196,6 +197,23 @@ public class ReflectionsTest {
 	}
 	
 	@Test
+	public void testInvoke() throws NoSuchMethodException {
+		Toto toto = new Toto();
+		Method setter = Toto.class.getMethod("setA", int.class);
+		
+		// minimal test
+		Reflections.invoke(setter, toto, 42);
+		assertEquals(42, toto.getA());
+		
+		// wrong input type (throws IllegalArgumentException)
+		assertThrows(InvokationRuntimeException.class, () -> Reflections.invoke(setter, toto, "dummyString"));
+		
+		// Non accessible method
+		Method privateMethod = Toto.class.getDeclaredMethod("toto");
+		assertThrows(InvokationRuntimeException.class, () -> Reflections.invoke(privateMethod, toto));
+	}
+	
+	@Test
 	public void testWrappedField() throws NoSuchMethodException, NoSuchFieldException {
 		// simple case
 		Field field = Reflections.wrappedField(Toto.class.getDeclaredMethod("setB", String.class));
@@ -263,6 +281,10 @@ public class ReflectionsTest {
 		}
 		
 		private void toto2() {
+		}
+		
+		public int getA() {
+			return a;
 		}
 		
 		public void setA(int a) {
