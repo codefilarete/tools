@@ -15,15 +15,15 @@ import java.util.Iterator;
  */
 public abstract class SteppingIterator<E> implements Iterator<E> {
 	
-	private final Iterator<E> delegate;
+	private final Iterator<? extends E> delegate;
 	private long stepCounter = 0;
 	private final long step;
 	
-	public SteppingIterator(Iterable<E> delegate, long step) {
+	public SteppingIterator(Iterable<? extends E> delegate, long step) {
 		this(delegate.iterator(), step);
 	}
 	
-	public SteppingIterator(Iterator<E> delegate, long step) {
+	public SteppingIterator(Iterator<? extends E> delegate, long step) {
 		this.delegate = delegate;
 		this.step = step;
 	}

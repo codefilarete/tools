@@ -7,7 +7,7 @@ import java.util.Objects;
  */
 public class Duo<A, B> {
 	
-	private final A left;
+	private A left;
 	private final B right;
 	
 	public Duo(A left, B right) {
@@ -17,6 +17,10 @@ public class Duo<A, B> {
 	
 	public A getLeft() {
 		return left;
+	}
+	
+	public void setLeft(A left) {
+		this.left = left;
 	}
 	
 	public B getRight() {

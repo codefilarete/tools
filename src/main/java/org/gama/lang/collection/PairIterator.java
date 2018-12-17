@@ -12,16 +12,16 @@ import org.gama.lang.Duo;
  * @param <V> type of second {@link Iterator}'s element
  * @author Guillaume Mary
  */
-public class PairIterator<K, V> implements Iterator<Duo<K, V>> {
+public class PairIterator<K, V> implements Iterator<Duo<? extends K, ? extends V>> {
 	
-	protected Iterator<K> iterator1;
-	protected Iterator<V> iterator2;
+	protected Iterator<? extends K> iterator1;
+	protected Iterator<? extends V> iterator2;
 	
-	public PairIterator(Iterable<K> iterator1, Iterable<V> iterator2) {
+	public PairIterator(Iterable<? extends K> iterator1, Iterable<? extends V> iterator2) {
 		this(iterator1.iterator(), iterator2.iterator());
 	}
 	
-	public PairIterator(Iterator<K> iterator1, Iterator<V> iterator2) {
+	public PairIterator(Iterator<? extends K> iterator1, Iterator<? extends V> iterator2) {
 		this.iterator1 = iterator1;
 		this.iterator2 = iterator2;
 	}
@@ -53,11 +53,11 @@ public class PairIterator<K, V> implements Iterator<Duo<K, V>> {
 	 */
 	public static class UntilBothIterator<K, V> extends PairIterator<K, V> {
 		
-		public UntilBothIterator(Iterable<K> iterator1, Iterable<V> iterator2) {
+		public UntilBothIterator(Iterable<? extends K> iterator1, Iterable<? extends V> iterator2) {
 			super(iterator1, iterator2);
 		}
 		
-		public UntilBothIterator(Iterator<K> iterator1, Iterator<V> iterator2) {
+		public UntilBothIterator(Iterator<? extends K> iterator1, Iterator<? extends V> iterator2) {
 			super(iterator1, iterator2);
 		}
 		
