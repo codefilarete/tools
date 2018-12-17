@@ -265,7 +265,7 @@ public final class Iterables {
 	 * @param <O> the output type
 	 * @return the collection given by the supplier
 	 */
-	public static <I, O> List<O> collectToList(Iterable<I> iterable, Function<I, O> mapper) {
+	public static <I, O> List<O> collectToList(Iterable<? extends I> iterable, Function<I, O> mapper) {
 		return collect(iterable, mapper, ArrayList::new);
 	}
 	
@@ -280,7 +280,7 @@ public final class Iterables {
 	 * @param <C> the collecting type
 	 * @return the collection given by the supplier
 	 */
-	public static <I, O, C extends Collection<O>> C collect(Iterable<I> iterable, Function<I, O> mapper, Supplier<C> target) {
+	public static <I, O, C extends Collection<O>> C collect(Iterable<? extends I> iterable, Function<I, O> mapper, Supplier<C> target) {
 		return collect(iterable, i -> true, mapper, target);
 	}
 	
@@ -296,7 +296,7 @@ public final class Iterables {
 	 * @param <C> the collecting type
 	 * @return the collection given by the supplier
 	 */
-	public static <I, O, C extends Collection<O>> C collect(Iterable<I> iterable, Predicate<I> acceptFilter, Function<I, O> mapper, Supplier<C> target) {
+	public static <I, O, C extends Collection<O>> C collect(Iterable<? extends I> iterable, Predicate<I> acceptFilter, Function<I, O> mapper, Supplier<C> target) {
 		C result = target.get();
 		for (I pawn : iterable) {
 			if (acceptFilter.test(pawn)) {
@@ -453,9 +453,9 @@ public final class Iterables {
 	 * @param iterable an {@link Iterable}, not null
 	 * @return a {@link Stream} than will iterate over the {@link Iterable} passed as arguemnt
 	 */
-	public static <E> Stream<E> stream(Iterable<E> iterable) {
+	public static <E> Stream<E> stream(Iterable<? extends E> iterable) {
 		// StreamSupport knows how to convert an Iterable to a stream
-		return StreamSupport.stream(iterable.spliterator(), false);
+		return (Stream<E>) StreamSupport.stream(iterable.spliterator(), false);
 	}
 	
 	/**
