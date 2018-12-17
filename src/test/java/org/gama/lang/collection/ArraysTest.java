@@ -1,6 +1,7 @@
 package org.gama.lang.collection;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
@@ -52,12 +53,38 @@ public class ArraysTest {
 		assertTrue(Arrays.asTreeSet(String.CASE_INSENSITIVE_ORDER).add("a"));
 	}
 	
+	/**
+	 * Test for Comparator<? super T> signature
+	 */
+	@Test
+	public void asTreeSet_arrayArgument_generics() {
+		Comparator<CharSequence> charSequenceComparator = (o1, o2) -> o2.hashCode() - o1.hashCode();
+		Set<String> newSet = Arrays.asTreeSet(charSequenceComparator, "a", "b", "A");
+		assertEquals(java.util.Arrays.asList("b", "a", "A").toString(), newSet.toString());
+		assertTrue(Arrays.asTreeSet(charSequenceComparator).isEmpty());
+		// the set is modifiable
+		assertTrue(Arrays.asTreeSet(charSequenceComparator).add("a"));
+	}
+	
 	@Test
 	public void asTreeSet_collectionArgument() {
 		Set<String> newSet = Arrays.asTreeSet(String.CASE_INSENSITIVE_ORDER, java.util.Arrays.asList("a", "b", "A"));
 		assertEquals(java.util.Arrays.asList("a", "b").toString(), newSet.toString());
 		// the set is modifiable
 		assertTrue(Arrays.asTreeSet(String.CASE_INSENSITIVE_ORDER, new ArrayList<>()).add("a"));
+	}
+	
+	/**
+	 * Test for Comparator<? super T> signature
+	 */
+	@Test
+	public void asTreeSet_collectionArgument_generics() {
+		Comparator<CharSequence> charSequenceComparator = (o1, o2) -> o2.hashCode() - o1.hashCode();
+		List<String> a = java.util.Arrays.asList("a", "b", "A");
+		Set<String> newSet = Arrays.asTreeSet(charSequenceComparator, a);
+		assertEquals(java.util.Arrays.asList("b", "a", "A").toString(), newSet.toString());
+		// the set is modifiable
+		assertTrue(Arrays.asTreeSet(charSequenceComparator, new ArrayList<>()).add("a"));
 	}
 	
 	@Test

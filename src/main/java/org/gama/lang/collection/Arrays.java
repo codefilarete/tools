@@ -34,7 +34,7 @@ public class Arrays {
 		return toReturn;
 	}
 	
-	public static <T> TreeSet<T> asTreeSet(Comparator<T> comparator, T ... a) {
+	public static <T> TreeSet<T> asTreeSet(Comparator<? super T> comparator, T ... a) {
 		TreeSet<T> toReturn = new TreeSet<>(comparator);
 		java.util.Collections.addAll(toReturn, a);
 		return toReturn;
