@@ -3,7 +3,7 @@ package org.gama.lang.function;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.gama.lang.function.QuietConverter.NullAwareConverter;
+import org.gama.lang.function.Converter.NullAwareConverter;
 
 /**
  * @author Guilllaume Mary
@@ -55,12 +55,12 @@ public class ConverterRegistry {
 		});
 	}
 	
-	private final Map<Class, QuietConverter> converters = new HashMap<>();
+	private final Map<Class, Converter> converters = new HashMap<>();
 	
 	public ConverterRegistry() {
 	}
 	
-	public <O> void setConverter(Class<O> clazz, QuietConverter<Object, O> converter) {
+	public <O> void setConverter(Class<O> clazz, Converter<Object, O> converter) {
 		converters.put(clazz, converter);
 	}
 	
@@ -92,7 +92,7 @@ public class ConverterRegistry {
 		return getConverter(clazz).convert(value);
 	}
 	
-	public <O> QuietConverter<Object, O> getConverter(Class<O> clazz) {
+	public <O> Converter<Object, O> getConverter(Class<O> clazz) {
 		return this.converters.get(clazz);
 	}
 }
