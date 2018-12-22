@@ -216,12 +216,23 @@ public class IterablesTest {
 	}
 	
 	@Test
-	public void testCollect_filter() {
+	public void testCollect_withFilter() {
 		// test with content
 		List<Integer> aSet = asList(1, 2, 1);
 		assertEquals(asHashSet("1"), collect(aSet, i -> i.equals(1), Object::toString, HashSet::new));
 		assertEquals(asHashSet("2"), collect(aSet, i -> i.equals(2), Object::toString, HashSet::new));
 		assertEquals(asHashSet("1", "2"), collect(aSet, i -> true, Object::toString, HashSet::new));
+	}
+	
+	@Test
+	public void testCollect_with2Filters() {
+		// test with content
+		List<Integer> aSet = asList(1, 2, 1);
+		assertEquals(asHashSet("1"), collect(aSet, i -> i.equals(1), Object::toString, "1"::equals, HashSet::new));
+		assertEquals(asHashSet("2"), collect(aSet, i -> i.equals(2), Object::toString, "2"::equals, HashSet::new));
+		assertEquals(asHashSet(), collect(aSet, i -> i.equals(2), Object::toString, "x"::equals, HashSet::new));
+		assertEquals(asHashSet("1", "2"), collect(aSet, i -> true, Object::toString, HashSet::new));
+		assertEquals(asHashSet("1"), collect(aSet, i -> true, Object::toString, "1"::equals, HashSet::new));
 	}
 	
 	@Test

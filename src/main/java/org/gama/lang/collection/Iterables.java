@@ -212,13 +212,13 @@ public final class Iterables {
 	/**
 	 * Maps an {@link Iterable} on a key took as a {@link Function} of its beans. The value is also a function took on them.
 	 * 
-	 * @param iterable the iterable to Map, not null
+	 * @param iterable the iterable to map
 	 * @param keyMapper the key provider
 	 * @param valueMapper the value provider
-	 * @param <T> the type of objets iterated
-	 * @param <K> the type of the keys
-	 * @param <V> the type of the values
-	 * @return a new (Hash)Map, never null
+	 * @param <T> iterated objets type
+	 * @param <K> keys type
+	 * @param <V> vaules type
+	 * @return a new (Hash)Map
 	 */
 	public static <T, K, V> Map<K, V> map(Iterable<T> iterable, Function<T, K> keyMapper, Function<T, V> valueMapper) {
 		return map(iterable, keyMapper, valueMapper, HashMap::new);
@@ -227,14 +227,14 @@ public final class Iterables {
 	/**
 	 * Maps an {@link Iterable} on a key took as a {@link Function} of its beans. The value is also a function took on them.
 	 *
-	 * @param iterable the iterable to Map, not null
+	 * @param iterable the iterable to map
 	 * @param keyMapper the key provider
 	 * @param valueMapper the value provider
 	 * @param target the map to be filled
-	 * @param <T> the type of objets iterated
-	 * @param <K> the type of the keys
-	 * @param <V> the type of the values
-	 * @return a new (Hash)Map, never null
+	 * @param <T> iterated objets type
+	 * @param <K> keys type
+	 * @param <V> vaules type
+	 * @return a new (Hash)Map
 	 */
 	public static <T, K, V, M extends Map<K, V>> M map(Iterable<T> iterable, Function<T, K> keyMapper, Function<T, V> valueMapper, Supplier<M> target) {
 		M result = target.get();
@@ -247,11 +247,11 @@ public final class Iterables {
 	/**
 	 * Maps objects of an {@link Iterable} over a key took as a {@link Function} of them. 
 	 * 
-	 * @param iterable the iterable to Map, not null
+	 * @param iterable the iterable to map
 	 * @param keyMapper the key provider
-	 * @param <T> the type of objects iterated
-	 * @param <K> the type of the keys
-	 * @return a new (Hash)Map, never null
+	 * @param <T> iterated objets type
+	 * @param <K> keys type
+	 * @return a new (Hash)Map
 	 */
 	public static <T, K> Map<K, T> mapIdentity(Iterable<T> iterable, Function<T, K> keyMapper) {
 		return map(iterable, keyMapper, Function.identity());
@@ -259,10 +259,11 @@ public final class Iterables {
 	
 	/**
 	 * Equivalent to {@link #collect(Iterable, Function, Supplier)} collecting to a {@link List}
+	 * 
 	 * @param iterable the source
 	 * @param mapper the mapping function
-	 * @param <I> the input type
-	 * @param <O> the output type
+	 * @param <I> input type
+	 * @param <O> output type
 	 * @return the collection given by the supplier
 	 */
 	public static <I, O> List<O> collectToList(Iterable<? extends I> iterable, Function<I, O> mapper) {
@@ -270,7 +271,7 @@ public final class Iterables {
 	}
 	
 	/**
-	 * Applies a mapper over an {@link Iterable} to collect information and put each result into a collection.
+	 * Applies a mapper over an {@link Iterable} to collect information and puts each result into a collection.
 	 * 
 	 * @param iterable the source
 	 * @param mapper the mapping function
@@ -285,7 +286,7 @@ public final class Iterables {
 	}
 	
 	/**
-	 * Applies a filter and a mapper over an {@link Iterable} to collect information and put each result into a collection.
+	 * Applies a filter and a mapper over an {@link Iterable} to collect information and puts each result into a collection.
 	 *
 	 * @param iterable the source
 	 * @param acceptFilter the accepting condition
@@ -296,11 +297,34 @@ public final class Iterables {
 	 * @param <C> the collecting type
 	 * @return the collection given by the supplier
 	 */
-	public static <I, O, C extends Collection<O>> C collect(Iterable<? extends I> iterable, Predicate<I> acceptFilter, Function<I, O> mapper, Supplier<C> target) {
+	public static <I, O, C extends Collection<O>> C collect(Iterable<? extends I> iterable, Predicate<I> acceptFilter, Function<I, O> mapper,
+															Supplier<C> target) {
+		return collect(iterable, acceptFilter, mapper, x -> true, target);
+	}
+	
+	/**
+	 * Applies a filter and a mapper over an {@link Iterable} to collect information and puts result into a collection if it's accepted by a second
+	 * predicate.
+	 *
+	 * @param iterable the source
+	 * @param acceptFilter the accepting condition
+	 * @param mapper the mapping function
+	 * @param mappedValueFilter the accepting condition for the mapped value
+	 * @param target the supplier of resulting collection
+	 * @param <I> the input type
+	 * @param <O> the output type
+	 * @param <C> the collecting type
+	 * @return the collection given by the supplier
+	 */
+	public static <I, O, C extends Collection<O>> C collect(Iterable<? extends I> iterable, Predicate<I> acceptFilter, Function<I, O> mapper,
+															Predicate<O> mappedValueFilter, Supplier<C> target) {
 		C result = target.get();
 		for (I pawn : iterable) {
 			if (acceptFilter.test(pawn)) {
-				result.add(mapper.apply(pawn));
+				O mappedPawn = mapper.apply(pawn);
+				if (mappedValueFilter.test(mappedPawn)) {
+					result.add(mappedPawn);
+				}
 			}
 		}
 		return result;

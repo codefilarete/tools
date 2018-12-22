@@ -1,7 +1,7 @@
 package org.gama.lang;
 
-import org.gama.lang.bean.IDelegate;
 import org.gama.lang.exception.Exceptions;
+import org.gama.lang.function.ThrowingExecutable;
 
 /**
  * @author Guillaume Mary
@@ -18,7 +18,7 @@ public abstract class Retryer {
 		this.retryDelay = retryDelay;
 	}
 
-	public <T, E extends Throwable> T execute(IDelegate<T, E> delegate, String description) throws E, RetryException {
+	public <T, E extends Throwable> T execute(ThrowingExecutable<T, E> delegate, String description) throws E, RetryException {
 		Executor<T, E> executor = new Executor<>(delegate, description);
 		return executor.execute();
 	}
@@ -46,9 +46,9 @@ public abstract class Retryer {
 	 */
 	private final class Executor<R, E extends Throwable> {
 		private int tryCount = 0;
-		private final IDelegate<R, E> delegateWithResult;
+		private final ThrowingExecutable<R, E> delegateWithResult;
 		private final String description;
-		private Executor(IDelegate<R, E> delegateWithResult, String description) {
+		private Executor(ThrowingExecutable<R, E> delegateWithResult, String description) {
 			this.delegateWithResult = delegateWithResult;
 			this.description = description;
 		}
