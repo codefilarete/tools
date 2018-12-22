@@ -1,10 +1,10 @@
-package org.gama.lang.bean;
+package org.gama.lang.function;
 
 /**
 * @author Guillaume Mary
 */
 @FunctionalInterface
-public interface QuietConverter<I, O> extends Converter<I, O, RuntimeException> {
+public interface QuietConverter<I, O> extends ThrowingConverter<I, O, RuntimeException> {
 	
 	abstract class NullAwareConverter<I, O> implements QuietConverter<I, O> {
 		

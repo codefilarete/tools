@@ -1,9 +1,9 @@
-package org.gama.lang.bean;
+package org.gama.lang.function;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.gama.lang.bean.QuietConverter.NullAwareConverter;
+import org.gama.lang.function.QuietConverter.NullAwareConverter;
 
 /**
  * @author Guilllaume Mary
