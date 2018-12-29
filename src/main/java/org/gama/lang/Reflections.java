@@ -1,6 +1,7 @@
 package org.gama.lang;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -144,7 +145,9 @@ public final class Reflections {
 	 * @param clazz the class of the field
 	 * @param name the name of the field
 	 * @return the found field, null possible
+	 * @throws MemberNotFoundException in case of non existing field
 	 */
+	@Nullable
 	public static Field findField(Class clazz, String name) {
 		return Iterables.stream(new FieldIterator(clazz)).filter(field -> field.getName().equals(name)).findAny().orElse(null);
 	}
@@ -173,6 +176,7 @@ public final class Reflections {
 	 * @param argTypes the argument types of the method
 	 * @return the found method, null possible
 	 */
+	@Nullable
 	public static Method findMethod(Class clazz, String name, Class... argTypes) {
 		return Iterables.stream(new MethodIterator(clazz))
 				.filter(method -> method.getName().equals(name) && Arrays.equals(method.getParameterTypes(), argTypes))
@@ -187,6 +191,7 @@ public final class Reflections {
 	 * @param name the name of the method
 	 * @param argTypes the argument types of the method
 	 * @return the found method, never null
+	 * @throws MemberNotFoundException in case of non existing method
 	 */
 	public static Method getMethod(Class clazz, String name, Class... argTypes) {
 		Method method = findMethod(clazz, name, argTypes);
@@ -204,9 +209,10 @@ public final class Reflections {
 	 * @param argTypes the argument types of the method
 	 * @return the found method, null possible
 	 */
+	@Nullable
 	public static Constructor findConstructor(Class clazz, Class... argTypes) {
 		try {
-			return Reflections.getConstructor(clazz, argTypes);
+			return getConstructor(clazz, argTypes);
 		} catch (MemberNotFoundException e) {
 			return null;
 		}
@@ -219,6 +225,7 @@ public final class Reflections {
 	 * @param clazz the class of the method
 	 * @param argTypes the argument types of the method
 	 * @return the found method, never null
+	 * @throws MemberNotFoundException in case of non existing constructor
 	 */
 	public static Constructor getConstructor(Class clazz, Class... argTypes) {
 		try {
