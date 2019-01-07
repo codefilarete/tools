@@ -208,31 +208,38 @@ public class IterablesTest {
 	
 	@Test
 	public void testCollect() {
-		// test with content
-		List<Integer> aSet = asList(1, 2, 1);
-		assertEquals(asList("1", "2", "1"), collectToList(aSet, Object::toString));
+		List<Integer> aList = asList(1, 2, 1);
+		assertEquals(asList("1", "2", "1"), collectToList(aList, Object::toString));
 		
-		assertEquals(asHashSet("1", "2"), collect(aSet, Object::toString, HashSet::new));
+		assertEquals(asHashSet("1", "2"), collect(aList, Object::toString, HashSet::new));
 	}
 	
 	@Test
 	public void testCollect_withFilter() {
-		// test with content
-		List<Integer> aSet = asList(1, 2, 1);
-		assertEquals(asHashSet("1"), collect(aSet, i -> i.equals(1), Object::toString, HashSet::new));
-		assertEquals(asHashSet("2"), collect(aSet, i -> i.equals(2), Object::toString, HashSet::new));
-		assertEquals(asHashSet("1", "2"), collect(aSet, i -> true, Object::toString, HashSet::new));
+		List<Integer> aList = asList(1, 2, 1);
+		assertEquals(asList(1, 1), collect(aList, (Integer i) -> i == 1, ArrayList::new));
+		
+		assertEquals(asHashSet(1), collect(aList, (Integer i) -> i == 1, HashSet::new));
+		assertEquals(asHashSet(2), collect(aList, (Integer i) -> i == 2, HashSet::new));
+		assertEquals(asHashSet(1, 2), collect(aList, (Integer i) -> true, HashSet::new));
 	}
 	
 	@Test
-	public void testCollect_with2Filters() {
-		// test with content
-		List<Integer> aSet = asList(1, 2, 1);
-		assertEquals(asHashSet("1"), collect(aSet, i -> i.equals(1), Object::toString, "1"::equals, HashSet::new));
-		assertEquals(asHashSet("2"), collect(aSet, i -> i.equals(2), Object::toString, "2"::equals, HashSet::new));
-		assertEquals(asHashSet(), collect(aSet, i -> i.equals(2), Object::toString, "x"::equals, HashSet::new));
-		assertEquals(asHashSet("1", "2"), collect(aSet, i -> true, Object::toString, HashSet::new));
-		assertEquals(asHashSet("1"), collect(aSet, i -> true, Object::toString, "1"::equals, HashSet::new));
+	public void testCollect_mappedWithFilter() {
+		List<Integer> aList = asList(1, 2, 1);
+		assertEquals(asHashSet("1"), collect(aList, i -> i.equals(1), Object::toString, HashSet::new));
+		assertEquals(asHashSet("2"), collect(aList, i -> i.equals(2), Object::toString, HashSet::new));
+		assertEquals(asHashSet("1", "2"), collect(aList, i -> true, Object::toString, HashSet::new));
+	}
+	
+	@Test
+	public void testCollect_mappedWith2Filters() {
+		List<Integer> aList = asList(1, 2, 1);
+		assertEquals(asHashSet("1"), collect(aList, i -> i.equals(1), Object::toString, "1"::equals, HashSet::new));
+		assertEquals(asHashSet("2"), collect(aList, i -> i.equals(2), Object::toString, "2"::equals, HashSet::new));
+		assertEquals(asHashSet(), collect(aList, i -> i.equals(2), Object::toString, "x"::equals, HashSet::new));
+		assertEquals(asHashSet("1", "2"), collect(aList, i -> true, Object::toString, HashSet::new));
+		assertEquals(asHashSet("1"), collect(aList, i -> true, Object::toString, "1"::equals, HashSet::new));
 	}
 	
 	@Test

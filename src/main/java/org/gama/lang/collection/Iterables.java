@@ -271,7 +271,7 @@ public final class Iterables {
 	}
 	
 	/**
-	 * Applies a mapper over an {@link Iterable} to collect information and puts each result into a collection.
+	 * Applies a mapper over an {@link Iterable} and puts each object into a collection.
 	 * 
 	 * @param iterable the source
 	 * @param mapper the mapping function
@@ -286,7 +286,21 @@ public final class Iterables {
 	}
 	
 	/**
-	 * Applies a filter and a mapper over an {@link Iterable} to collect information and puts each result into a collection.
+	 * Applies a filter over an {@link Iterable} to collect objects that satisfy the condition and puts them into a collection.
+	 * 
+	 * @param iterable the source
+	 * @param acceptFilter the accepting condition
+	 * @param target the supplier of resulting collection
+	 * @param <I> the input type
+	 * @param <C> the collecting type
+	 * @return the collection given by the supplier
+	 */
+	public static <I, C extends Collection<I>> C collect(Iterable<? extends I> iterable, Predicate<I> acceptFilter, Supplier<C> target) {
+		return collect(iterable, acceptFilter, Function.identity(), target);
+	}
+	
+	/**
+	 * Applies a filter and a mapper over an {@link Iterable} to collect objects and puts them into a collection.
 	 *
 	 * @param iterable the source
 	 * @param acceptFilter the accepting condition
@@ -303,7 +317,7 @@ public final class Iterables {
 	}
 	
 	/**
-	 * Applies a filter and a mapper over an {@link Iterable} to collect information and puts result into a collection if it's accepted by a second
+	 * Applies a filter and a mapper over an {@link Iterable} to collect objects and puts them into a collection if it's accepted by a second
 	 * predicate.
 	 *
 	 * @param iterable the source
