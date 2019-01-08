@@ -215,16 +215,6 @@ public class IterablesTest {
 	}
 	
 	@Test
-	public void testCollect_withFilter() {
-		List<Integer> aList = asList(1, 2, 1);
-		assertEquals(asList(1, 1), collect(aList, (Integer i) -> i == 1, ArrayList::new));
-		
-		assertEquals(asHashSet(1), collect(aList, (Integer i) -> i == 1, HashSet::new));
-		assertEquals(asHashSet(2), collect(aList, (Integer i) -> i == 2, HashSet::new));
-		assertEquals(asHashSet(1, 2), collect(aList, (Integer i) -> true, HashSet::new));
-	}
-	
-	@Test
 	public void testCollect_mappedWithFilter() {
 		List<Integer> aList = asList(1, 2, 1);
 		assertEquals(asHashSet("1"), collect(aList, i -> i.equals(1), Object::toString, HashSet::new));
