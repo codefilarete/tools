@@ -25,6 +25,21 @@ public class Functions {
 	}
 	
 	/**
+	 * Converts a {@link Method} to a {@link Function}
+	 *
+	 * @param getter any method taking no argument
+	 * @param <I> target instance type
+	 * @param <O> argument type
+	 * @return a new (lambda) {@link Function} plugged onto {@link Predicate}
+	 */
+	public static <I, O> Function<I, O> toFunction(Method getter) {
+		if (getter.getParameterCount() > 0) {
+			throw new IllegalArgumentException("Method is expected to have no argument but has one : " + Reflections.toString(getter));
+		}
+		return target -> (O) Reflections.invoke(getter, target);
+	}
+	
+	/**
 	 * Converts a {@link Method} to a {@link BiConsumer}
 	 *
 	 * @param setter any method taking one argument
@@ -34,9 +49,20 @@ public class Functions {
 	 */
 	public static <I, O> BiConsumer<I, O> toBiConsumer(Method setter) {
 		if (setter.getParameterCount() == 0) {
-			throw new IllegalArgumentException("Method is expected to have at least 1 argument but has none :" + setter);
+			throw new IllegalArgumentException("Method is expected to have at least 1 argument but has none : " + Reflections.toString(setter));
 		}
 		return (target, args) -> Reflections.invoke(setter, target, args);
+	}
+	
+	/**
+	 * Chains a {@link Function} and a {@link Predicate} to build a {@link Predicate} on the input argument type of the {@link Function}
+	 *
+	 * @param function the first function that will be applied
+	 * @param predicate the predicate to be applied on result of {@code function}
+	 * @return a {@link Predicate} that chains the given arguments
+	 */
+	public static <K, A> Predicate<K> asPredicate(Function<K, A> function, Predicate<A> predicate) {
+		return k -> predicate.test(function.apply(k));
 	}
 	
 	/**

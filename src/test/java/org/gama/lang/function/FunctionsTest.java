@@ -2,6 +2,7 @@ package org.gama.lang.function;
 
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.junit.jupiter.api.Test;
 
@@ -17,18 +18,42 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class FunctionsTest {
 	
 	@Test
-	public void testToFunction_predicate() {
+	public void testToFunction_predicateArg() {
 		Function<Object, Boolean> predicateAsFunction = Functions.toFunction("hello"::equals);
 		assertTrue(predicateAsFunction.apply("hello"));
 		assertFalse(predicateAsFunction.apply("coucou"));
 	}
 	
 	@Test
-	public void testToBiConsumer_method() throws NoSuchMethodException {
+	public void testToFunction_methodArg() throws NoSuchMethodException {
+		Function<Object, Object> methodAsFunction = Functions.toFunction(Integer.class.getDeclaredMethod("toString"));
+		assertEquals("1", methodAsFunction.apply(1));
+	}
+	
+	@Test
+	public void testToBiConsumer_methodArg() throws NoSuchMethodException {
 		BiConsumer<Object, Object> methodAsBiConsumer = Functions.toBiConsumer(StringBuilder.class.getDeclaredMethod("append", int.class));
 		StringBuilder target = new StringBuilder();
 		methodAsBiConsumer.accept(target, 1);
 		assertEquals("1", target.toString());
+	}
+	
+	@Test
+	public void testAsPredicate() {
+		Predicate<StringBuilder> methodAsBiConsumer = Functions.asPredicate(StringBuilder::toString, "1"::equals);
+		StringBuilder target = new StringBuilder();
+		assertFalse(methodAsBiConsumer.test(target));
+		target.append(1);
+		assertTrue(methodAsBiConsumer.test(target));
+	}
+	
+	@Test
+	public void testAsPredicate_givenMethod() {
+		Predicate<StringBuilder> methodAsBiConsumer = Functions.asPredicate(StringBuilder::toString, "1"::equals);
+		StringBuilder target = new StringBuilder();
+		assertFalse(methodAsBiConsumer.test(target));
+		target.append(1);
+		assertTrue(methodAsBiConsumer.test(target));
 	}
 	
 	@Test
