@@ -3,19 +3,18 @@ package org.gama.lang.exception;
 /**
  * An exception aimed at being thrown for not implemented cases. For example :
  * <ul>
- *     <li>in the 'default' statement of a swith/case that implements all cases of an enumeration: will "prevent" from a non-evolved code on enumeration addition</li>
- *     <li>in a if/instanceof code block: will "prevent" from a new type that is not taken into account by the "legacy" code</li>
+ *     <li>in the {@code default} statement of a swith/case that implements all cases of an enumeration: this will prevent from a non-evolved
+ *     code on enumeration addition</li>
+ *     <li>in a if/instanceof code block: will prevent from a new type that is not taken into account by the "legacy" code</li>
  * </ul>
  * 
- * Implemented as as specialization of {@link UnsupportedOperationException} to provide more semantic to it.
+ * Implemented as a specialization of {@link UnsupportedOperationException} to provide more semantic to it.
  * 
  * @author Guillaume Mary
  */
 public class NotImplementedException extends UnsupportedOperationException {
 	
-	/* No default constructor to encourage detailed reason
-	 * 
-	 */
+	/* No default constructor to encourage detailed reason */
 	
 	public NotImplementedException(String message) {
 		super(message);
