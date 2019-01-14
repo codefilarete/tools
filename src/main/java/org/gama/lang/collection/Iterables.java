@@ -483,6 +483,31 @@ public final class Iterables {
 	}
 	
 	/**
+	 * Consumes an {@link Iterable} with an action that gets index of each element of the {@link Iterable}
+	 * 
+	 * @param iterable any {@link Iterable}
+	 * @param action an action that needs index and element as argument
+	 * @param <E> {@link Iterable} elements type
+	 */
+	public static <E> void iterate(Iterable<E> iterable, BiConsumer<Integer, E> action) {
+		int i = 0;
+		for (E e : iterable) {
+			action.accept(i++, e);
+		}
+	}
+	
+	/**
+	 * Consumes an {@link Iterator} with an action that gets index of each element of the {@link Iterator}
+	 * 
+	 * @param iterator any {@link Iterator}
+	 * @param action an action that needs index and element as argument
+	 * @param <E> {@link Iterator} elements type
+	 */
+	public static <E> void iterate(Iterator<E> iterator, BiConsumer<Integer, E> action) {
+		iterate(() -> iterator, action);
+	}
+	
+	/**
 	 * Keep elements of an {@link Iterable} that match a {@link Predicate}
 	 * 
 	 * @param iterable any {@link Iterable}

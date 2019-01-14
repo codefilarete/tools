@@ -30,6 +30,7 @@ import static org.gama.lang.collection.Iterables.find;
 import static org.gama.lang.collection.Iterables.first;
 import static org.gama.lang.collection.Iterables.firstValue;
 import static org.gama.lang.collection.Iterables.intersect;
+import static org.gama.lang.collection.Iterables.iterate;
 import static org.gama.lang.collection.Iterables.last;
 import static org.gama.lang.collection.Iterables.minus;
 import static org.gama.lang.collection.Iterables.pair;
@@ -297,6 +298,14 @@ public class IterablesTest {
 		
 		integers = asList(1, 2, 3, 4, 5);
 		assertEquals(Maps.asMap("a", 1).add("b", 2).add("c", 3).add(null, 5), pair(strings, integers));
+	}
+	
+	@Test
+	public void testIterate() {
+		List<String> strings = asList("a", "b");
+		List<Object> result = new ArrayList<>();
+		iterate(strings, (i, s) -> { result.add(i); result.add(s); });
+		assertEquals(Arrays.asList(0, "a", 1, "b"), result);
 	}
 	
 	@Test
