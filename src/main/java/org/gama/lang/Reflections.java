@@ -229,10 +229,16 @@ public final class Reflections {
 	 */
 	public static Constructor getConstructor(Class clazz, Class... argTypes) {
 		try {
-			return clazz.getConstructor(argTypes);
+			return clazz.getDeclaredConstructor(argTypes);
 		} catch (NoSuchMethodException e) {
-			throw new MemberNotFoundException("Constructor of " + toString(clazz) + " with arguments ("
-					+ new StringAppender().ccat(argTypes, ", ").toString() + ") was not found");
+			MemberNotFoundException detailedException = new MemberNotFoundException("Constructor of " + toString(clazz) 
+					+ " with arguments (" + new StringAppender().ccat(argTypes, ", ") + ") was not found");
+			if (isInnerClass(clazz)
+					&& (argTypes.length == 0 || argTypes[0] != clazz.getEnclosingClass())) {
+				throw new MemberNotFoundException("Non static inner classes require an enclosing class parameter as first argument", detailedException);
+			} else {
+				throw detailedException;
+			}
 		}
 	}
 	

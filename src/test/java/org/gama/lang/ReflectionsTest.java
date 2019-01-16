@@ -34,6 +34,7 @@ public class ReflectionsTest {
 		Constructor<ClosedClass> defaultConstructor = Reflections.getDefaultConstructor(ClosedClass.class);
 		assertNotNull(defaultConstructor);
 	}
+	
 	@Test
 	public void testGetDefaultConstructor_innerStaticClass() {
 		Constructor<InnerStaticClass> defaultConstructor = Reflections.getDefaultConstructor(InnerStaticClass.class);
@@ -63,6 +64,20 @@ public class ReflectionsTest {
 	public void testGetDefaultConstructor_throwingCases(Class clazz, String expectedMessage) {
 		assertEquals(expectedMessage,
 				assertThrows(UnsupportedOperationException.class, () -> Reflections.getDefaultConstructor(clazz)).getMessage());
+	}
+	
+	@Test
+	public void testGetConstructor_private() {
+		Constructor<InnerStaticClassWithPrivateConstructor> constructor1 = Reflections.getConstructor(InnerStaticClassWithPrivateConstructor.class);
+		assertNotNull(constructor1);
+		Constructor<InnerClassWithPrivateConstructor> constructor2 = Reflections.getConstructor(InnerClassWithPrivateConstructor.class, ReflectionsTest.class);
+		assertNotNull(constructor2);
+	}
+	
+	@Test
+	public void testGetConstructor_innerNonStaticClass_missingEnclosingClassAsParameter_throwsException() {
+		assertEquals("Non static inner classes require an enclosing class parameter as first argument",
+				assertThrows(MemberNotFoundException.class, () -> Reflections.getConstructor(InnerClassWithPrivateConstructor.class)).getMessage());
 	}
 	
 	public static Object[][] testGetFieldData() {
@@ -327,7 +342,20 @@ public class ReflectionsTest {
 		
 	}
 	
+	private class InnerClassWithPrivateConstructor {
+		
+		private InnerClassWithPrivateConstructor() {
+		}
+	}
+	
 	private static class InnerStaticClass {
 		
+	}
+	
+	private static class InnerStaticClassWithPrivateConstructor {
+		
+		private InnerStaticClassWithPrivateConstructor() {
+			
+		}
 	}
 }
