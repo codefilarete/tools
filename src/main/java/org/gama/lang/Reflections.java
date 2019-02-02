@@ -34,7 +34,8 @@ public final class Reflections {
 	public static final String FLAT_PACKAGES_OPTION_KEY = "reflections.flatPackages";
 	
 	/** Possible values of {@link #FLAT_PACKAGES_OPTION_KEY} : disable, false, off */
-	public static final Set<String> DISABLE_FLAT_PACKAGES_OPTIONS = org.gama.lang.collection.Arrays.asTreeSet(String.CASE_INSENSITIVE_ORDER, "disable, false, off");
+	public static final Set<String> DISABLE_FLAT_PACKAGES_OPTIONS = org.gama.lang.collection.Arrays.asHashSet(
+			"disable", "false", "off");
 	
 	public static final Function<Method, String> JAVA_BEAN_ACCESSOR_PREFIX_REMOVER = method -> method.getName().substring(3);
 	
@@ -51,16 +52,20 @@ public final class Reflections {
 			.add(double.class, 0D)
 	);
 	
+	public static final ThreadLocal<Optional<String>> PACKAGES_PRINT_MODE_CONTEXT = ThreadLocal.withInitial(
+			//AccessControlException
+			() -> Optional.ofNullable(System.getProperty(FLAT_PACKAGES_OPTION_KEY)));
+	
 	/**
 	 * Printer for {@link #toString(Class)} and {@link #toString(Method)}.
 	 * Depends on {@link #FLAT_PACKAGES_OPTION_KEY} system property
 	 */
-	private static final MemberPrinter MEMBER_PRINTER = ((Supplier<MemberPrinter>) () -> {
-		Optional<String> flattenPackageOption = Optional.ofNullable(System.getProperty(FLAT_PACKAGES_OPTION_KEY));
+	private static final Supplier<MemberPrinter> MEMBER_PRINTER = () -> {
+		Optional<String> flattenPackageOption = PACKAGES_PRINT_MODE_CONTEXT.get();
 		return flattenPackageOption.filter(DISABLE_FLAT_PACKAGES_OPTIONS::contains).isPresent()
 				? FULL_PACKAGE_PRINTER
 				: FLATTEN_PACKAGE_PRINTER;
-	}).get();
+	};
 	
 	/**
 	 * Shortcut for {@link AccessibleObject#setAccessible(boolean)}
@@ -255,7 +260,7 @@ public final class Reflections {
 			// safeguard for non-accessible accessor
 			Reflections.ensureAccessible(defaultConstructor);
 			return defaultConstructor.newInstance();
-		} catch (ReflectiveOperationException e) {
+		} catch (ReflectiveOperationException | UnsupportedOperationException e) {
 			throw new InvokationRuntimeException("Class " + clazz.getName() + " can't be instanciated", e);
 		}
 	}
@@ -379,19 +384,19 @@ public final class Reflections {
 	}
 	
 	public static String toString(Field field) {
-		return MEMBER_PRINTER.toString(field);
+		return MEMBER_PRINTER.get().toString(field);
 	}
 	
 	public static String toString(Constructor constructor) {
-		return MEMBER_PRINTER.toString(constructor);
+		return MEMBER_PRINTER.get().toString(constructor);
 	}
 	
 	public static String toString(Method method) {
-		return MEMBER_PRINTER.toString(method);
+		return MEMBER_PRINTER.get().toString(method);
 	}
 	
 	public static String toString(Class clazz) {
-		return MEMBER_PRINTER.toString(clazz);
+		return MEMBER_PRINTER.get().toString(clazz);
 	}
 	
 	/**
