@@ -4,6 +4,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Properties;
 
 import org.gama.lang.Reflections;
@@ -31,6 +32,7 @@ public class MemberPrinterTest {
 		assertEquals("boolean", testInstance.toString(Boolean.TYPE));
 		assertEquals("void", testInstance.toString(Void.TYPE));
 		assertEquals("j.l.Comparable[]", testInstance.toString(Comparable[].class));
+		assertEquals("j.u.Map$Entry", testInstance.toString(Map.Entry.class));
 	}
 	
 	@Test

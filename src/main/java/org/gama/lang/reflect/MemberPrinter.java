@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.gama.lang.Nullable;
 import org.gama.lang.StringAppender;
 import org.gama.lang.collection.Arrays;
 
@@ -76,7 +77,7 @@ public class MemberPrinter {
 		if (packageName.isEmpty()) {
 			return aClass.getSimpleName();
 		} else {
-			return packageName + "." + aClass.getSimpleName();
+			return packageName + "." + Nullable.nullable(aClass.getEnclosingClass()).apply(c -> c.getSimpleName() + "$").orGet("") + aClass.getSimpleName();
 		}
 	}
 	

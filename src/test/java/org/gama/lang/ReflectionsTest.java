@@ -16,7 +16,19 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import static org.gama.lang.Reflections.*;
+import static org.gama.lang.Reflections.PACKAGES_PRINT_MODE_CONTEXT;
+import static org.gama.lang.Reflections.findConstructor;
+import static org.gama.lang.Reflections.findField;
+import static org.gama.lang.Reflections.findMethod;
+import static org.gama.lang.Reflections.forName;
+import static org.gama.lang.Reflections.getConstructor;
+import static org.gama.lang.Reflections.getDefaultConstructor;
+import static org.gama.lang.Reflections.invoke;
+import static org.gama.lang.Reflections.newInstance;
+import static org.gama.lang.Reflections.onJavaBeanPropertyWrapper;
+import static org.gama.lang.Reflections.onJavaBeanPropertyWrapperName;
+import static org.gama.lang.Reflections.propertyName;
+import static org.gama.lang.Reflections.wrappedField;
 import static org.gama.lang.ThreadLocals.doWithThreadLocal;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -30,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ReflectionsTest {
 	
 	@Test
-	public void testToString() {
+	public void testToString_flatPackagePrintOtionSwitching() {
 		assertEquals("j.l.String", Reflections.toString(String.class));
 		Runnable fullPackagePrintAssertion = () -> assertEquals("java.lang.String", Reflections.toString(String.class));
 		
@@ -78,7 +90,7 @@ public class ReflectionsTest {
 	
 	public static Object[][] testGetDefaultConstructor_throwingCases_data() {
 		return new Object[][] {
-				{ InnerClass.class, "Class o.g.l.InnerClass has no default constructor because it is an inner non static class" +
+				{ InnerClass.class, "Class o.g.l.ReflectionsTest$InnerClass has no default constructor because it is an inner non static class" +
 						" (needs an instance of the encosing class to be constructed)" },
 				{ int.class, "Class int has no default constructor because it is a primitive type" },
 				{ int[].class, "Class int[] has no default constructor because it is an array" },
@@ -253,7 +265,7 @@ public class ReflectionsTest {
 				() -> newInstance(ThrowingConstructorClass.class));
 		
 		assertNotNull(Exceptions.findExceptionInHierarchy(thrownException, InvokationRuntimeException.class,
-				"Class org.gama.lang.ReflectionsTest$ThrowingConstructorClass can't be instanciated"),
+				"Class o.g.l.ReflectionsTest$ThrowingConstructorClass can't be instanciated"),
 				() -> {
 					StringWriter exceptionAsString = new StringWriter();
 					thrownException.printStackTrace(new PrintWriter(exceptionAsString));
@@ -305,7 +317,7 @@ public class ReflectionsTest {
 	@Test
 	public void testPropertyName_methodDoesntFitJavaBeanConvention_exceptionIsThrown() throws NoSuchMethodException {
 		Method fixBMethod = Toto.class.getDeclaredMethod("fixB", String.class);
-		assertEquals("Field wrapper void o.g.l.Toto.fixB(j.l.String) doesn't fit encapsulation naming convention",
+		assertEquals("Field wrapper void o.g.l.ReflectionsTest$Toto.fixB(j.l.String) doesn't fit encapsulation naming convention",
 				assertThrows(MemberNotFoundException.class, () -> propertyName(fixBMethod)).getMessage());
 	}
 	

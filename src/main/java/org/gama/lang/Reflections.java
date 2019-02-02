@@ -261,7 +261,7 @@ public final class Reflections {
 			Reflections.ensureAccessible(defaultConstructor);
 			return defaultConstructor.newInstance();
 		} catch (ReflectiveOperationException | UnsupportedOperationException e) {
-			throw new InvokationRuntimeException("Class " + clazz.getName() + " can't be instanciated", e);
+			throw new InvokationRuntimeException("Class " + toString(clazz) + " can't be instanciated", e);
 		}
 	}
 	
