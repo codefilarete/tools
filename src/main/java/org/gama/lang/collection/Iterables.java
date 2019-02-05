@@ -210,6 +210,26 @@ public final class Iterables {
 	}
 	
 	/**
+	 * Collects iterable elements until a given element
+	 * 
+	 * @param iterable the iterable to scan
+	 * @param untilExcluded stopping element
+	 * @param <E> elements type
+	 * @return firsts elements of the iterable that differ from {@code untilExcluded}, in the iteration order, without {@code untilExcluded}
+	 */
+	public static <E> List<E> head(Iterable<E> iterable, E untilExcluded) {
+		List<E> result = new ArrayList<>();
+		for (E e : iterable) {
+			if (untilExcluded.equals(e)) {
+				break;
+			} else {
+				result.add(e);
+			}
+		}
+		return result;
+	}
+	
+	/**
 	 * Maps an {@link Iterable} on a key took as a {@link Function} of its beans. The value is also a function took on them.
 	 * 
 	 * @param iterable the iterable to map

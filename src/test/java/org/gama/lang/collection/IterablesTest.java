@@ -29,6 +29,7 @@ import static org.gama.lang.collection.Iterables.filter;
 import static org.gama.lang.collection.Iterables.find;
 import static org.gama.lang.collection.Iterables.first;
 import static org.gama.lang.collection.Iterables.firstValue;
+import static org.gama.lang.collection.Iterables.head;
 import static org.gama.lang.collection.Iterables.intersect;
 import static org.gama.lang.collection.Iterables.iterate;
 import static org.gama.lang.collection.Iterables.last;
@@ -116,12 +117,23 @@ public class IterablesTest {
 	@Test
 	public void testLast() {
 		List<String> strings = asList("a", "b");
-		assertEquals(last(strings), "b");
+		assertEquals("b", last(strings));
 		strings = asList("a");
-		assertEquals(last(strings), "a");
+		assertEquals("a", last(strings));
 		// test against null
 		assertNull(last(emptyList()));
 		assertNull(last(null));
+	}
+	
+	@Test
+	public void testHead() {
+		List<String> strings = asList("a", "b", "c", "d");
+		assertEquals(Arrays.asList("a", "b"), head(strings, "c"));
+		assertEquals(Arrays.asList("a", "b", "c", "d"), head(strings, "z"));
+		strings = asList("a");
+		assertEquals(emptyList(), head(strings, "a"));
+		// test against null
+		assertEquals(emptyList(), head(emptyList(), "xx"));
 	}
 	
 	@Test
