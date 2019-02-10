@@ -323,7 +323,7 @@ public final class Reflections {
 	}
 	
 	/**
-	 * Calls a {@link Supplier} according to the detected kind of getter or setter a method is. This implementation only tests on method name
+	 * Calls a {@link Supplier} according to the detected kind of getter or setter a method is. This implementation tests method name and parameter count
 	 * (or method return type for boolean getter). So it does not ensure that a real field matches the wrapped method.
 	 *
 	 * @param fieldWrapper the method to test against getter, setter
