@@ -8,7 +8,10 @@ import java.util.Objects;
 public class Duo<A, B> {
 	
 	private A left;
-	private final B right;
+	private B right;
+	
+	public Duo() {
+	}
 	
 	public Duo(A left, B right) {
 		this.left = left;
@@ -27,10 +30,14 @@ public class Duo<A, B> {
 		return right;
 	}
 	
+	public void setRight(B right) {
+		this.right = right;
+	}
+	
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
-		if (!(o instanceof Duo)) return false;
+		if (o == null || getClass() != o.getClass()) return false;
 		Duo<?, ?> duo = (Duo<?, ?>) o;
 		return Objects.equals(left, duo.left) &&
 				Objects.equals(right, duo.right);
