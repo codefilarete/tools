@@ -266,7 +266,7 @@ public class IterablesTest {
 		assertNull(result);
 	}
 	
-	public static Object[][] testConsumeAll() {
+	public static Object[][] testConsume() {
 		return new Object[][] {
 				{ asList("a", "b"), "a", asSet(0) },
 				{ asList("a", "b"), "b", asSet(1) },
@@ -278,10 +278,10 @@ public class IterablesTest {
 	}
 	
 	@ParameterizedTest
-	@MethodSource("testConsumeAll")
-	public void testConsumeAll(List<String> input, String lookupElement, Set<Integer> expected) {
+	@MethodSource("testConsume")
+	public void testConsume(List<String> input, String lookupElement, Set<Integer> expected) {
 		Set<Integer> collectedIndexes = new HashSet<>();
-		Iterables.consumeAll(input, lookupElement::equals, (s, i) -> collectedIndexes.add(i));
+		Iterables.consume(input, lookupElement::equals, (s, i) -> collectedIndexes.add(i));
 		assertEquals(expected, collectedIndexes);
 	}
 	

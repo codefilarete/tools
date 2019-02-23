@@ -620,27 +620,27 @@ public final class Iterables {
 	 * Consumes all predicate-matching elements of an {@link Iterable}
 	 *
 	 * @param iterable the {@link Iterable} to scan
-	 * @param predicate the test to execute for equality
+	 * @param matcher the test to execute for equality
 	 * @param foundConsumer will be called with every mathing element and its index
 	 * @param <I> input type
 	 */
-	public static <I> void consumeAll(Iterable<I> iterable, Predicate<I> predicate, BiConsumer<I, Integer> foundConsumer) {
-		consumeAll(iterable.iterator(), predicate, foundConsumer);
+	public static <I> void consume(Iterable<I> iterable, Predicate<I> matcher, BiConsumer<I, Integer> foundConsumer) {
+		consume(iterable.iterator(), matcher, foundConsumer);
 	}
 	
 	/**
 	 * Consumes all predicate-matching elements of an {@link Iterator}
 	 *
 	 * @param iterator the {@link Iterator} to scan
-	 * @param predicate the test to execute for equality
+	 * @param matcher the test to execute for equality
 	 * @param foundConsumer will be called with every mathing element and its index
 	 * @param <I> input type
 	 */
-	public static <I> void consumeAll(Iterator<I> iterator, Predicate<I> predicate, BiConsumer<I, Integer> foundConsumer) {
+	public static <I> void consume(Iterator<I> iterator, Predicate<I> matcher, BiConsumer<I, Integer> foundConsumer) {
 		int index = 0;
 		while (iterator.hasNext()) {
 			I step = iterator.next();
-			if (predicate.test(step)) {
+			if (matcher.test(step)) {
 				foundConsumer.accept(step, index);
 			}
 			index++;
