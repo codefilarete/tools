@@ -30,10 +30,18 @@ public class MethodDispatcher {
 	 * These are stored per a light signature to take polymorphism and multiple inheritance into account.
 	 * Indeed, the light signature doesn't contain declaring class nor return type : only method name and arguments types.
 	 */
-	private final Map<String /* simple method signature */, Interceptor> interceptors = new HashMap<>();
+	protected final Map<String /* simple method signature */, Interceptor> interceptors = new HashMap<>();
 	
 	/** Final target when no interceptor handled method, not null after {@link #build(Class)} invokation */
 	private Object fallback;
+	
+	public Map<String, Interceptor> getInterceptors() {
+		return interceptors;
+	}
+	
+	public Object getFallback() {
+		return fallback;
+	}
 	
 	/**
 	 * Redirects all interfazz methods to extensionSurrogate
@@ -57,9 +65,13 @@ public class MethodDispatcher {
 	 */
 	public <X> MethodDispatcher redirect(Class<X> interfazz, X extensionSurrogate, boolean returnProxy) {
 		for (Method method : interfazz.getMethods()) {
-			interceptors.put(giveSignature(method), new Interceptor(method, extensionSurrogate, returnProxy));
+			addInterceptor(method, extensionSurrogate, returnProxy);
 		}
 		return this;
+	}
+	
+	protected  <X> void addInterceptor(Method method, X extensionSurrogate, boolean returnProxy) {
+		interceptors.put(giveSignature(method), new Interceptor(method, extensionSurrogate, returnProxy));
 	}
 	
 	/**
@@ -68,7 +80,7 @@ public class MethodDispatcher {
 	 * @param method a method to get a signature
 	 * @return a lightweight version of the signature of the given method
 	 */
-	private String giveSignature(Method method) {
+	protected String giveSignature(Method method) {
 		StringAppender signature = new StringAppender();
 		signature.cat(method.getName());
 		signature.ccat(method.getParameterTypes(), ",");
@@ -160,7 +172,7 @@ public class MethodDispatcher {
 	 * @return
 	 * @throws Throwable
 	 */
-	private Object invoke(Object target, Method method, Object[] args) throws Throwable {
+	protected Object invoke(Object target, Method method, Object[] args) throws Throwable {
 		try {
 			return method.invoke(target, args);
 		} catch (InvocationTargetException e) {
@@ -197,7 +209,7 @@ public class MethodDispatcher {
 		}
 	}
 	
-	private static class Interceptor {
+	protected static class Interceptor {
 		
 		private final Method method;
 		private final Object methodTarget;
