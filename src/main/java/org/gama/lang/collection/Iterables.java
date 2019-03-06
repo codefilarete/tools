@@ -4,6 +4,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -405,11 +406,26 @@ public final class Iterables {
 	 * @param c1 a {@link Collection}, not null
 	 * @param c2 a {@link Collection}, not null
 	 * @param <E> type of elements
-	 * @return the intersection betwenn two {@link Collection}s
+	 * @return the intersection between two {@link Collection}s
 	 */
 	public static <E> Set<E> intersect(Collection<E> c1, Collection<E> c2) {
 		Set<E> copy = new HashSet<>(c1);
 		copy.retainAll(c2);
+		return copy; 
+	}
+	
+	/**
+	 * Gives the intersection between two {@link Collection}s by comparing objects with a {@link Comparator}
+	 * Implementation has no particular optimization, it is based on a {@link java.util.TreeSet}.
+	 *
+	 * @param c1 a {@link Collection}, not null
+	 * @param c2 a {@link Collection}, not null
+	 * @param <E> type of elements
+	 * @return the intersection between two {@link Collection}s according to the given {@link Comparator}
+	 */
+	public static <E> Set<E> intersect(Collection<E> c1, Collection<E> c2, Comparator<E> comparator) {
+		Set<E> copy = new HashSet<>(c1);
+		copy.retainAll(Arrays.asTreeSet(comparator, c2));
 		return copy; 
 	}
 	

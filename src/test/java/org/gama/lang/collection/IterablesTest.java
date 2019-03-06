@@ -2,6 +2,7 @@ package org.gama.lang.collection;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -191,6 +192,30 @@ public class IterablesTest {
 		// test with striclty same instance
 		List<Integer> c1 = asList(1, 2, 3, 4, 5);
 		assertEquals(asHashSet(1, 2, 3, 4, 5), intersect(c1, c1));
+	}
+	
+	@Test
+	public void testIntersect_withComparator() {
+		// let's take a non comparable class : StringBuilder (which is simple to compare in fact)
+		StringBuilder a = new StringBuilder().append("a");
+		StringBuilder a$ = new StringBuilder().append("a");
+		StringBuilder b = new StringBuilder().append("b");
+		StringBuilder b$ = new StringBuilder().append("b");
+		StringBuilder c = new StringBuilder().append("c");
+		StringBuilder c$ = new StringBuilder().append("c");
+		StringBuilder d = new StringBuilder().append("d");
+		StringBuilder d$ = new StringBuilder().append("d");
+		assertEquals(emptySet(), intersect(asList(a, b, c), asList(a$, b$)));
+		
+		Comparator<StringBuilder> stringBuilderComparator = Comparator.comparing(StringBuilder::toString);
+		assertEquals(asHashSet(a, b), intersect(asList(a, b, c), asList(a$, b$), stringBuilderComparator));
+		assertEquals(asHashSet(d), intersect(asList(a, d, c), asList(d$, b$), stringBuilderComparator));
+		assertEquals(asHashSet(b, c), intersect(asList(c, b, c), asList(b$, a$, b$, c$), stringBuilderComparator));
+		assertEquals(emptySet(), intersect(asList(b, c), emptyList(), stringBuilderComparator));
+		assertEquals(emptySet(), intersect(emptyList(), asList(c, a, d), stringBuilderComparator));
+		// test with striclty same instance
+		List<StringBuilder> c1 = asList(b, c);
+		assertEquals(asHashSet(b, c), intersect(c1, c1));
 	}
 	
 	@Test
