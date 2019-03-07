@@ -212,6 +212,38 @@ public class ReflectionsTest {
 	}
 	
 	@Test
+	public void testOnJavaBeanPropertyWrapperName_doesntMatchJavaBeanStandard_throwsException() {
+		MemberNotFoundException thrownException = assertThrows(MemberNotFoundException.class, () -> onJavaBeanPropertyWrapperName(String.class.getMethod("toString"),
+				m -> false, m -> true, m -> false));
+		assertEquals("Field wrapper j.l.String j.l.String.toString() doesn't fit encapsulation naming convention", thrownException.getMessage());
+	}
+	
+	@Test
+	public void testOnJavaBeanPropertyWrapperName_inputMethodName_getterIsRecognized() {
+		boolean found = onJavaBeanPropertyWrapperName("getA", m -> true, m -> false, m -> false);
+		assertTrue(found);
+	}
+	
+	@Test
+	public void testOnJavaBeanPropertyWrapperName_inputMethodName_getterIsRecognized_boolean() {
+		boolean found = onJavaBeanPropertyWrapperName("isA", m -> false, m -> false, m -> true);
+		assertTrue(found);
+	}
+	
+	@Test
+	public void testOnJavaBeanPropertyWrapperName_inputMethodName_setterIsRecognized() {
+		boolean found = onJavaBeanPropertyWrapperName("setA", m -> false, m -> true, m -> false);
+		assertTrue(found);
+	}
+	
+	@Test
+	public void testOnJavaBeanPropertyWrapperName_inputMethodName_doesntMatchJavaBeanStandard_throwsException() {
+		MemberNotFoundException thrownException = assertThrows(MemberNotFoundException.class, () -> onJavaBeanPropertyWrapperName("doSomething",
+				m -> false, m -> true, m -> false));
+		assertEquals("Field wrapper doSomething doesn't fit encapsulation naming convention", thrownException.getMessage());
+	}
+	
+	@Test
 	public void testOnJavaBeanPropertyWrapper_getterIsRecognized() throws NoSuchMethodException {
 		class X {
 			String getA() {

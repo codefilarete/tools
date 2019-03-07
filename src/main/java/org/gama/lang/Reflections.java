@@ -37,9 +37,13 @@ public final class Reflections {
 	public static final Set<String> DISABLE_FLAT_PACKAGES_OPTIONS = org.gama.lang.collection.Arrays.asHashSet(
 			"disable", "false", "off");
 	
-	public static final Function<Method, String> JAVA_BEAN_ACCESSOR_PREFIX_REMOVER = method -> method.getName().substring(3);
+	public static final Function<String, String> GET_SET_PREFIX_REMOVER = methodName -> methodName.substring(3);
 	
-	public static final Function<Method, String> JAVA_BEAN_BOOLEAN_ACCESSOR_PREFIX_REMOVER = method -> method.getName().substring(2);
+	public static final Function<String, String> IS_PREFIX_REMOVER = methodName -> methodName.substring(2);
+	
+	public static final Function<Method, String> JAVA_BEAN_ACCESSOR_PREFIX_REMOVER = method -> GET_SET_PREFIX_REMOVER.apply(method.getName());
+	
+	public static final Function<Method, String> JAVA_BEAN_BOOLEAN_ACCESSOR_PREFIX_REMOVER = method -> IS_PREFIX_REMOVER.apply(method.getName());
 	
 	public static final Map<Class, Object> PRIMITIVE_DEFAULT_VALUES = Collections.unmodifiableMap(Maps
 			.asHashMap((Class) boolean.class, (Object) false)
@@ -311,6 +315,13 @@ public final class Reflections {
 		return propertyName;
 	}
 	
+	public static String propertyName(String methodName) {
+		String propertyName = Reflections.onJavaBeanPropertyWrapperName(methodName,
+				GET_SET_PREFIX_REMOVER, GET_SET_PREFIX_REMOVER, IS_PREFIX_REMOVER);
+		propertyName = Strings.uncapitalize(propertyName);
+		return propertyName;
+	}
+	
 	/**
 	 * Gives the type of eventualy-wrapped property by a method (works even if the field doesn't exists), which means:
 	 * - the input if the method is a setter
@@ -336,7 +347,7 @@ public final class Reflections {
 	public static <E> E onJavaBeanPropertyWrapper(Method fieldWrapper, Function<Method, E> getterAction, Function<Method, E> setterAction, Function<Method, E> booleanGetterAction) {
 		int parameterCount = fieldWrapper.getParameterCount();
 		Class<?> returnType = fieldWrapper.getReturnType();
-		MemberNotFoundException exception = newEncapsulationException(fieldWrapper);
+		MemberNotFoundException exception = newEncapsulationException(() -> toString(fieldWrapper));
 		return onJavaBeanPropertyWrapperName(fieldWrapper, new GetOrThrow<>(getterAction, () -> parameterCount == 0 && returnType != Void.class, () -> exception),
 				new GetOrThrow<>(setterAction, () -> parameterCount == 1 && returnType == void.class, () -> exception),
 				new GetOrThrow<>(booleanGetterAction, () -> parameterCount == 0 && returnType == boolean.class, () -> exception));
@@ -354,22 +365,53 @@ public final class Reflections {
 	 * @return the result of the called action
 	 */
 	public static <E> E onJavaBeanPropertyWrapperName(Method fieldWrapper, Function<Method, E> getterAction, Function<Method, E> setterAction, Function<Method, E> booleanGetterAction) {
-		String methodName = fieldWrapper.getName();
-		if (methodName.startsWith("get")) {
-			return getterAction.apply(fieldWrapper);
-		} else if (methodName.startsWith("set")) {
-			return setterAction.apply(fieldWrapper);
-		} else if (methodName.startsWith("is")) {
-			return booleanGetterAction.apply(fieldWrapper);
-		} else {
-			throw newEncapsulationException(fieldWrapper);
-		}
+		return onJavaBeanPropertyWrapperNameGeneric(fieldWrapper.getName(), fieldWrapper, getterAction, setterAction, booleanGetterAction, () -> toString(fieldWrapper));
 	}
 	
-	private static MemberNotFoundException newEncapsulationException(Method method) {
-		return new MemberNotFoundException("Field wrapper "
-				+ toString(method)
-				+ " doesn't fit encapsulation naming convention");
+	/**
+	 * Same as {@link #onJavaBeanPropertyWrapper(Method, Function, Function, Function)} but with only method name as input.
+	 *
+	 * @param methodName the method name to test against getter, setter
+	 * @param getterAction the action run in case of given method is a getter
+	 * @param setterAction the action run in case of given method is a setter
+	 * @param booleanGetterAction the action run in case of given method is a getter of a boolean
+	 * @param <E> the returned type
+	 * @return the result of the called action
+	 */
+	public static <E> E onJavaBeanPropertyWrapperName(String methodName, Function<String, E> getterAction, Function<String, E> setterAction, Function<String, E> booleanGetterAction) {
+		return onJavaBeanPropertyWrapperNameGeneric(methodName, methodName, getterAction, setterAction, booleanGetterAction, () -> methodName);
+	}
+	
+	private static MemberNotFoundException newEncapsulationException(Supplier<String> methodName) {
+		return new MemberNotFoundException("Field wrapper " + methodName.get() + " doesn't fit encapsulation naming convention");
+	}
+	
+	/**
+	 * Technical method to centralize quite similar code of {@link #onJavaBeanPropertyWrapperName(Method, Function, Function, Function)} and
+	 * {@link #onJavaBeanPropertyWrapperName(String, Function, Function, Function)}.
+	 * 
+	 * @param methodName method name
+	 * @param input real object that represents the method
+	 * @param getterAction {@link Function} to be applied if method name starts with "get"
+	 * @param setterAction {@link Function} to be applied if method name starts with "set"
+	 * @param booleanGetterAction {@link Function} to be applied if method name starts with "is"
+	 * @param inputToString printing of the input to be used in the exception message if methodName doesn't start with any of "get", "set", or "is"
+	 * @param <I> real "method" object type
+	 * @param <E> returned type
+	 * @return the result of the called action
+	 */
+	private static <I, E> E onJavaBeanPropertyWrapperNameGeneric(String methodName, I input,
+							   Function<I, E> getterAction, Function<I, E> setterAction, Function<I, E> booleanGetterAction,
+							   Supplier<String> inputToString) {
+		if (methodName.startsWith("get")) {
+			return getterAction.apply(input);
+		} else if (methodName.startsWith("set")) {
+			return setterAction.apply(input);
+		} else if (methodName.startsWith("is")) {
+			return booleanGetterAction.apply(input);
+		} else {
+			throw newEncapsulationException(inputToString);
+		}
 	}
 	
 	/**
