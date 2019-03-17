@@ -11,14 +11,15 @@ import org.gama.lang.collection.ReadOnlyIterator;
  */
 public class ClassIterator extends ReadOnlyIterator<Class> {
 	
-	private Class currentClass, topBoundAncestor;
+	private Class currentClass;
+	private final Class topBoundAncestor;
 	
 	/**
 	 * Constructor for an {@link java.util.Iterator} from fromClass to {@link Object} class included
 	 * @param fromClass the start point (included) of this {@link java.util.Iterator}
 	 */
 	public ClassIterator(Class fromClass) {
-		this(fromClass, null);
+		this(fromClass, Object.class);
 	}
 	
 	/**
@@ -33,11 +34,15 @@ public class ClassIterator extends ReadOnlyIterator<Class> {
 	
 	@Override
 	public boolean hasNext() {
-		return !Objects.equalsWithNull(currentClass, topBoundAncestor);
+		return currentClass != topBoundAncestor;
 	}
 	
 	@Override
 	public Class next() {
+		if (!hasNext()) {
+			// this is necessary to be compliant with Iterator#next(..) contract
+			throw new NoSuchElementException();
+		}
 		Class next = currentClass;
 		try {
 			currentClass = currentClass.getSuperclass();

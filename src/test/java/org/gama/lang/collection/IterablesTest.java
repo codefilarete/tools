@@ -52,9 +52,9 @@ public class IterablesTest {
 	@Test
 	public void testFirst_iterable() {
 		Iterable<String> strings = asList("a", "b");
-		assertEquals(first(strings), "a");
+		assertEquals("a", first(strings));
 		strings = asList("a");
-		assertEquals(first(strings), "a");
+		assertEquals("a", first(strings));
 		// test against null
 		assertNull(first(asList()));
 		assertNull(first((Iterable) null));
@@ -63,9 +63,9 @@ public class IterablesTest {
 	@Test
 	public void testFirst_iterator() {
 		Iterator<String> strings = asList("a", "b").iterator();
-		assertEquals(first(strings), "a");
+		assertEquals("a", first(strings));
 		strings = asList("a").iterator();
-		assertEquals(first(strings), "a");
+		assertEquals("a", first(strings));
 		// test against null
 		assertNull(first(asList()));
 		assertNull(first((Iterable) null));
@@ -74,9 +74,9 @@ public class IterablesTest {
 	@Test
 	public void testFirst_list() {
 		List<String> strings = asList("a", "b");
-		assertEquals(first(strings), "a");
+		assertEquals("a", first(strings));
 		strings = asList("a");
-		assertEquals(first(strings), "a");
+		assertEquals("a", first(strings));
 		// test against null
 		assertNull(first(asList()));
 		assertNull(first((Iterable) null));
@@ -85,9 +85,9 @@ public class IterablesTest {
 	@Test
 	public void testFirst_array() {
 		String[] strings = new String[] { "a", "b" };
-		assertEquals(first(strings), "a");
+		assertEquals("a", first(strings));
 		strings = new String[] { "a" };
-		assertEquals(first(strings), "a");
+		assertEquals("a", first(strings));
 		// test against null
 		assertNull(first(new Object[] {}));
 		assertNull(first((Object[]) null));
@@ -109,7 +109,7 @@ public class IterablesTest {
 		Map<String, Integer> aMap = new LinkedHashMap<>();
 		aMap.put("d", 25);
 		aMap.put("a", 14);
-		assertEquals((int) firstValue(aMap), 25);
+		assertEquals(25, (int) firstValue(aMap));
 		// test against null
 		assertNull(first(new HashMap()));
 		assertNull(first((Map) null));
@@ -307,6 +307,14 @@ public class IterablesTest {
 	public void testConsume(List<String> input, String lookupElement, Set<Integer> expected) {
 		Set<Integer> collectedIndexes = new HashSet<>();
 		Iterables.consume(input, lookupElement::equals, (s, i) -> collectedIndexes.add(i));
+		assertEquals(expected, collectedIndexes);
+	}
+	
+	@ParameterizedTest
+	@MethodSource("testConsume")
+	public void testConsume_stream(List<String> input, String lookupElement, Set<Integer> expected) {
+		Set<Integer> collectedIndexes = new HashSet<>();
+		Iterables.consume(input.stream(), lookupElement::equals, (s, i) -> collectedIndexes.add(i));
 		assertEquals(expected, collectedIndexes);
 	}
 	

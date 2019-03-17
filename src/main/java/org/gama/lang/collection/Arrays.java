@@ -1,6 +1,7 @@
 package org.gama.lang.collection;
 
 import javax.annotation.Nullable;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -22,24 +23,28 @@ public class Arrays {
 		return new ArrayList<>(java.util.Arrays.asList(a));
 	}
 	
+	@SuppressWarnings("squid:S1319")	// LinkedHashSet return type is voluntary because it is the goal of this method
 	public static <T> LinkedHashSet<T> asSet(T ... a) {
 		LinkedHashSet<T> toReturn = new LinkedHashSet<>(a.length, 1);
 		java.util.Collections.addAll(toReturn, a);
 		return toReturn;
 	}
 	
+	@SuppressWarnings("squid:S1319")	// HashSet return type is voluntary because it is the goal of this method
 	public static <T> HashSet<T> asHashSet(T ... a) {
 		HashSet<T> toReturn = new HashSet<>(a.length, 1);
 		java.util.Collections.addAll(toReturn, a);
 		return toReturn;
 	}
 	
+	@SuppressWarnings("squid:S1319")	// TreeSet return type is voluntary because it is the goal of this method
 	public static <T> TreeSet<T> asTreeSet(Comparator<? super T> comparator, T ... a) {
 		TreeSet<T> toReturn = new TreeSet<>(comparator);
 		java.util.Collections.addAll(toReturn, a);
 		return toReturn;
 	}
 	
+	@SuppressWarnings("squid:S1319")	// TreeSet return type is voluntary because it is the goal of this method
 	public static <T> TreeSet<T> asTreeSet(Comparator<? super T> comparator, Collection<T> a) {
 		TreeSet<T> toReturn = new TreeSet<>(comparator);
 		toReturn.addAll(a);
@@ -108,7 +113,50 @@ public class Arrays {
 		return args[args.length-1];
 	}
 	
+	/**
+	 * Concats 2 arrays of int
+	 * @param src1 an array
+	 * @param src2 an array
+	 * @return a new array of length src1 + src2 containing the aggregation of both
+	 */
+	public static int[] cat(int[] src1, int[] src2) {
+		int[] result = new int[src1.length + src2.length];
+		System.arraycopy(src1, 0, result, 0, src1.length);
+		System.arraycopy(src2, 0, result, src1.length, src2.length);
+		return result;
+	}
+	
+	/**
+	 * Concats 2 arrays of long
+	 * @param src1 an array
+	 * @param src2 an array
+	 * @return a new array of length src1 + src2 containing the aggregation of both
+	 */
+	public static long[] cat(long[] src1, long[] src2) {
+		long[] result = new long[src1.length + src2.length];
+		System.arraycopy(src1, 0, result, 0, src1.length);
+		System.arraycopy(src2, 0, result, src1.length, src2.length);
+		return result;
+	}
+	
+	/**
+	 * Concats 2 arrays of objects
+	 * 
+	 * @param src1 an array
+	 * @param src2 an array
+	 * @return a new array of length src1 + src2 containing the aggregation of both
+	 */
+	public static <E> E[] cat(E[] src1, E[] src2) {
+		return cat(src1, src2, (E[]) Array.newInstance(src1.getClass().getComponentType(), src1.length + src2.length));
+	}
+	
+	private static <E> E[] cat(E[] src1, E[] src2, E[] dest) {
+		System.arraycopy(src1, 0, dest, 0, src1.length);
+		System.arraycopy(src2, 0, dest, src1.length, src2.length);
+		return dest;
+	}
+	
 	private Arrays() {
-		// tools class
+		// tool class
 	}
 }

@@ -133,11 +133,8 @@ public class InvocationHandlerSupport implements InvocationHandler {
 		
 		@Override
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-			if (Reflections.PRIMITIVE_DEFAULT_VALUES.containsKey(method.getReturnType())) {
-				return Reflections.PRIMITIVE_DEFAULT_VALUES.get(method.getReturnType());
-			} else {
-				return surrogate.invoke(proxy, method, args);
-			}
+			Object defaultReturnTypeValue = Reflections.PRIMITIVE_DEFAULT_VALUES.get(method.getReturnType());
+			return defaultReturnTypeValue != null ? defaultReturnTypeValue : surrogate.invoke(proxy, method, args);
 		}
 	}
 	

@@ -24,6 +24,7 @@ import java.util.stream.StreamSupport;
 
 import org.gama.lang.Duo;
 import org.gama.lang.collection.PairIterator.UntilBothIterator;
+import org.gama.lang.trace.ModifiableInt;
 
 /**
  * @author Guillaume Mary
@@ -444,6 +445,21 @@ public final class Iterables {
 		return copy; 
 	}
 	
+	/**
+	 * Gives the complement of c2 in c1 : all elements of c1 that are not member of c2 by comparing objects with a {@link Comparator}
+	 * Implementation has no particular optimization, it is based on a {@link java.util.TreeSet}.
+	 *
+	 * @param c1 a {@link Collection}, not null
+	 * @param c2 a {@link Collection}, not null
+	 * @param <E> type of elements
+	 * @return the complement of c1 in c2
+	 */
+	public static <E> Set<E> minus(Collection<E> c1, Collection<E> c2, Comparator<E> comparator) {
+		Set<E> copy = new HashSet<>(c1);
+		copy.removeAll(Arrays.asTreeSet(comparator, c2));
+		return copy;
+	}
+	
 	public static <E> boolean equals(Iterable<E> it1, Iterable<E> it2, BiPredicate<E, E> predicate) {
 		if (it1 == it2)
 			return true;
@@ -583,6 +599,7 @@ public final class Iterables {
 	 * @param <I> input type
 	 * @return null if no element matches the predicate
 	 */
+	@SuppressWarnings("squid:AssignmentInSubExpressionCheck")	// simple algorithm, doesn't require to extract assignment from if
 	public static <I> I find(Iterator<I> iterator, Predicate<I> predicate) {
 		I result = null;
 		boolean found = false;
@@ -619,6 +636,7 @@ public final class Iterables {
 	 * @param <O> output type
 	 * @return null if no mapped values matches the predicate
 	 */
+	@SuppressWarnings("squid:AssignmentInSubExpressionCheck")	// simple algorithm, doesn't require to extract assignment from if
 	public static <I, O> Duo<I, O> find(Iterator<I> iterator, Function<I, O> mapper, Predicate<O> predicate) {
 		Duo<I, O> result = null;
 		boolean found = false;
@@ -638,9 +656,9 @@ public final class Iterables {
 	 * @param iterable the {@link Iterable} to scan
 	 * @param matcher the test to execute for equality
 	 * @param foundConsumer will be called with every mathing element and its index
-	 * @param <I> input type
+	 * @param <E> input type
 	 */
-	public static <I> void consume(Iterable<I> iterable, Predicate<I> matcher, BiConsumer<I, Integer> foundConsumer) {
+	public static <E> void consume(Iterable<E> iterable, Predicate<E> matcher, BiConsumer<E, Integer> foundConsumer) {
 		consume(iterable.iterator(), matcher, foundConsumer);
 	}
 	
@@ -650,17 +668,32 @@ public final class Iterables {
 	 * @param iterator the {@link Iterator} to scan
 	 * @param matcher the test to execute for equality
 	 * @param foundConsumer will be called with every mathing element and its index
-	 * @param <I> input type
+	 * @param <E> input type
 	 */
-	public static <I> void consume(Iterator<I> iterator, Predicate<I> matcher, BiConsumer<I, Integer> foundConsumer) {
+	public static <E> void consume(Iterator<E> iterator, Predicate<E> matcher, BiConsumer<E, Integer> foundConsumer) {
 		int index = 0;
 		while (iterator.hasNext()) {
-			I step = iterator.next();
+			E step = iterator.next();
 			if (matcher.test(step)) {
 				foundConsumer.accept(step, index);
 			}
 			index++;
 		}
+	}
+	
+	/**
+	 * Equivalent of {@link #consume(Iterator, Predicate, BiConsumer)} with a {@link Stream} as input
+	 * 
+	 * @param stream the {@link Stream} to scan
+	 * @param matcher the test to execute for equality
+	 * @param foundConsumer will be called with every mathing element and its index
+	 * @param <E> input type
+	 */
+	public static <E> void consume(Stream<E> stream, Predicate<E> matcher, BiConsumer<E, Integer> foundConsumer) {
+		final ModifiableInt index = new ModifiableInt(-1);
+		stream.map(e -> new Duo<>(e, index.increment()))
+				.filter(d -> matcher.test(d.getLeft()))
+				.forEach(d -> foundConsumer.accept(d.getLeft(), d.getRight()));
 	}
 	
 	/**

@@ -1,5 +1,7 @@
 package org.gama.lang;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Constructor;
@@ -369,6 +371,21 @@ public class ReflectionsTest {
 		assertEquals(Object.class, forName("java.lang.Object"));
 		assertEquals(boolean[].class, forName("[Z"));
 		assertEquals(boolean[][].class, forName("[[Z"));
+	}
+	
+	@Test
+	void newProxy() throws NoSuchMethodException, IOException {
+		Method[] capturedMethod = new Method[1];
+		CharSequence proxy = Reflections.newProxy(CharSequence.class, (p, m, args) -> {
+			capturedMethod[0] = m;
+			return null;
+		}, Closeable.class);
+		
+		// capturing main method interface
+		proxy.subSequence(0, 1);
+		assertEquals(CharSequence.class.getMethod("subSequence", int.class, int.class), capturedMethod[0]);
+		((Closeable) proxy).close();
+		assertEquals(Closeable.class.getMethod("close"), capturedMethod[0]);
 	}
 	
 	private static class ClosedClass {

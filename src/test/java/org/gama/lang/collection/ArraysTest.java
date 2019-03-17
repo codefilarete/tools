@@ -130,4 +130,11 @@ public class ArraysTest {
 		assertEquals("c", last.apply(new String[] { "a", "b", "c" }));
 	}
 	
+	@Test
+	public void cat() {
+		assertArrayEquals(new int[] { 1, 2, 3, 4, 5}, Arrays.cat(new int[] { 1, 2, 3 }, new int[] { 4, 5}));
+		assertArrayEquals(new String[] { "1", "2", "3", "4", "5"}, Arrays.cat(new String[] { "1", "2", "3" }, new String[] { "4", "5"}));
+		// since generic type Array creation can be tricky, we ensure that array type is the good one
+		assertEquals(String[].class, Arrays.cat(new String[] { "1", "2", "3" }, new String[] { "4", "5"}).getClass());
+	}
 }

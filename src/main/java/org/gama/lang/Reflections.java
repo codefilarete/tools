@@ -5,21 +5,25 @@ import javax.annotation.Nullable;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
+import java.lang.reflect.Proxy;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import org.gama.lang.bean.FieldIterator;
 import org.gama.lang.bean.MethodIterator;
+import org.gama.lang.collection.Arrays;
 import org.gama.lang.collection.Iterables;
 import org.gama.lang.collection.Maps;
+import org.gama.lang.function.ThrowingExecutable;
 import org.gama.lang.reflect.MemberPrinter;
 
 import static org.gama.lang.reflect.MemberPrinter.FLATTEN_PACKAGE_PRINTER;
@@ -34,8 +38,7 @@ public final class Reflections {
 	public static final String FLAT_PACKAGES_OPTION_KEY = "reflections.flatPackages";
 	
 	/** Possible values of {@link #FLAT_PACKAGES_OPTION_KEY} : disable, false, off */
-	public static final Set<String> DISABLE_FLAT_PACKAGES_OPTIONS = org.gama.lang.collection.Arrays.asHashSet(
-			"disable", "false", "off");
+	public static final Set<String> DISABLE_FLAT_PACKAGES_OPTIONS = Collections.unmodifiableSet(Arrays.asHashSet("disable", "false", "off"));
 	
 	public static final Function<String, String> GET_SET_PREFIX_REMOVER = methodName -> methodName.substring(3);
 	
@@ -44,6 +47,12 @@ public final class Reflections {
 	public static final Function<Method, String> JAVA_BEAN_ACCESSOR_PREFIX_REMOVER = method -> GET_SET_PREFIX_REMOVER.apply(method.getName());
 	
 	public static final Function<Method, String> JAVA_BEAN_BOOLEAN_ACCESSOR_PREFIX_REMOVER = method -> IS_PREFIX_REMOVER.apply(method.getName());
+	
+	public static final Predicate<String> JAVA_BEAN_METHOD_NAME_CONVENTION_MATCHER = methodName ->
+			onJavaBeanPropertyWrapperNameGeneric(methodName, methodName, s -> true, s -> true, s -> true, () -> false);
+	
+	public static final Predicate<Method> JAVA_BEAN_METHOD_CONVENTION_MATCHER = method ->
+			onJavaBeanPropertyWrapperNameGeneric(method.getName(), method, s -> true, s -> true, s -> true, () -> false);
 	
 	public static final Map<Class, Object> PRIMITIVE_DEFAULT_VALUES = Collections.unmodifiableMap(Maps
 			.asHashMap((Class) boolean.class, (Object) false)
@@ -187,8 +196,8 @@ public final class Reflections {
 	 */
 	@Nullable
 	public static Method findMethod(Class clazz, String name, Class... argTypes) {
-		return Iterables.stream(new MethodIterator(clazz))
-				.filter(method -> method.getName().equals(name) && Arrays.equals(method.getParameterTypes(), argTypes))
+		return Iterables.stream(new MethodIterator(clazz, null))
+				.filter(method -> method.getName().equals(name) && java.util.Arrays.equals(method.getParameterTypes(), argTypes))
 				.findAny().orElse(null);
 	}
 	
@@ -365,7 +374,7 @@ public final class Reflections {
 	 * @return the result of the called action
 	 */
 	public static <E> E onJavaBeanPropertyWrapperName(Method fieldWrapper, Function<Method, E> getterAction, Function<Method, E> setterAction, Function<Method, E> booleanGetterAction) {
-		return onJavaBeanPropertyWrapperNameGeneric(fieldWrapper.getName(), fieldWrapper, getterAction, setterAction, booleanGetterAction, () -> toString(fieldWrapper));
+		return onJavaBeanPropertyWrapperName(fieldWrapper.getName(), fieldWrapper, getterAction, setterAction, booleanGetterAction, () -> toString(fieldWrapper));
 	}
 	
 	/**
@@ -379,7 +388,7 @@ public final class Reflections {
 	 * @return the result of the called action
 	 */
 	public static <E> E onJavaBeanPropertyWrapperName(String methodName, Function<String, E> getterAction, Function<String, E> setterAction, Function<String, E> booleanGetterAction) {
-		return onJavaBeanPropertyWrapperNameGeneric(methodName, methodName, getterAction, setterAction, booleanGetterAction, () -> methodName);
+		return onJavaBeanPropertyWrapperName(methodName, methodName, getterAction, setterAction, booleanGetterAction, () -> methodName);
 	}
 	
 	private static MemberNotFoundException newEncapsulationException(Supplier<String> methodName) {
@@ -400,9 +409,33 @@ public final class Reflections {
 	 * @param <E> returned type
 	 * @return the result of the called action
 	 */
-	private static <I, E> E onJavaBeanPropertyWrapperNameGeneric(String methodName, I input,
-							   Function<I, E> getterAction, Function<I, E> setterAction, Function<I, E> booleanGetterAction,
-							   Supplier<String> inputToString) {
+	private static <I, E> E onJavaBeanPropertyWrapperName(String methodName, I input,
+														  Function<I, E> getterAction, Function<I, E> setterAction,
+														  Function<I, E> booleanGetterAction,
+														  Supplier<String> inputToString) {
+		return onJavaBeanPropertyWrapperNameGeneric(methodName, input, getterAction, setterAction, booleanGetterAction,
+				() -> { throw newEncapsulationException(inputToString); });
+	}
+	
+	/**
+	 * Very technical method to centralize similar code of Java bean method name convention.
+	 *
+	 * @param methodName method name
+	 * @param input real object that represents the method
+	 * @param getterAction {@link Function} to be applied if method name starts with "get"
+	 * @param setterAction {@link Function} to be applied if method name starts with "set"
+	 * @param booleanGetterAction {@link Function} to be applied if method name starts with "is"
+	 * @param onNonCompliantName action to be done when methodName doesn't start with any of "get", "set", or "is"
+	 * @param <I> real "method" object type
+	 * @param <E> returned type
+	 * @return the result of the called action
+	 */
+	public static <I, E> E onJavaBeanPropertyWrapperNameGeneric(String methodName,
+																 I input,
+																 Function<I, E> getterAction,
+																 Function<I, E> setterAction,
+																 Function<I, E> booleanGetterAction,
+																 ThrowingExecutable<E, ? extends RuntimeException> onNonCompliantName) {
 		if (methodName.startsWith("get")) {
 			return getterAction.apply(input);
 		} else if (methodName.startsWith("set")) {
@@ -410,7 +443,7 @@ public final class Reflections {
 		} else if (methodName.startsWith("is")) {
 			return booleanGetterAction.apply(input);
 		} else {
-			throw newEncapsulationException(inputToString);
+			return onNonCompliantName.execute();
 		}
 	}
 	
@@ -445,10 +478,10 @@ public final class Reflections {
 	 * Almost the same as {@link Class#forName(String)} but accepts serialized form of type names.
 	 * @param typeName a type name, not null
 	 * @return the {@link Class} found behind typeName
-	 * @throws ClassNotFoundException as thrown by {@link Class#forName(String)}
+	 * @throws MemberNotFoundException wrapping the one thrown by {@link Class#forName(String)}
 	 * @see Class#getName()
 	 */
-	public static Class forName(String typeName) throws ClassNotFoundException {
+	public static Class forName(String typeName) {
 		switch (typeName) {
 			case "Z":
 				return boolean.class;
@@ -469,10 +502,28 @@ public final class Reflections {
 			case "V":
 				return void.class;
 			default:
-				return Class.forName(typeName);
+				try {
+					return Class.forName(typeName);
+				} catch (ClassNotFoundException e) {
+					throw new Reflections.MemberNotFoundException(e);
+				}
 		}
 	}
 	
+	/**
+	 * Shortcut to create a JDK proxy for a given interface (implementing also some optional other interfaces) which methods are intercepted
+	 * by the given {@link InvocationHandler} 
+	 * 
+	 * @param iface the mandatory interface that the JDK proxy must implement
+	 * @param invocationHandler the intercepting code
+	 * @param additionalInterfaces optional other interfaces also implemented by the proxy
+	 * @param <I> main interface type, which is also the returned-proxy type
+	 * @return
+	 */
+	public static <I> I newProxy(Class<I> iface, InvocationHandler invocationHandler, Class<?> ... additionalInterfaces) {
+		return (I) Proxy.newProxyInstance(iface.getClassLoader(), Arrays.cat(new Class[] { iface }, additionalInterfaces), invocationHandler);
+	}
+		
 	@FunctionalInterface
 	private interface Checker {
 		boolean check();

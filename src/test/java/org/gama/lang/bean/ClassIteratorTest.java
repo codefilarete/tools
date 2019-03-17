@@ -12,7 +12,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Guillaume Mary
@@ -21,8 +20,8 @@ public class ClassIteratorTest {
 	
 	public static Object[][] testNextMethodsData() {
 		return new Object[][] {
-				{ X.class, Arrays.asList((Class) X.class, Object.class) },
-				{ Y.class, Arrays.asList((Class) Y.class, X.class, Object.class) }
+				{ X.class, Arrays.asList((Class) X.class) },
+				{ Y.class, Arrays.asList((Class) Y.class, X.class) }
 		};
 	}
 	
@@ -49,14 +48,11 @@ public class ClassIteratorTest {
 	public void testNext_throwsNoSuchElementException() {
 		// with intermediary hasNext() invokation
 		ClassIterator testInstance = new ClassIterator(Object.class);
-		assertTrue(testInstance.hasNext());
-		testInstance.next();
 		assertFalse(testInstance.hasNext());
 		assertThrows(NoSuchElementException.class, testInstance::next);
 		
 		// without hasNext() invokation
 		testInstance = new ClassIterator(Object.class);
-		testInstance.next();
 		assertThrows(NoSuchElementException.class, testInstance::next);
 	}
 	

@@ -7,7 +7,10 @@ import org.gama.lang.collection.ArrayIterator;
 import org.gama.lang.collection.Iterables;
 
 /**
+ * Iterator over (declared) fields of a class hierarchy
+ * 
  * @author Guillaume Mary
+ * @see InstanceFieldIterator
  */
 public class FieldIterator extends InheritedElementIterator<Field> {
 	

@@ -10,6 +10,7 @@ import org.gama.lang.collection.Iterables;
  * Iterator over (declared) methods of a class hierarchy
  * 
  * @author Guillaume Mary
+ * @see InstanceMethodIterator
  */
 public class MethodIterator extends InheritedElementIterator<Method> {
 	
@@ -17,7 +18,7 @@ public class MethodIterator extends InheritedElementIterator<Method> {
 	private static final String JACOCO_METHOD_NAME = "$jacocoInit";
 	
 	public MethodIterator(Class fromClass) {
-		this(fromClass, null);
+		this(fromClass, Object.class);
 	}
 	
 	public MethodIterator(Class fromClass, Class toClass) {
