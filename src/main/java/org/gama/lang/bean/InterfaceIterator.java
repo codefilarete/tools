@@ -14,7 +14,7 @@ import org.gama.lang.collection.Iterables;
 public class InterfaceIterator extends InheritedElementIterator<Class> {
 	
 	public InterfaceIterator(Class aClass) {
-		this(new ClassIterator(aClass));
+		this(new ClassIterator(aClass, null));
 	}
 	
 	public InterfaceIterator(Iterator<Class> classIterator) {
