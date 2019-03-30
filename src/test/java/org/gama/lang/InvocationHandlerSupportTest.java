@@ -12,6 +12,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -47,6 +48,13 @@ public class InvocationHandlerSupportTest {
 		InvocationHandlerSupport testInstance = new InvocationHandlerSupport((proxy, method, args) -> "Hello");
 		// 42.get() => "Hello" !
 		assertEquals("Hello", testInstance.invoke(42, Reflections.findMethod(Supplier.class, "get"), new Object[0]));
+	}
+	
+	@Test
+	public void testMock() throws Throwable {
+		CharSequence mock = InvocationHandlerSupport.mock(CharSequence.class, Appendable.class);
+		assertEquals(0, mock.length());
+		assertNull(((Appendable) mock).append("coucou"));
 	}
 	
 	@Test

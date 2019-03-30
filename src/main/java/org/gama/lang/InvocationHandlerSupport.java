@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Objects;
 
+import org.gama.lang.collection.Arrays;
 import org.gama.lang.collection.Iterables;
 
 /**
@@ -95,8 +96,8 @@ public class InvocationHandlerSupport implements InvocationHandler {
 	 * @param <T> type interface
 	 * @return a no-operation proxy, of type T
 	 */
-	public static <T> T mock(Class<T> interfazz) {
-		return (T) Proxy.newProxyInstance(InvocationHandlerSupport.class.getClassLoader(), new Class[] { interfazz }, new InvocationHandlerSupport());
+	public static <T> T mock(Class<T> interfazz, Class ... interfaces) {
+		return (T) Proxy.newProxyInstance(InvocationHandlerSupport.class.getClassLoader(), Arrays.cat(new Class[] { interfazz }, interfaces), new InvocationHandlerSupport());
 	}
 	
 	/**
