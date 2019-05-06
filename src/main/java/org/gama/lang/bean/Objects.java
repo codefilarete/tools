@@ -3,6 +3,8 @@ package org.gama.lang.bean;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
+import org.gama.lang.function.Predicates;
+
 /**
  * @author Guillaume Mary
  */
@@ -51,6 +53,6 @@ public class Objects {
 	 * @return a negated {@link Predicate} of the given one
 	 */
 	public static <E> Predicate<E> not(Predicate<E> predicate) {
-		return predicate.negate();
+		return Predicates.not(predicate);
 	}
 }
