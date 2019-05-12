@@ -19,7 +19,7 @@ public class Objects {
 	 *		<br> o1.equals(o2) if o1 and o2 non null
 	 *		<br> false if o1 != null or-exclusive o2 != null
 	 */
-	public static boolean equalsWithNull(Object o1, Object o2) {
+	public static <T, U> boolean equalsWithNull(T o1, U o2) {
 		return equalsWithNull(o1, o2, Object::equals);
 	}
 	
