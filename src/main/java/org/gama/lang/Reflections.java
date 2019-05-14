@@ -343,8 +343,9 @@ public final class Reflections {
 	}
 	
 	/**
-	 * Calls a {@link Supplier} according to the detected kind of getter or setter a method is. This implementation tests method name and parameter count
-	 * (or method return type for boolean getter). So it does not ensure that a real field matches the wrapped method.
+	 * Calls a {@link Supplier} according to the detected kind of getter or setter a method is. The implementation tests method name and parameter count
+	 * (or method return type for boolean getter), hence it is a little bit more stricter that {@link #onJavaBeanPropertyWrapperName(Method, Function, Function, Function)}.
+	 * This does not ensure that a real field matches the wrapped method.
 	 *
 	 * @param fieldWrapper the method to test against getter, setter
 	 * @param getterAction the action run in case of given method is a getter
@@ -363,8 +364,9 @@ public final class Reflections {
 	}
 	
 	/**
-	 * Calls a {@link Supplier} according to the detected kind of getter or setter a method is. This implementation only tests method name
-	 * (or method return type for boolean getter). So it does not ensure that a real field matches the wrapped method.
+	 * Calls a {@link Supplier} according to the detected kind of getter or setter a method is. The implementation only tests method name, no parameter count
+	 * nor return type, as a difference to {@link #onJavaBeanPropertyWrapper(Method, Function, Function, Function)}.
+	 * This does not ensure that a real field matches the wrapped method.
 	 * 
 	 * @param fieldWrapper the method to test against getter, setter
 	 * @param getterAction the action run in case of given method is a getter
