@@ -86,4 +86,34 @@ public class StringsTest {
 		// inverting order of pre-concatenated Strings may work also but lessly optimized
 		assertEquals("bbbbbbbbbbbbbbbbbbbbbbbbbcc", Strings.repeat(27, s, s5, s10).toString());
 	}
+	
+	@Test
+	void foorPrint() {
+		assertEquals("42", Strings.footPrint(new FootPrintCandidate().setValue1(42), FootPrintCandidate::getValue1));
+		assertEquals("42, a", Strings.footPrint(new FootPrintCandidate().setValue1(42).setValue2("a"), FootPrintCandidate::getValue1, FootPrintCandidate::getValue2));
+	}
+	
+	private class FootPrintCandidate {
+		
+		private int value1;
+		private String value2;
+		
+		private int getValue1() {
+			return value1;
+		}
+		
+		private FootPrintCandidate setValue1(int value1) {
+			this.value1 = value1;
+			return this;
+		}
+		
+		private String getValue2() {
+			return value2;
+		}
+		
+		private FootPrintCandidate setValue2(String value2) {
+			this.value2 = value2;
+			return this;
+		}
+	}
 }

@@ -3,6 +3,7 @@ package org.gama.lang;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.function.Function;
 
 /**
  * @author Guillaume Mary
@@ -141,6 +142,24 @@ public abstract class Strings {
 		} else {
 			return emptyDelegate.onNotNullNotEmpty(cs);
 		}
+	}
+	
+	/**
+	 * Give a printable view of an object through method references of any of its properties. These will be concatenated to each other
+	 * with comma (", ").
+	 * Result of method references are printed by {@link StringBuilder#append(Object)} contract.
+	 * 
+	 * @param object any object (non null)
+	 * @param printableProperties functions that give a properties to be concatenated
+	 * @param <O> object type
+	 * @return the concatenation of the results of functions invokation on the given object
+	 */
+	public static <O> String footPrint(O object, Function<O, ?> ... printableProperties) {
+		StringAppender result = new StringAppender();
+		for (Function<O, ?> printableProperty : printableProperties) {
+			result.cat(printableProperty.apply(object), ", ");
+		}
+		return result.cutTail(2).toString();
 	}
 	
 	private interface INullOrEmptyDelegate {
