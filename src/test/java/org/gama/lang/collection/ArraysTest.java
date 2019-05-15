@@ -137,4 +137,20 @@ public class ArraysTest {
 		// since generic type Array creation can be tricky, we ensure that array type is the good one
 		assertEquals(String[].class, Arrays.cat(new String[] { "1", "2", "3" }, new String[] { "4", "5"}).getClass());
 	}
+	
+	@Test
+	public void head() {
+		assertArrayEquals(new Object[] { 1, 2, 3}, Arrays.head(new Object[] { 1, 2, 3, 4, 5 }, 3));
+		assertArrayEquals(new String[] { "1", "2", "3"}, Arrays.head(new String[] { "1", "2", "3", "4", "5" }, 3));
+		// since generic type Array creation can be tricky, we ensure that array type is the good one
+		assertEquals(String[].class, Arrays.head(new String[] { "1", "2", "3", "4", "5" }, 3).getClass());
+	}
+	
+	@Test
+	public void tail() {
+		assertArrayEquals(new Object[] { 3, 4, 5}, Arrays.tail(new Object[] { 1, 2, 3, 4, 5 }, 3));
+		assertArrayEquals(new String[] { "3", "4", "5"}, Arrays.tail(new String[] { "3", "4", "5" }, 3));
+		// since generic type Array creation can be tricky, we ensure that array type is the good one
+		assertEquals(String[].class, Arrays.tail(new String[] { "3", "4", "5" }, 3).getClass());
+	}
 }

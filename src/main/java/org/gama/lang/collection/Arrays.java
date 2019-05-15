@@ -147,13 +147,45 @@ public class Arrays {
 	 * @return a new array of length src1 + src2 containing the aggregation of both
 	 */
 	public static <E> E[] cat(E[] src1, E[] src2) {
-		return cat(src1, src2, (E[]) Array.newInstance(src1.getClass().getComponentType(), src1.length + src2.length));
+		return cat(src1, src2, newInstance(src1, src1.length + src2.length));
 	}
 	
 	private static <E> E[] cat(E[] src1, E[] src2, E[] dest) {
 		System.arraycopy(src1, 0, dest, 0, src1.length);
 		System.arraycopy(src2, 0, dest, src1.length, src2.length);
 		return dest;
+	}
+	
+	/**
+	 * Gives the headSize firsts elements of the given array
+	 * 
+	 * @param src a source array
+	 * @param headSize number of elements to be kept in final result
+	 * @param <E> array elements type
+	 * @return the headSize firsts elements of the given array
+	 */
+	public static <E> E[] head(E[] src, int headSize) {
+		E[] result = newInstance(src, headSize);
+		System.arraycopy(src, 0, result, 0, headSize);
+		return result;
+	}
+	
+	/**
+	 * Gives the tailSize lasts elements of the given array
+	 *
+	 * @param src a source array
+	 * @param tailSize number of elements to be kept in final result
+	 * @param <E> array elements type
+	 * @return the headSize lasts elements of the given array
+	 */
+	public static <E> E[] tail(E[] src, int tailSize) {
+		E[] result = newInstance(src, tailSize);
+		System.arraycopy(src, src.length - tailSize, result, 0, tailSize);
+		return result;
+	}
+	
+	private static <E> E[] newInstance(E[] template, int length) {
+		return (E[]) Array.newInstance(template.getClass().getComponentType(), length);
 	}
 	
 	private Arrays() {
