@@ -23,7 +23,7 @@ import org.gama.lang.bean.MethodIterator;
 import org.gama.lang.collection.Arrays;
 import org.gama.lang.collection.Iterables;
 import org.gama.lang.collection.Maps;
-import org.gama.lang.function.ThrowingExecutable;
+import org.gama.lang.function.ThrowingFunction;
 import org.gama.lang.reflect.MemberPrinter;
 
 import static org.gama.lang.reflect.MemberPrinter.FLATTEN_PACKAGE_PRINTER;
@@ -49,10 +49,10 @@ public final class Reflections {
 	public static final Function<Method, String> JAVA_BEAN_BOOLEAN_ACCESSOR_PREFIX_REMOVER = method -> IS_PREFIX_REMOVER.apply(method.getName());
 	
 	public static final Predicate<String> JAVA_BEAN_METHOD_NAME_CONVENTION_MATCHER = methodName ->
-			onJavaBeanPropertyWrapperNameGeneric(methodName, methodName, s -> true, s -> true, s -> true, () -> false);
+			onJavaBeanPropertyWrapperNameGeneric(methodName, methodName, s -> true, s -> true, s -> true, s -> false);
 	
 	public static final Predicate<Method> JAVA_BEAN_METHOD_CONVENTION_MATCHER = method ->
-			onJavaBeanPropertyWrapperNameGeneric(method.getName(), method, s -> true, s -> true, s -> true, () -> false);
+			onJavaBeanPropertyWrapperNameGeneric(method.getName(), method, s -> true, s -> true, s -> true, s -> false);
 	
 	public static final Map<Class, Object> PRIMITIVE_DEFAULT_VALUES = Collections.unmodifiableMap(Maps
 			.asHashMap((Class) boolean.class, (Object) false)
@@ -416,7 +416,7 @@ public final class Reflections {
 														  Function<I, E> booleanGetterAction,
 														  Supplier<String> inputToString) {
 		return onJavaBeanPropertyWrapperNameGeneric(methodName, input, getterAction, setterAction, booleanGetterAction,
-				() -> { throw newEncapsulationException(inputToString); });
+				i -> { throw newEncapsulationException(inputToString); });
 	}
 	
 	/**
@@ -427,7 +427,7 @@ public final class Reflections {
 	 * @param getterAction {@link Function} to be applied if method name starts with "get"
 	 * @param setterAction {@link Function} to be applied if method name starts with "set"
 	 * @param booleanGetterAction {@link Function} to be applied if method name starts with "is"
-	 * @param onNonCompliantName action to be done when methodName doesn't start with any of "get", "set", or "is"
+	 * @param onNonCompliantName {@link Function} to be applied when method name doesn't start with any of "get", "set", or "is"
 	 * @param <I> real "method" object type
 	 * @param <E> returned type
 	 * @return the result of the called action
@@ -437,7 +437,7 @@ public final class Reflections {
 																 Function<I, E> getterAction,
 																 Function<I, E> setterAction,
 																 Function<I, E> booleanGetterAction,
-																 ThrowingExecutable<E, ? extends RuntimeException> onNonCompliantName) {
+																 ThrowingFunction<I, E, ? extends RuntimeException> onNonCompliantName) {
 		if (methodName.startsWith("get")) {
 			return getterAction.apply(input);
 		} else if (methodName.startsWith("set")) {
@@ -445,7 +445,7 @@ public final class Reflections {
 		} else if (methodName.startsWith("is")) {
 			return booleanGetterAction.apply(input);
 		} else {
-			return onNonCompliantName.execute();
+			return onNonCompliantName.apply(input);
 		}
 	}
 	
