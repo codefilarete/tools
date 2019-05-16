@@ -58,6 +58,33 @@ public class Predicates {
 	}
 	
 	/**
+	 * Checks that o1.equals(o2) by taking null check into account
+	 *
+	 * @param o1 an instance, null possible
+	 * @param o2 an instance, null possible
+	 * @return - true if o1 == null && o2 == null
+	 *		<br> - false if o1 != null or-exclusive o2 != null
+	 *		<br> - else (i.e o1 and o2 not null) o1.equals(o2)
+	 */
+	public static <T, U> boolean equalOrNull(@Nullable T o1, @Nullable U o2) {
+		return equalOrNull(o1, o2, Object::equals);
+	}
+	
+	/**
+	 * Checks that 2 instances are equal according to a {@link Predicate} and by taking null check into account
+	 *
+	 * @param t an instance, null possible
+	 * @param u an instance, null possible
+	 * @param equalsNonNullDelegate the predicate delegate to test non null values
+	 * @return - true if o1 == null && o2 == null
+	 *		<br> - false if o1 != null or-exclusive o2 != null
+	 *		<br> - else (i.e o1 and o2 not null) o1.equals(o2)
+	 */
+	public static <T, U> boolean equalOrNull(@Nullable T t, @Nullable U u, BiPredicate<T, U> equalsNonNullDelegate) {
+		return (t == null && u == null) || (t != null && u != null && equalsNonNullDelegate.test(t, u));
+	}
+	
+	/**
 	 * A {@link Predicate} that always returns true
 	 * @param <C>
 	 */
