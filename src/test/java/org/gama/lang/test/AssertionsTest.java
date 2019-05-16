@@ -1,0 +1,145 @@
+package org.gama.lang.test;
+
+import java.util.function.BiPredicate;
+import java.util.function.Function;
+
+import org.gama.lang.collection.Arrays;
+import org.junit.jupiter.api.Test;
+import org.opentest4j.AssertionFailedError;
+
+import static org.gama.lang.test.Assertions.assertEquals;
+
+/**
+ * @author Guillaume Mary
+ */
+class AssertionsTest {
+	
+	/* How to test an assertion without relying on another assertion framework ?
+	 * By checking that failing cases throw an exception, and others don't throw anything 
+	 */
+	
+	@Test
+	void assertEquals_sameInstance() {
+		Object expected = new Object();
+		Object actual = expected;
+		assertEquals(expected, actual);
+	}
+	
+	@Test
+	void assertEquals_null_null() {
+		assertEquals(null, null);
+	}
+	
+	@Test
+	void assertEquals_nonNull_null_fails() {
+		Object expected = new Object();
+		assertAssertion(() -> assertEquals(expected, null), "expected: <" + expected + "> but was: <null>");
+	}
+	
+	@Test
+	void assertEquals_null_nonNull_fails() {
+		Object actual = new Object();
+		assertAssertion(() -> assertEquals(null, actual), "expected: <null> but was: <" + actual + ">");
+	}
+	
+	@Test
+	void assertEquals_inputHasSameToString_failureMssageContainsDistinguishNames() {
+		final String toStringMessage = "my dummy toString";
+		Object expected = new Object() {
+			@Override
+			public String toString() {
+				return toStringMessage;
+			}
+		};
+		Object actual = new Object() {
+			@Override
+			public String toString() {
+				return toStringMessage;
+			}
+		};
+		assertAssertion(() -> assertEquals(expected, actual),
+				"expected: " + Assertions.systemToString(expected) + "<" + toStringMessage + ">"
+				+ " but was: " + Assertions.systemToString(actual) + "<" + toStringMessage + ">");
+	}
+	
+	@Test
+	void assertEquals_comparator() {
+		assertEquals("A", "a", String.CASE_INSENSITIVE_ORDER);
+	}
+	
+	@Test
+	void assertEquals_comparator_failureMessage() {
+		assertAssertion(() -> assertEquals("b", "a", String.CASE_INSENSITIVE_ORDER),
+				"expected: <b> but was: <a> by comparing with " + String.CASE_INSENSITIVE_ORDER);
+	}
+	
+	@Test
+	void assertEquals_mapper() {
+		assertEquals("b", "a", s -> 1);
+	}
+	
+	@Test
+	void assertEquals_mapper_failureMessage() {
+		assertAssertion(() -> assertEquals("b", "a", (Function<String, String>) String::toUpperCase),
+				"expected: <B> but was: <A> by applying mapper on <b> and <a>");
+	}
+	
+	@Test
+	void assertEquals_predicate() {
+		assertEquals("b", "a", (BiPredicate) (e, a) -> true);
+	}
+	
+	@Test
+	void assertEquals_predicate_failureMessage() {
+		BiPredicate biPredicate = (e, a) -> false;
+		assertAssertion(() -> assertEquals("b", "a", biPredicate),
+				"expected: <b> but was: <a> by testing with " + biPredicate);
+	}
+	
+	@Test
+	void assertEquals_mapper_predicate() {
+		assertEquals("b", "a", String::toUpperCase, (e, a) -> true);
+	}
+	
+	@Test
+	void assertEquals_mapper_predicate_failureMessage() {
+		BiPredicate biPredicate = (e, a) -> false;
+		assertAssertion(() -> assertEquals("b", "a", String::toUpperCase, biPredicate),
+				"expected: <B> but was: <A> by applying mapper on <b> and <a> and testing with " + biPredicate);
+	}
+	
+	@Test
+	void assertEquals_iterable_mapper() {
+		assertEquals(Arrays.asList("b", "a"), Arrays.asHashSet("a", "b"), (Function<String, String>) String::toUpperCase);
+	}
+	
+	@Test
+	void assertEquals_iterable_mapper_failureMessage() {
+		assertAssertion(() -> assertEquals(Arrays.asList("b", "a"), Arrays.asHashSet("c", "b"), (Function<String, String>) String::toUpperCase),
+				"expected: <[B, A]> but was: <[B, C]> by applying mapper on <[b, a]> and <[b, c]>");
+	}
+	
+	@Test
+	void systemToString() {
+		Object o = new Object();
+		assertEquals("java.lang.Object@" + Integer.toHexString(System.identityHashCode(o)), Assertions.systemToString(o));
+		// works on toString()-overriding classes
+		assertEquals("java.lang.String@" + Integer.toHexString(System.identityHashCode("a")), Assertions.systemToString("a"));
+	}
+	
+	private static void assertAssertion(Runnable assertion, String message) {
+		AssertionFailedError thrownException = null;
+		try {
+			assertion.run();
+		} catch (AssertionFailedError assertionFailedError) {
+			thrownException = assertionFailedError;
+		}
+		if (thrownException == null) {
+			throw new AssertionFailedError("assertion failed");
+		} else {
+			if (!message.equals(thrownException.getMessage())) {
+				throw new AssertionFailedError("wrong message", message, thrownException.getMessage());
+			}
+		}
+	}
+}
