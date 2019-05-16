@@ -1,5 +1,7 @@
 package org.gama.lang.function;
 
+import javax.annotation.Nullable;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -41,6 +43,22 @@ public class Predicates {
 	 */
 	public static <I, O> Predicate<I> predicate(Function<I, O> mapper, Predicate<O> predicate) {
 		return predicate(mapper.andThen(Functions.toFunction(predicate)));
+	}
+	
+	/**
+	 * Creates a {@link BiPredicate} which makes a logical AND between the results of the given {@link Function}s.
+	 * Allows one to test objects equality on some properties by referencing them with getter references (which are {@link Function}s)
+	 *
+	 * @param testableProperties some {@link Function}s
+	 * @param <I> input predicate type
+	 * @return a {@link Predicate} as a logical AND between all given {@link Predicate}s
+	 */
+	public static <I> BiPredicate<I, I> and(Function<I, ?> ... testableProperties) {
+		BiPredicate<I, I> result = (a, b) -> true;
+		for (Function<I, ?> printableProperty : testableProperties) {
+			result = result.and((a, b) -> equalOrNull(printableProperty.apply(a), printableProperty.apply(b)));
+		}
+		return result;
 	}
 	
 	/**

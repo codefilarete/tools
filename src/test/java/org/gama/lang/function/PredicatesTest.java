@@ -3,16 +3,21 @@ package org.gama.lang.function;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiPredicate;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.gama.lang.collection.Arrays;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.clearInvocations;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -71,27 +76,60 @@ class PredicatesTest {
 	
 	@Test
 	void equalsWithNull_predicate() {
-		BiPredicate predicateMock = Mockito.mock(BiPredicate.class);
+		BiPredicate predicateMock = mock(BiPredicate.class);
 		when(predicateMock.test(any(), any())).thenReturn(true);
 		
 		assertTrue(Predicates.equalOrNull(null, null, predicateMock));
-		Mockito.verifyZeroInteractions(predicateMock);
+		verifyZeroInteractions(predicateMock);
 
 		Predicates.equalOrNull("a", "a", predicateMock);
-		Mockito.verify(predicateMock, Mockito.times(1)).test(eq("a"), eq("a"));
+		verify(predicateMock, times(1)).test(eq("a"), eq("a"));
 
 		Predicates.equalOrNull("a", "b", predicateMock);
-		Mockito.verify(predicateMock, Mockito.times(1)).test(eq("a"), eq("b"));
+		verify(predicateMock, times(1)).test(eq("a"), eq("b"));
 
 		Predicates.equalOrNull("b", "a", predicateMock);
-		Mockito.verify(predicateMock, Mockito.times(1)).test(eq("a"), eq("b"));
+		verify(predicateMock, times(1)).test(eq("a"), eq("b"));
 		
-		Mockito.clearInvocations(predicateMock);
+		clearInvocations(predicateMock);
 		
 		Predicates.equalOrNull(null, "b", predicateMock);
-		Mockito.verifyZeroInteractions(predicateMock);
+		verifyZeroInteractions(predicateMock);
 		
 		Predicates.equalOrNull("a", null, predicateMock);
-		Mockito.verifyZeroInteractions(predicateMock);
+		verifyZeroInteractions(predicateMock);
+	}
+	
+	@Test
+	void and_functions() {
+		Function<Toto, String> function1 = Toto::getProp1;
+		Function<Toto, Integer> function2 = Toto::getProp2;
+		
+		BiPredicate<Toto, Toto> testInstance = Predicates.and(function1, function2);
+		assertTrue(testInstance.test(new Toto("a", 1), new Toto("a", 1)));
+		assertFalse(testInstance.test(new Toto("a", 1), new Toto("a", 2)));
+		assertFalse(testInstance.test(new Toto("a", 1), new Toto("b", 1)));
+		// test with null
+		assertTrue(testInstance.test(new Toto(null, 1), new Toto(null, 1)));
+		assertTrue(testInstance.test(new Toto("a", null), new Toto("a", null)));
+	}
+	
+	private class Toto {
+		
+		private final String prop1;
+		private final Integer prop2;
+		
+		private Toto(String prop1, Integer prop2) {
+			this.prop1 = prop1;
+			this.prop2 = prop2;
+		}
+		
+		public String getProp1() {
+			return prop1;
+		}
+		
+		public Integer getProp2() {
+			return prop2;
+		}
 	}
 }
