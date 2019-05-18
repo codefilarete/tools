@@ -170,6 +170,8 @@ public class NullableTest {
 		assertEquals(1, isCalled.getValue());
 		Nullable.nullable(value).accept(dummyFunction);
 		assertEquals(2, isCalled.getValue());
+		Nullable.nullable((String) null).accept(dummyFunction);
+		assertEquals(2, isCalled.getValue());
 	}
 	
 	@Test

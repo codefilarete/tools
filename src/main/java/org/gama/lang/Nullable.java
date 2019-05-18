@@ -46,7 +46,7 @@ public class Nullable<T> implements Supplier<T> {
 	 * @param input a nullable value
 	 * @param f a function to be applied on the input
 	 * @param <I> value type
-	 * @return new Nullable(input).orApply(f)
+	 * @return new Nullable(input).apply(f)
 	 */
 	public static <I, O> Nullable<O> nullable(@javax.annotation.Nullable I input, Function<I, O> f) {
 		return nullable(input).apply(f);
@@ -58,7 +58,7 @@ public class Nullable<T> implements Supplier<T> {
 	 * @param input a nullable value
 	 * @param f a function to be applied on the input
 	 * @param <I> value type
-	 * @return new Nullable(input).orApply(f)
+	 * @return new Nullable(input).apply(f)
 	 */
 	public static <I, O> Nullable<O> nullable(Supplier<I> input, Function<I, O> f) {
 		return nullable(input).apply(f);
