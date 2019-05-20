@@ -217,7 +217,7 @@ public class ReflectionsTest {
 	public void testOnJavaBeanPropertyWrapperName_doesntMatchJavaBeanStandard_throwsException() {
 		MemberNotFoundException thrownException = assertThrows(MemberNotFoundException.class, () -> onJavaBeanPropertyWrapperName(String.class.getMethod("toString"),
 				m -> false, m -> true, m -> false));
-		assertEquals("Field wrapper j.l.String j.l.String.toString() doesn't fit encapsulation naming convention", thrownException.getMessage());
+		assertEquals("Field wrapper j.l.String.toString() doesn't fit encapsulation naming convention", thrownException.getMessage());
 	}
 	
 	@Test
@@ -351,12 +351,12 @@ public class ReflectionsTest {
 	@Test
 	public void testPropertyName_methodDoesntFitJavaBeanConvention_exceptionIsThrown() throws NoSuchMethodException {
 		Method fixBMethod = Toto.class.getDeclaredMethod("fixB", String.class);
-		assertEquals("Field wrapper void o.g.l.ReflectionsTest$Toto.fixB(j.l.String) doesn't fit encapsulation naming convention",
+		assertEquals("Field wrapper o.g.l.ReflectionsTest$Toto.fixB(j.l.String) doesn't fit encapsulation naming convention",
 				assertThrows(MemberNotFoundException.class, () -> propertyName(fixBMethod)).getMessage());
 	}
 	
 	@Test
-	public void testForName() throws ClassNotFoundException {
+	public void testForName() {
 		assertEquals(boolean.class, forName("Z"));
 		assertEquals(int.class, forName("I"));
 		assertEquals(long.class, forName("J"));

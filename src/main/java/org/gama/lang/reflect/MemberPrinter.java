@@ -87,12 +87,12 @@ public class MemberPrinter {
 	}
 	
 	public String toString(Method method) {
-		return new ClassAppender().cat(method.getReturnType(), " ", method.getDeclaringClass(), ".", method.getName())
+		return new ClassAppender().cat(method.getDeclaringClass(), ".", method.getName())
 				.cat("(").ccat(method.getParameterTypes(), ", ").cat(")").toString();
 	}
 	
 	public String toString(Field field) {
-		return new ClassAppender().cat(field.getType(), " ", field.getDeclaringClass(), ".", field.getName()).toString();
+		return new ClassAppender().cat(field.getDeclaringClass(), ".", field.getName()).toString();
 	}
 	
 	
