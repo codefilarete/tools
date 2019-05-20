@@ -27,7 +27,7 @@ class AssertionsTest {
 	
 	@Test
 	void assertEquals_null_null() {
-		assertEquals(null, null);
+		Assertions.assertAllEquals(null, null);
 	}
 	
 	@Test
@@ -110,12 +110,12 @@ class AssertionsTest {
 	
 	@Test
 	void assertEquals_iterable_mapper() {
-		assertEquals(Arrays.asList("b", "a"), Arrays.asHashSet("a", "b"), (Function<String, String>) String::toUpperCase);
+		Assertions.assertAllEquals(Arrays.asList("b", "a"), Arrays.asHashSet("a", "b"), (Function<String, String>) String::toUpperCase);
 	}
 	
 	@Test
 	void assertEquals_iterable_mapper_failureMessage() {
-		assertAssertion(() -> assertEquals(Arrays.asList("b", "a"), Arrays.asHashSet("c", "b"), (Function<String, String>) String::toUpperCase),
+		assertAssertion(() -> Assertions.assertAllEquals(Arrays.asList("b", "a"), Arrays.asHashSet("c", "b"), (Function<String, String>) String::toUpperCase),
 				"expected: <[B, A]> but was: <[B, C]> by applying mapper on <[b, a]> and <[b, c]>");
 	}
 	
@@ -125,6 +125,28 @@ class AssertionsTest {
 		assertEquals("java.lang.Object@" + Integer.toHexString(System.identityHashCode(o)), Assertions.systemToString(o));
 		// works on toString()-overriding classes
 		assertEquals("java.lang.String@" + Integer.toHexString(System.identityHashCode("a")), Assertions.systemToString("a"));
+	}
+	
+	@Test
+	void assertAllEquals() {
+		Assertions.assertAllEquals(Arrays.asList("1", "2", "3"), Arrays.asList(1, 2, 3), Integer::valueOf, Function.identity());
+	}
+	
+	@Test
+	void assertAllEquals_failureMessage() {
+		assertAssertion(() -> Assertions.assertAllEquals(Arrays.asList("0", "2", "3"), Arrays.asList(1, 2, 3), Integer::valueOf, Function.identity()),
+				"expected: <[0, 2, 3]> but was: <[1, 2, 3]> with mappers");
+	}
+	
+	@Test
+	void assertAllEquals_predicate() {
+		Assertions.assertAllEquals(Arrays.asList("1", "2", "3"), Arrays.asList(1, 2, 3), (s, i) -> Integer.valueOf(s).equals(i));
+	}
+	
+	@Test
+	void assertAllEquals_predicate_failureMessage() {
+		assertAssertion(() -> Assertions.assertAllEquals(Arrays.asList("0", "2", "3"), Arrays.asList(1, 2, 3), (s, i) -> Integer.valueOf(s).equals(i)),
+				"expected: <[0, 2, 3]> but was: <[1, 2, 3]> with predicate");
 	}
 	
 	private static void assertAssertion(Runnable assertion, String message) {

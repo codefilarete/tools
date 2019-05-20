@@ -1,12 +1,15 @@
 package org.gama.lang.test;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.gama.lang.Duo;
 import org.gama.lang.collection.Iterables;
+import org.gama.lang.collection.PairIterator;
 import org.gama.lang.exception.Exceptions;
 import org.gama.lang.function.Predicates;
 import org.gama.lang.reflect.MemberPrinter;
@@ -123,7 +126,7 @@ public class Assertions {
 		}
 	}
 	
-	public static <E> void assertEquals(Iterable<E> expected, Iterable<E> actual) {
+	public static <E> void assertAllEquals(Iterable<E> expected, Iterable<E> actual) {
 		assertPredicate(new ExpectedPredicate<Iterable<E>, Iterable<E>>(expected, Predicates::equalOrNull) {
 			@Override
 			public Iterable<E> giveExpectedFromActual(Iterable<E> actual) {
@@ -132,7 +135,7 @@ public class Assertions {
 		}, actual);
 	}
 	
-	public static <E, M> void assertEquals(Iterable<E> expected, Iterable<E> actual, Function<E, M> mapper) {
+	public static <E, M> void assertAllEquals(Iterable<E> expected, Iterable<E> actual, Function<E, M> mapper) {
 		assertPredicate(new ExpectedPredicate<Iterable<E>, Iterable<E>>(expected,
 				(e, a) -> Predicates.equalOrNull(Iterables.collectToList(e, mapper), Iterables.collectToList(a, mapper)),
 				new FailureMessageBuilder() {
@@ -148,6 +151,33 @@ public class Assertions {
 				return actual;
 			}
 		}, actual);
+	}
+	
+	public static <A, B> void assertAllEquals(Iterable<A> expected, Iterable<B> actual, BiPredicate<A, B> biPredicate) {
+		IterableTester<A, B> iterableTester = new IterableTester<>(biPredicate);
+		boolean areEquals = iterableTester.test(expected, actual);
+		if (!areEquals) {
+			FailureMessageBuilder failureMessageBuilder = new FailureMessageBuilder();
+			String failureMessage = failureMessageBuilder.build(expected, actual);
+			throw new AssertionFailedError(failureMessage + " with predicate", expected, actual);
+		}
+	}
+	
+	public static <A, B, M> void assertAllEquals(Iterable<A> expected, Iterable<B> actual, Function<A, M> mapperForAs, Function<B, M> mapperForBs) {
+		List<M> as = new ArrayList<>();
+		List<M> bs = new ArrayList<>();
+		IterableTester<A, B> iterableTester = new IterableTester<>((a, b) -> {
+			M mappedA = mapperForAs.apply(a);
+			as.add(mappedA);
+			M mappedB = mapperForBs.apply(b);
+			bs.add(mappedB);
+			return Predicates.equalOrNull(mappedA, mappedB);
+		});
+		if (!iterableTester.test(expected, actual)) {
+			FailureMessageBuilder failureMessageBuilder = new FailureMessageBuilder();
+			String failureMessage = failureMessageBuilder.build(expected, actual);
+			throw new AssertionFailedError(failureMessage + " with mappers", as, bs);
+		}
 	}
 	
 	public static void assertThrows(Runnable executable, Predicate<Throwable> throwablePredicate) {
@@ -418,5 +448,23 @@ public class Assertions {
 	 */
 	static String systemToString(Object o) {
 		return o.getClass().getName() + "@" + Integer.toHexString(System.identityHashCode(o));
+	}
+	
+	private static class IterableTester<A, B> {
+		private BiPredicate<A, B> biPredicate;
+		
+		public IterableTester(BiPredicate<A, B> biPredicate) {
+			this.biPredicate = biPredicate;
+		}
+		
+		public boolean test(Iterable<A> expected, Iterable<B> actual) {
+			boolean areEquals = true;
+			PairIterator<A, B> duoIterator = new PairIterator<>(expected, actual);
+			while (duoIterator.hasNext()) {
+				Duo<A, B> next = duoIterator.next();
+				areEquals &= biPredicate.test(next.getLeft(), next.getRight());
+			}
+			return areEquals;
+		}
 	}
 }
