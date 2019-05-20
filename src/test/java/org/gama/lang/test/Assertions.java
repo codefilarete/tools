@@ -312,7 +312,7 @@ public class Assertions {
 		
 		@Override
 		public boolean test(Throwable throwable) {
-			T foundException = Exceptions.findExceptionInHierarchy(throwable, getExpected());
+			T foundException = Exceptions.findExceptionInCauses(throwable, getExpected());
 			if (foundException != null) {
 				this.projection = foundException;
 				return true;

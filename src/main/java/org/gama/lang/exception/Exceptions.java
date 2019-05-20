@@ -28,12 +28,12 @@ public interface Exceptions {
 		}
 	}
 	
-	static <T> T findExceptionInHierarchy(Throwable t, Class<T> throwableClass) {
-		return (T) findExceptionInHierarchy(t, new ClassExceptionFilter<>(throwableClass));
+	static <T> T findExceptionInCauses(Throwable t, Class<T> throwableClass) {
+		return (T) findExceptionInCauses(t, new ClassExceptionFilter<>(throwableClass));
 	}
 	
-	static <T> T findExceptionInHierarchy(Throwable t, Class<T> throwableClass, String message) {
-		return (T) findExceptionInHierarchy(t, new ClassAndMessageExceptionFilter<>(throwableClass, message));
+	static <T> T findExceptionInCauses(Throwable t, Class<T> throwableClass, String message) {
+		return (T) findExceptionInCauses(t, new ClassAndMessageExceptionFilter<>(throwableClass, message));
 	}
 	
 	/**
@@ -43,20 +43,20 @@ public interface Exceptions {
 	 * @param filter a filter
 	 * @return null if not found
 	 */
-	static Throwable findExceptionInHierarchy(Throwable t, final ExceptionFilter filter) {
-		return Iterables.stream(new ExceptionHierarchyIterator(t)).filter(filter::accept).findAny().orElse(null);
+	static Throwable findExceptionInCauses(Throwable t, final ExceptionFilter filter) {
+		return Iterables.stream(new ExceptionCauseIterator(t)).filter(filter::accept).findAny().orElse(null);
 	}
 	
 	/**
 	 * Iterator on {@link Throwable} causes (and itself)
 	 */
-	class ExceptionHierarchyIterator extends ReadOnlyIterator<Throwable> {
+	class ExceptionCauseIterator extends ReadOnlyIterator<Throwable> {
 		
 		private Throwable currentThrowable;
 		
 		private boolean hasNext = false;
 		
-		public ExceptionHierarchyIterator(Throwable throwable) {
+		public ExceptionCauseIterator(Throwable throwable) {
 			this.currentThrowable = throwable;
 		}
 		

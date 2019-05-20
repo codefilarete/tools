@@ -289,7 +289,7 @@ public class ReflectionsTest {
 	public void testNewInstance_interface_throwsException() {
 		InvokationRuntimeException thrownException = assertThrows(InvokationRuntimeException.class,
 				() -> newInstance(CharSequence.class));
-		assertNotNull(Exceptions.findExceptionInHierarchy(thrownException, UnsupportedOperationException.class,
+		assertNotNull(Exceptions.findExceptionInCauses(thrownException, UnsupportedOperationException.class,
 				"Class j.l.CharSequence has no default constructor because it is an interface"));
 	}
 	
@@ -298,7 +298,7 @@ public class ReflectionsTest {
 		InvokationRuntimeException thrownException = assertThrows(InvokationRuntimeException.class,
 				() -> newInstance(ThrowingConstructorClass.class));
 		
-		assertNotNull(Exceptions.findExceptionInHierarchy(thrownException, InvokationRuntimeException.class,
+		assertNotNull(Exceptions.findExceptionInCauses(thrownException, InvokationRuntimeException.class,
 				"Class o.g.l.ReflectionsTest$ThrowingConstructorClass can't be instanciated"),
 				() -> {
 					StringWriter exceptionAsString = new StringWriter();
@@ -306,7 +306,7 @@ public class ReflectionsTest {
 					return "Can't find exception in " + exceptionAsString;
 				});
 		// looking for exception thrown by constructor
-		assertNotNull(Exceptions.findExceptionInHierarchy(thrownException, NullPointerException.class));
+		assertNotNull(Exceptions.findExceptionInCauses(thrownException, NullPointerException.class));
 	}
 	
 	@Test

@@ -6,7 +6,7 @@ import java.util.NoSuchElementException;
 
 import org.gama.lang.collection.Arrays;
 import org.gama.lang.collection.Iterables;
-import org.gama.lang.exception.Exceptions.ExceptionHierarchyIterator;
+import org.gama.lang.exception.Exceptions.ExceptionCauseIterator;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -21,14 +21,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ExceptionsTest {
 	
 	@Nested
-	class ExceptionHierarchyIteratorTest {
+	class ExceptionCauseIteratorTest {
 		
 		@Test
 		public void testNext() {
 			RuntimeException root = new RuntimeException("root", 
 					new RuntimeException("cause", 
 					new RuntimeException("second cause")));
-			ExceptionHierarchyIterator testInstance = new ExceptionHierarchyIterator(root);
+			ExceptionCauseIterator testInstance = new ExceptionCauseIterator(root);
 			List<String> stackMessages = Iterables.collect(() -> testInstance, Throwable::getMessage, ArrayList::new);
 			assertEquals(Arrays.asList("root", "cause", "second cause"), stackMessages);
 		}
@@ -36,7 +36,7 @@ class ExceptionsTest {
 		@Test
 		public void testNext_throwsNoSuchElementException() {
 			RuntimeException root = new RuntimeException("root", new RuntimeException("cause"));
-			ExceptionHierarchyIterator testInstance = new ExceptionHierarchyIterator(root);
+			ExceptionCauseIterator testInstance = new ExceptionCauseIterator(root);
 			assertTrue(testInstance.hasNext());
 			testInstance.next();
 			assertTrue(testInstance.hasNext());
@@ -47,7 +47,7 @@ class ExceptionsTest {
 		
 		@Test
 		public void testNext_throwsNoSuchElementException_onNullException() {
-			ExceptionHierarchyIterator testInstance = new ExceptionHierarchyIterator(null);
+			ExceptionCauseIterator testInstance = new ExceptionCauseIterator(null);
 			assertFalse(testInstance.hasNext());
 			assertThrows(NoSuchElementException.class, testInstance::next);
 		}
