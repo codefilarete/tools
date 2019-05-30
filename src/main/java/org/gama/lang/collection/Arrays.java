@@ -171,6 +171,44 @@ public class Arrays {
 	}
 	
 	/**
+	 * Gives the headSize firsts elements of the given array
+	 * 
+	 * @param src a source array
+	 * @param headSize number of elements to be kept in final result
+	 * @return the headSize firsts elements of the given array
+	 */
+	public static long[] head(long[] src, int headSize) {
+		return (long[]) arrayCopy(src, headSize, new long[headSize]);
+	}
+	
+	/**
+	 * Gives the headSize firsts elements of the given array
+	 * 
+	 * @param src a source array
+	 * @param headSize number of elements to be kept in final result
+	 * @return the headSize firsts elements of the given array
+	 */
+	public static int[] head(int[] src, int headSize) {
+		return (int[]) arrayCopy(src, headSize, new int[headSize]);
+	}
+	
+	/**
+	 * Gives the headSize firsts elements of the given array
+	 * 
+	 * @param src a source array
+	 * @param headSize number of elements to be kept in final result
+	 * @return the headSize firsts elements of the given array
+	 */
+	public static byte[] head(byte[] src, int headSize) {
+		return (byte[]) arrayCopy(src, headSize, new byte[headSize]);
+	}
+	
+	private static Object arrayCopy(Object src, int headSize, Object result) {
+		System.arraycopy(src, 0, result, 0, headSize);
+		return result;
+	}
+	
+	/**
 	 * Gives the tailSize lasts elements of the given array
 	 *
 	 * @param src a source array

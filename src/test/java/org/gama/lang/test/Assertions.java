@@ -12,6 +12,7 @@ import org.gama.lang.collection.Iterables;
 import org.gama.lang.collection.PairIterator;
 import org.gama.lang.exception.Exceptions;
 import org.gama.lang.function.Predicates;
+import org.gama.lang.function.ThrowingRunnable;
 import org.gama.lang.reflect.MemberPrinter;
 import org.junit.platform.commons.util.StringUtils;
 import org.opentest4j.AssertionFailedError;
@@ -180,7 +181,7 @@ public class Assertions {
 		}
 	}
 	
-	public static void assertThrows(Runnable executable, Predicate<Throwable> throwablePredicate) {
+	public static <E extends Throwable> void assertThrows(ThrowingRunnable<E> executable, Predicate<Throwable> throwablePredicate) {
 		try {
 			executable.run();
 		} catch (Throwable actualException) {
