@@ -525,6 +525,36 @@ public final class Reflections {
 	public static <I> I newProxy(Class<I> iface, InvocationHandler invocationHandler, Class<?> ... additionalInterfaces) {
 		return (I) Proxy.newProxyInstance(iface.getClassLoader(), Arrays.cat(new Class[] { iface }, additionalInterfaces), invocationHandler);
 	}
+	
+	/**
+	 * Gives the wrapping class of a primitive type (Integer for int, Boolean for boolean, etc.)
+	 * Caller must check if given argument is a primitive type (with {@link Class#isPrimitive()} else a {@link IllegalArgumentException} will be thrown.
+	 * 
+	 * @param clazz any primitive type
+	 * @return the matching wrapper class of the given type
+	 */
+	public static Class<?> wrapperClass(Class<?> clazz) {
+		if (clazz == Integer.TYPE)
+			return Integer.class;
+		if (clazz == Long.TYPE)
+			return Long.class;
+		if (clazz == Boolean.TYPE)
+			return Boolean.class;
+		if (clazz == Byte.TYPE)
+			return Byte.class;
+		if (clazz == Character.TYPE)
+			return Character.class;
+		if (clazz == Float.TYPE)
+			return Float.class;
+		if (clazz == Double.TYPE)
+			return Double.class;
+		if (clazz == Short.TYPE)
+			return Short.class;
+		if (clazz == Void.TYPE)
+			return Void.class;
+		
+		throw new IllegalArgumentException("Given type is not a primitive one : " + toString(clazz));
+	}
 		
 	@FunctionalInterface
 	private interface Checker {

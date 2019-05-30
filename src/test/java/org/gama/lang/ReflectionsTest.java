@@ -14,6 +14,7 @@ import java.util.Optional;
 import org.gama.lang.Reflections.InvokationRuntimeException;
 import org.gama.lang.Reflections.MemberNotFoundException;
 import org.gama.lang.exception.Exceptions;
+import org.gama.lang.test.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -371,6 +372,21 @@ public class ReflectionsTest {
 		assertEquals(Object.class, forName("java.lang.Object"));
 		assertEquals(boolean[].class, forName("[Z"));
 		assertEquals(boolean[][].class, forName("[[Z"));
+	}
+	
+	@Test
+	public void wrapperClass() {
+		assertEquals(Boolean.class, Reflections.wrapperClass(boolean.class));
+		assertEquals(Integer.class, Reflections.wrapperClass(int.class));
+		assertEquals(Long.class, Reflections.wrapperClass(long.class));
+		assertEquals(Short.class, Reflections.wrapperClass(short.class));
+		assertEquals(Byte.class, Reflections.wrapperClass(byte.class));
+		assertEquals(Double.class, Reflections.wrapperClass(double.class));
+		assertEquals(Float.class, Reflections.wrapperClass(float.class));
+		assertEquals(Character.class, Reflections.wrapperClass(char.class));
+		assertEquals(Void.class, Reflections.wrapperClass(void.class));
+		Assertions.assertThrows(() -> Reflections.wrapperClass(String.class), Assertions.hasExceptionInHierarchy(IllegalArgumentException.class)
+				.andProjection(Assertions.hasMessage("Given type is not a primitive one : j.l.String")));
 	}
 	
 	@Test
