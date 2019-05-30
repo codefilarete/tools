@@ -17,22 +17,12 @@ public interface ThrowingFunction<T, R, E extends Throwable> {
 	 */
 	R apply(T t) throws E;
 	
-	default <V> ThrowingFunction<V, R, E> compose(Function<? super V, ? extends T> before) {
-		Objects.requireNonNull(before);
-		return (V v) -> apply(before.apply(v));
-	}
-	
-	default <V> ThrowingFunction<V, R, E> compose(ThrowingFunction<? super V, ? extends T, E> before) {
-		Objects.requireNonNull(before);
-		return (V v) -> apply(before.apply(v));
-	}
-	
-	default <V> ThrowingFunction<T, V, E> andThen(Function<? super R, ? extends V> after) {
+	default <RR> ThrowingFunction<T, RR, E> andThen(Function<? super R, ? extends RR> after) {
 		Objects.requireNonNull(after);
 		return (T t) -> after.apply(apply(t));
 	}
 	
-	default <V> ThrowingFunction<T, V, E> andThen(ThrowingFunction<? super R, ? extends V, E> after) {
+	default <RR> ThrowingFunction<T, RR, E> andThen(ThrowingFunction<? super R, ? extends RR, E> after) {
 		Objects.requireNonNull(after);
 		return (T t) -> after.apply(apply(t));
 	}
