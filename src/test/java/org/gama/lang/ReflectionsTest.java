@@ -385,7 +385,7 @@ public class ReflectionsTest {
 		assertEquals(Float.class, Reflections.wrapperClass(float.class));
 		assertEquals(Character.class, Reflections.wrapperClass(char.class));
 		assertEquals(Void.class, Reflections.wrapperClass(void.class));
-		Assertions.assertThrows(() -> Reflections.wrapperClass(String.class), Assertions.hasExceptionInHierarchy(IllegalArgumentException.class)
+		Assertions.assertThrows(() -> Reflections.wrapperClass(String.class), Assertions.hasExceptionInCauses(IllegalArgumentException.class)
 				.andProjection(Assertions.hasMessage("Given type is not a primitive one : j.l.String")));
 	}
 	

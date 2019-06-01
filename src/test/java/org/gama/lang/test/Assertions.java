@@ -288,7 +288,8 @@ public class Assertions {
 		};
 	}
 	
-	public static <T extends Throwable, X extends ExpectationPredicate<Throwable, Class<T>> & PrintablePredicate<Throwable> & ProjectingPredicate<Throwable, T>> X hasExceptionInHierarchy(Class<T> throwableClass) {
+	public static <T extends Throwable, X extends ExpectationPredicate<Throwable, Class<T>> & PrintablePredicate<Throwable> & ProjectingPredicate<Throwable, T>>
+	X hasExceptionInCauses(Class<T> throwableClass) {
 		return (X) new ThrowableClassExpectedPredicate<>(throwableClass);
 	}
 	
