@@ -45,28 +45,22 @@ public class Assertions {
 	}
 	
 	public static <E, M> void assertEquals(E expected, E actual, Function<E, M> mapper) {
-		assertPredicate(new ExpectedPredicate<E, E>(expected, (e, a) -> Predicates.equalOrNull(mapper.apply(e), mapper.apply(a)), new FailureMessageBuilder() {
+		assertPredicate(new ExpectedPredicate<M, M>(mapper.apply(expected), Predicates::equalOrNull, new FailureMessageBuilder() {
 			@Override
 			protected String build(Duo<String, String> messageParameters) {
-				return super.build(new Duo<>(wrap(toString(mapper.apply(expected))), wrap(toString(mapper.apply(actual)))))
-						+ " by applying mapper on " + messageParameters.getLeft() + " and " + messageParameters.getRight();
+				return super.build(new Duo<>(wrap(toString(mapper.apply(expected))), wrap(toString(mapper.apply(actual)))));
 			}
 		}) {
 
 			@Override
-			public E giveExpectedFromActual(E actual) {
+			public M giveExpectedFromActual(M actual) {
 				return actual;
 			}
-		}, actual);
+		}, mapper.apply(actual));
 	}
 	
 	public static <E> void assertEquals(E expected, E actual, BiPredicate<E, E> predicate) {
-		assertPredicate(new ExpectedPredicate<E, E>(expected, predicate, new FailureMessageBuilder() {
-			@Override
-			protected String build(Duo<String, String> messageParameters) {
-				return super.build(messageParameters) + " by testing with " + predicate;
-			}
-		}) {
+		assertPredicate(new ExpectedPredicate<E, E>(expected, predicate, new FailureMessageBuilder()) {
 			
 			@Override
 			public E giveExpectedFromActual(E actual) {
@@ -79,7 +73,7 @@ public class Assertions {
 		assertPredicate(new ExpectedPredicate<E, E>(expected, predicate, new FailureMessageBuilder() {
 			@Override
 			protected String build(Duo<String, String> messageParameters) {
-				return super.build(new Duo<>(printingFunction.apply(expected), printingFunction.apply(actual))) + " by testing with " + predicate;
+				return super.build(new Duo<>(printingFunction.apply(expected), printingFunction.apply(actual)));
 			}
 		}) {
 			
@@ -91,12 +85,7 @@ public class Assertions {
 	}
 	
 	public static <E> void assertEquals(E expected, E actual, Comparator<E> comparator) {
-		assertPredicate(new ExpectedPredicate<E, E>(expected, (e, a) -> comparator.compare(e, a) == 0, new FailureMessageBuilder() {
-			@Override
-			protected String build(Duo<String, String> messageParameters) {
-				return super.build(messageParameters) + " by comparing with " + comparator;
-			}
-		}) {
+		assertPredicate(new ExpectedPredicate<E, E>(expected, (e, a) -> comparator.compare(e, a) == 0, new FailureMessageBuilder()) {
 			
 			@Override
 			public E giveExpectedFromActual(E actual) {
@@ -109,8 +98,7 @@ public class Assertions {
 		assertPredicate(new ExpectedPredicate<E, E>(expected, (e, a) -> predicate.test(mapper.apply(e), mapper.apply(a)), new FailureMessageBuilder() {
 			@Override
 			protected String build(Duo<String, String> messageParameters) {
-				return super.build(new Duo<>(wrap(toString(mapper.apply(expected))), wrap(toString(mapper.apply(actual)))))
-						+ " by applying mapper on " + messageParameters.getLeft() + " and " + messageParameters.getRight() + " and testing with " + predicate;
+				return super.build(new Duo<>(wrap(toString(mapper.apply(expected))), wrap(toString(mapper.apply(actual)))));
 			}
 		}) {
 			
@@ -137,21 +125,21 @@ public class Assertions {
 	}
 	
 	public static <E, M> void assertAllEquals(Iterable<E> expected, Iterable<E> actual, Function<E, M> mapper) {
-		assertPredicate(new ExpectedPredicate<Iterable<E>, Iterable<E>>(expected,
-				(e, a) -> Predicates.equalOrNull(Iterables.collectToList(e, mapper), Iterables.collectToList(a, mapper)),
+		assertPredicate(new ExpectedPredicate<Iterable<M>, Iterable<M>>(Iterables.collectToList(expected, mapper),
+				Predicates::equalOrNull,
 				new FailureMessageBuilder() {
-			@Override
-			protected String build(Duo<String, String> messageParameters) {
-				return super.build(new Duo<>(wrap(toString(Iterables.collectToList(expected, mapper))), wrap(toString(Iterables.collectToList(actual, mapper)))))
-						+ " by applying mapper on " + messageParameters.getLeft() + " and " + messageParameters.getRight();
-			}
-		}) {
+					@Override
+					protected String build(Duo<String, String> messageParameters) {
+						return super.build(new Duo<>(wrap(Iterables.collectToList(expected, mapper).toString()),
+								wrap(Iterables.collectToList(actual, mapper).toString())));
+					}
+				}) {
 			
 			@Override
-			public Iterable<E> giveExpectedFromActual(Iterable<E> actual) {
+			public Iterable<M> giveExpectedFromActual(Iterable<M> actual) {
 				return actual;
 			}
-		}, actual);
+		}, Iterables.collectToList(actual, mapper));
 	}
 	
 	public static <A, B> void assertAllEquals(Iterable<A> expected, Iterable<B> actual, BiPredicate<A, B> biPredicate) {
@@ -160,7 +148,7 @@ public class Assertions {
 		if (!areEquals) {
 			FailureMessageBuilder failureMessageBuilder = new FailureMessageBuilder();
 			String failureMessage = failureMessageBuilder.build(expected, actual);
-			throw new AssertionFailedError(failureMessage + " with predicate", expected, actual);
+			throw new AssertionFailedError(failureMessage, expected, actual);
 		}
 	}
 	
@@ -177,7 +165,7 @@ public class Assertions {
 		if (!iterableTester.test(expected, actual)) {
 			FailureMessageBuilder failureMessageBuilder = new FailureMessageBuilder();
 			String failureMessage = failureMessageBuilder.build(expected, actual);
-			throw new AssertionFailedError(failureMessage + " with mappers", as, bs);
+			throw new AssertionFailedError(failureMessage, as, bs);
 		}
 	}
 	

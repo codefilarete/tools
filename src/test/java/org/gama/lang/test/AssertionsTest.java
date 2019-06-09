@@ -70,7 +70,7 @@ class AssertionsTest {
 	@Test
 	void assertEquals_comparator_failureMessage() {
 		assertAssertion(() -> assertEquals("b", "a", String.CASE_INSENSITIVE_ORDER),
-				"expected: <b> but was: <a> by comparing with " + String.CASE_INSENSITIVE_ORDER);
+				"expected: <b> but was: <a>");
 	}
 	
 	@Test
@@ -81,7 +81,7 @@ class AssertionsTest {
 	@Test
 	void assertEquals_mapper_failureMessage() {
 		assertAssertion(() -> assertEquals("b", "a", (Function<String, String>) String::toUpperCase),
-				"expected: <B> but was: <A> by applying mapper on <b> and <a>");
+				"expected: <B> but was: <A>");
 	}
 	
 	@Test
@@ -93,7 +93,7 @@ class AssertionsTest {
 	void assertEquals_predicate_failureMessage() {
 		BiPredicate biPredicate = (e, a) -> false;
 		assertAssertion(() -> assertEquals("b", "a", biPredicate),
-				"expected: <b> but was: <a> by testing with " + biPredicate);
+				"expected: <b> but was: <a>");
 	}
 	
 	@Test
@@ -105,7 +105,7 @@ class AssertionsTest {
 	void assertEquals_mapper_predicate_failureMessage() {
 		BiPredicate biPredicate = (e, a) -> false;
 		assertAssertion(() -> assertEquals("b", "a", String::toUpperCase, biPredicate),
-				"expected: <B> but was: <A> by applying mapper on <b> and <a> and testing with " + biPredicate);
+				"expected: <B> but was: <A>");
 	}
 	
 	@Test
@@ -116,7 +116,7 @@ class AssertionsTest {
 	@Test
 	void assertEquals_iterable_mapper_failureMessage() {
 		assertAssertion(() -> Assertions.assertAllEquals(Arrays.asList("b", "a"), Arrays.asHashSet("c", "b"), (Function<String, String>) String::toUpperCase),
-				"expected: <[B, A]> but was: <[B, C]> by applying mapper on <[b, a]> and <[b, c]>");
+				"expected: <[B, A]> but was: <[B, C]>");
 	}
 	
 	@Test
@@ -135,7 +135,7 @@ class AssertionsTest {
 	@Test
 	void assertAllEquals_failureMessage() {
 		assertAssertion(() -> Assertions.assertAllEquals(Arrays.asList("0", "2", "3"), Arrays.asList(1, 2, 3), Integer::valueOf, Function.identity()),
-				"expected: <[0, 2, 3]> but was: <[1, 2, 3]> with mappers");
+				"expected: <[0, 2, 3]> but was: <[1, 2, 3]>");
 	}
 	
 	@Test
@@ -146,7 +146,7 @@ class AssertionsTest {
 	@Test
 	void assertAllEquals_predicate_failureMessage() {
 		assertAssertion(() -> Assertions.assertAllEquals(Arrays.asList("0", "2", "3"), Arrays.asList(1, 2, 3), (s, i) -> Integer.valueOf(s).equals(i)),
-				"expected: <[0, 2, 3]> but was: <[1, 2, 3]> with predicate");
+				"expected: <[0, 2, 3]> but was: <[1, 2, 3]>");
 	}
 	
 	private static void assertAssertion(Runnable assertion, String message) {
