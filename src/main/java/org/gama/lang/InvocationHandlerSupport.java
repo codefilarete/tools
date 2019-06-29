@@ -13,7 +13,7 @@ import org.gama.lang.collection.Iterables;
  * particular method.
  *
  * @author Guillaume Mary
- * @see #mock(Class)
+ * @see #mock(Class, Class[]) 
  */
 public class InvocationHandlerSupport implements InvocationHandler {
 	
