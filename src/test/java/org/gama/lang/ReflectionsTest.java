@@ -27,6 +27,7 @@ import static org.gama.lang.Reflections.forName;
 import static org.gama.lang.Reflections.getConstructor;
 import static org.gama.lang.Reflections.getDefaultConstructor;
 import static org.gama.lang.Reflections.invoke;
+import static org.gama.lang.Reflections.isAssignableFrom;
 import static org.gama.lang.Reflections.newInstance;
 import static org.gama.lang.Reflections.onJavaBeanPropertyWrapper;
 import static org.gama.lang.Reflections.onJavaBeanPropertyWrapperName;
@@ -375,18 +376,30 @@ public class ReflectionsTest {
 	}
 	
 	@Test
-	public void wrapperClass() {
-		assertEquals(Boolean.class, Reflections.wrapperClass(boolean.class));
-		assertEquals(Integer.class, Reflections.wrapperClass(int.class));
-		assertEquals(Long.class, Reflections.wrapperClass(long.class));
-		assertEquals(Short.class, Reflections.wrapperClass(short.class));
-		assertEquals(Byte.class, Reflections.wrapperClass(byte.class));
-		assertEquals(Double.class, Reflections.wrapperClass(double.class));
-		assertEquals(Float.class, Reflections.wrapperClass(float.class));
-		assertEquals(Character.class, Reflections.wrapperClass(char.class));
-		assertEquals(Void.class, Reflections.wrapperClass(void.class));
-		Assertions.assertThrows(() -> Reflections.wrapperClass(String.class), Assertions.hasExceptionInCauses(IllegalArgumentException.class)
+	public void testWrapperClass() {
+		assertEquals(Boolean.class, Reflections.giveWrapperClass(boolean.class));
+		assertEquals(Integer.class, Reflections.giveWrapperClass(int.class));
+		assertEquals(Long.class, Reflections.giveWrapperClass(long.class));
+		assertEquals(Short.class, Reflections.giveWrapperClass(short.class));
+		assertEquals(Byte.class, Reflections.giveWrapperClass(byte.class));
+		assertEquals(Double.class, Reflections.giveWrapperClass(double.class));
+		assertEquals(Float.class, Reflections.giveWrapperClass(float.class));
+		assertEquals(Character.class, Reflections.giveWrapperClass(char.class));
+		assertEquals(Void.class, Reflections.giveWrapperClass(void.class));
+		Assertions.assertThrows(() -> Reflections.giveWrapperClass(String.class), Assertions.hasExceptionInCauses(IllegalArgumentException.class)
 				.andProjection(Assertions.hasMessage("Given type is not a primitive one : j.l.String")));
+	}
+	
+	@Test
+	public void testIsAssignableFrom() {
+		Assertions.assertEquals(true, isAssignableFrom(boolean.class, Boolean.class));
+		Assertions.assertEquals(true, isAssignableFrom(Boolean.class, boolean.class));
+		Assertions.assertEquals(true, isAssignableFrom(CharSequence.class, String.class));
+		Assertions.assertEquals(false, isAssignableFrom(String.class, CharSequence.class));
+		Assertions.assertEquals(true, isAssignableFrom(String.class, String.class));
+		Assertions.assertEquals(true, isAssignableFrom(CharSequence.class, CharSequence.class));
+		Assertions.assertEquals(false, isAssignableFrom(CharSequence.class, Object.class));
+		Assertions.assertEquals(true, isAssignableFrom(Object.class, CharSequence.class));
 	}
 	
 	@Test

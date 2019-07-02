@@ -26,6 +26,7 @@ import org.gama.lang.collection.Maps;
 import org.gama.lang.function.ThrowingFunction;
 import org.gama.lang.reflect.MemberPrinter;
 
+import static org.gama.lang.Nullable.nullable;
 import static org.gama.lang.reflect.MemberPrinter.FLATTEN_PACKAGE_PRINTER;
 import static org.gama.lang.reflect.MemberPrinter.FULL_PACKAGE_PRINTER;
 
@@ -532,8 +533,20 @@ public final class Reflections {
 	 * 
 	 * @param clazz any primitive type
 	 * @return the matching wrapper class of the given type
+	 * @throws IllegalArgumentException if given argument is not a primitive type
 	 */
-	public static Class<?> wrapperClass(Class<?> clazz) {
+	public static Class giveWrapperClass(Class<?> clazz) {
+		return nullable(findWrapperClass(clazz)).getOrThrow(new IllegalArgumentException("Given type is not a primitive one : " + toString(clazz)));
+	}
+	
+	/**
+	 * Gives the wrapping class of a primitive type (Integer for int, Boolean for boolean, etc.)
+	 *
+	 * @param clazz any primitive type
+	 * @return the matching wrapper class of the given type, or null if given argument is not a primitive type
+	 */
+	@Nullable
+	public static Class findWrapperClass(Class<?> clazz) {
 		if (clazz == Integer.TYPE)
 			return Integer.class;
 		if (clazz == Long.TYPE)
@@ -552,8 +565,20 @@ public final class Reflections {
 			return Short.class;
 		if (clazz == Void.TYPE)
 			return Void.class;
-		
-		throw new IllegalArgumentException("Given type is not a primitive one : " + toString(clazz));
+		return null;
+	}
+	
+	/**
+	 * Equivalent of {@link Class#isAssignableFrom(Class)} extended to primitive type, because {@link Class#isAssignableFrom(Class)} was created at
+	 * a time where autoboxing wasn't existing. See https://bugs.java.com/bugdatabase/view_bug.do?bug_id=6456930
+	 * @param aClass any class
+	 * @param otherClass any class
+	 * @return true if aClass variable accepts an otherClass variable
+	 */
+	public static boolean isAssignableFrom(Class<?> aClass, Class<?> otherClass) {
+		return aClass.isAssignableFrom(otherClass)
+				|| aClass.equals(findWrapperClass(otherClass))
+				|| otherClass.equals(findWrapperClass(aClass));
 	}
 		
 	@FunctionalInterface
