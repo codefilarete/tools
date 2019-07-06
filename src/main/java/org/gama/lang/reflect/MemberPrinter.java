@@ -77,7 +77,7 @@ public class MemberPrinter {
 		if (packageName.isEmpty()) {
 			return aClass.getSimpleName();
 		} else {
-			return packageName + "." + Nullable.nullable(aClass.getEnclosingClass()).apply(c -> c.getSimpleName() + "$").orGet("") + aClass.getSimpleName();
+			return packageName + "." + Nullable.nullable(aClass.getEnclosingClass()).map(c -> c.getSimpleName() + "$").getOr("") + aClass.getSimpleName();
 		}
 	}
 	

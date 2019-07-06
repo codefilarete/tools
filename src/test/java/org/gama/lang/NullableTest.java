@@ -9,7 +9,6 @@ import java.util.function.Supplier;
 import org.gama.lang.trace.ModifiableInt;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -20,138 +19,106 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * @author Guillaume Mary
  */
-public class NullableTest {
+class NullableTest {
 	
 	private static final Supplier<String> NULL_SUPPLIER = () -> null;
 	private static final Supplier<String> STRING_SUPPLIER = () -> "hello";
 	
 	@Test
-	public void testConstructors_object() {
+	void testConstructors_object() {
 		String nullObject = null;
-		assertEquals("hello", Nullable.nullable(nullObject).orGet("hello"));
+		assertEquals("hello", Nullable.nullable(nullObject).getOr("hello"));
 		Function<String, String> appendingWorldFunction = o -> o + " world";
 		Function<String, String> shallNotCallFunction = o -> {
 			fail("this code should not even be invoked");
 			return o;
 		};
-		assertEquals("hello", Nullable.nullable(nullObject, shallNotCallFunction).orGet("hello"));
-		assertEquals("hello", Nullable.nullable(nullObject, shallNotCallFunction).orGet("hello"));
-		assertEquals("hello", Nullable.nullable(nullObject, shallNotCallFunction, shallNotCallFunction).orGet("hello"));
+		assertEquals("hello", Nullable.nullable(nullObject, shallNotCallFunction).getOr("hello"));
+		assertEquals("hello", Nullable.nullable(nullObject, shallNotCallFunction).getOr("hello"));
+		assertEquals("hello", Nullable.nullable(nullObject, shallNotCallFunction, shallNotCallFunction).getOr("hello"));
 		
-		assertEquals("hello world", Nullable.nullable("hello", appendingWorldFunction).orGet("john"));
-		assertEquals("hello world", Nullable.nullable("hello", appendingWorldFunction).orGet("john"));
-		assertEquals("hello world !", Nullable.nullable("hello", appendingWorldFunction, o -> o + " !").orGet("john"));
+		assertEquals("hello world", Nullable.nullable("hello", appendingWorldFunction).getOr("john"));
+		assertEquals("hello world", Nullable.nullable("hello", appendingWorldFunction).getOr("john"));
+		assertEquals("hello world !", Nullable.nullable("hello", appendingWorldFunction, o -> o + " !").getOr("john"));
 	}
 	
 	@Test
-	public void testConstructors_supplier() {
-		assertEquals("hello", Nullable.nullable(NULL_SUPPLIER).orGet("hello"));
+	void testConstructors_supplier() {
+		assertEquals("hello", Nullable.nullable(NULL_SUPPLIER).getOr("hello"));
 		Function<String, String> appendingWorldFunction = o -> o + " world";
 		Function<String, String> shallNotCallFunction = o -> {
 			fail("this code should not even be invoked");
 			return o;
 		};
-		assertEquals("hello", Nullable.nullable(NULL_SUPPLIER, shallNotCallFunction).orGet("hello"));
-		assertEquals("hello", Nullable.nullable(NULL_SUPPLIER, shallNotCallFunction).orGet("hello"));
-		assertEquals("hello", Nullable.nullable(NULL_SUPPLIER, shallNotCallFunction, shallNotCallFunction).orGet("hello"));
+		assertEquals("hello", Nullable.nullable(NULL_SUPPLIER, shallNotCallFunction).getOr("hello"));
+		assertEquals("hello", Nullable.nullable(NULL_SUPPLIER, shallNotCallFunction).getOr("hello"));
+		assertEquals("hello", Nullable.nullable(NULL_SUPPLIER, shallNotCallFunction, shallNotCallFunction).getOr("hello"));
 		
-		assertEquals("hello world", Nullable.nullable(STRING_SUPPLIER, appendingWorldFunction).orGet("john"));
-		assertEquals("hello world", Nullable.nullable(STRING_SUPPLIER, appendingWorldFunction).orGet("john"));
-		assertEquals("hello world !", Nullable.nullable(STRING_SUPPLIER, appendingWorldFunction, o -> o + " !").orGet("john"));
+		assertEquals("hello world", Nullable.nullable(STRING_SUPPLIER, appendingWorldFunction).getOr("john"));
+		assertEquals("hello world", Nullable.nullable(STRING_SUPPLIER, appendingWorldFunction).getOr("john"));
+		assertEquals("hello world !", Nullable.nullable(STRING_SUPPLIER, appendingWorldFunction, o -> o + " !").getOr("john"));
 	}
 	
 	@Test
-	public void testIsPresent() {
+	void testIsPresent() {
 		assertTrue(Nullable.nullable(new Object()).isPresent());
 		assertFalse(Nullable.nullable((Object) null).isPresent());
 	}
 	
 	@Test
-	public void testOrGet_object() {
+	void testGetOr_object() {
 		Object value = new Object();
-		assertEquals(value, Nullable.nullable(value).orGet("hello"));
-		assertEquals("hello", Nullable.nullable((String) null).orGet("hello"));
+		assertEquals(value, Nullable.nullable(value).getOr("hello"));
+		assertEquals("hello", Nullable.nullable((String) null).getOr("hello"));
 	}
 	
 	@Test
-	public void testOrGet_supplier() {
+	void testGetOr_supplier() {
 		Object value = new Object();
 		Supplier<Object> dummyFunction = () -> value;
-		assertEquals(value, Nullable.nullable(value).orGet(dummyFunction));
-		assertEquals(value, Nullable.nullable((Object) null).orGet(dummyFunction));
+		assertEquals(value, Nullable.nullable(value).getOr(dummyFunction));
+		assertEquals(value, Nullable.nullable((Object) null).getOr(dummyFunction));
 	}
 	
 	@Test
-	public void testOrGet_function() {
-		// exact type method input test
-		Function<String, byte[]> getBytes = String::getBytes;
-		assertArrayEquals(new byte[] { 'h', 'e', 'l', 'l', 'o', }, Nullable.nullable("hello").orGet(getBytes));
-		assertNull(Nullable.nullable((String) null).orGet(getBytes));
-		
-		// super type method input test
-		Function<Object, Class> getClass = Object::getClass;
-		assertEquals(String.class, Nullable.nullable("hello").orGet(getClass));
-		assertNull(Nullable.nullable((String) null).orGet(getClass));
-		
-		// implemented interface method input test
-		Function<CharSequence, Integer> getLength = CharSequence::length;
-		assertEquals((long) 5, (long) Nullable.nullable("hello").orGet(getLength));
-		assertNull(Nullable.nullable((String) null).orGet(getLength));
-	}
-	
-	@Test
-	public void testSet_object() {
+	void testElseSet_object() {
 		Object value = new Object();
-		assertEquals("hello", Nullable.nullable(value).set("hello").get());
-		assertEquals("hello", Nullable.nullable((String) null).set("hello").get());
+		assertEquals(value, Nullable.nullable(value).elseSet("hello").get());
+		assertEquals("hello", Nullable.nullable((String) null).elseSet("hello").get());
 	}
 	
 	@Test
-	public void testSet_supplier() {
+	void testElseSet_supplier() {
 		Object value = new Object();
-		assertEquals("hello", Nullable.nullable(value).set(() -> "hello").get());
-		assertEquals("hello", Nullable.nullable((String) null).set(() -> "hello").get());
-	}
-	
-	@Test
-	public void testOrSet_object() {
-		Object value = new Object();
-		assertEquals(value, Nullable.nullable(value).orSet("hello").get());
-		assertEquals("hello", Nullable.nullable((String) null).orSet("hello").get());
-	}
-	
-	@Test
-	public void testOrSet_supplier() {
-		Object value = new Object();
-		assertEquals(value, Nullable.nullable(value).orSet(() -> "hello").get());
-		assertEquals("hello", Nullable.nullable((String) null).orSet(() -> "hello").get());
+		assertEquals(value, Nullable.nullable(value).elseSet(() -> "hello").get());
+		assertEquals("hello", Nullable.nullable((String) null).elseSet(() -> "hello").get());
 	}
 	
 	
 	@Test
-	public void testApply() {
+	void testMap() {
 		// simple case
-		assertEquals("Hello World", Nullable.nullable("Hello").apply(o -> o + " World").get());
+		assertEquals("Hello World", Nullable.nullable("Hello").map(o -> o + " World").get());
 		// with null value
-		assertNull(Nullable.nullable((Object) null).apply(o -> {
+		assertNull(Nullable.nullable((Object) null).map(o -> {
 			fail("this code should not even be invoked");
 			return o + " World";
 		}).get());
 	}
 	
 	@Test
-	public void testTest() {
+	void testTest() {
 		// simple case
-		assertTrue(Nullable.nullable("Hello").test(o -> o.equals("Hello")).get());
+		assertTrue(Nullable.nullable("Hello").test(o -> o.equals("Hello")));
 		// with null value
 		assertNull(Nullable.nullable((Object) null).test(o -> {
 			fail("this code should not even be invoked");
 			return false;
-		}).get());
+		}));
 	}
 	
 	@Test
-	public void testFilter() {
+	void testFilter() {
 		// simple case
 		assertEquals("Hello", Nullable.nullable("Hello").filter(o -> o.contains("ll")).get());
 		// with null value
@@ -162,21 +129,21 @@ public class NullableTest {
 	}
 	
 	@Test
-	public void testAccept() {
+	void testInvoke() {
 		String value = "hello";
 		ModifiableInt isCalled = new ModifiableInt();
 		Consumer<String> dummyFunction = s -> isCalled.increment();
-		Nullable.nullable(value).accept(dummyFunction);
+		Nullable.nullable(value).invoke(dummyFunction);
 		assertEquals(1, isCalled.getValue());
-		Nullable.nullable(value).accept(dummyFunction);
+		Nullable.nullable(value).invoke(dummyFunction);
 		assertEquals(2, isCalled.getValue());
-		Nullable.nullable((String) null).accept(dummyFunction);
+		Nullable.nullable((String) null).invoke(dummyFunction);
 		assertEquals(2, isCalled.getValue());
 	}
 	
 	@Test
-	public void testApplyThrowing() {
-		assertThrows(IOException.class, () -> Nullable.nullable(new ByteArrayOutputStream()).applyThrowing(b -> {
+	void testMapThrower() {
+		assertThrows(IOException.class, () -> Nullable.nullable(new ByteArrayOutputStream()).mapThrower(b -> {
 			b.write(0);
 			throw new IOException();
 		}));
@@ -184,32 +151,32 @@ public class NullableTest {
 	
 	
 	@Test
-	public void testAcceptThrowing() {
-		assertThrows(IOException.class, () -> Nullable.nullable(new ByteArrayOutputStream()).acceptThrowing(b -> {
+	void testInvokeThrower() {
+		assertThrows(IOException.class, () -> Nullable.nullable(new ByteArrayOutputStream()).invokeThrower(b -> {
 			b.write(0);
 			throw new IOException();
 		}));
 	}
 	
 	@Test
-	public void testOrThrow() throws IOException {
+	void testElseThrow() throws IOException {
 		Object value = new Object();
-		assertEquals(value, Nullable.nullable(value).orThrow(new IOException()).get());
+		assertEquals(value, Nullable.nullable(value).elseThrow(new IOException()).get());
 	}
 	
 	@Test
-	public void testOrThrow_nullValue_exceptionIsThrown() {
-		assertThrows(IOException.class, () -> Nullable.nullable((Object) null).orThrow(new IOException()));
+	void testElseThrow_nullValue_exceptionIsThrown() {
+		assertThrows(IOException.class, () -> Nullable.nullable((Object) null).elseThrow(new IOException()));
 	}
 	
 	@Test
-	public void testGetOrThrow() throws IOException {
+	void testGetElseThrow() throws IOException {
 		Object value = new Object();
 		assertEquals(value, Nullable.nullable(value).getOrThrow(new IOException()));
 	}
 	
 	@Test
-	public void testGetOrThrow_nullValue_exceptionIsThrown() {
+	void testGetElseThrow_nullValue_exceptionIsThrown() {
 		assertThrows(IOException.class, () -> Nullable.nullable((Object) null).getOrThrow(new IOException()));
 	}
 	

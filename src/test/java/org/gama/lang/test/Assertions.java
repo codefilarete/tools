@@ -413,7 +413,7 @@ public class Assertions {
 		}
 		
 		protected String formatClassAndValue(Object value, String valueString) {
-			String classAndHash = nullable(value).apply(Assertions::systemToString).orGet("null");
+			String classAndHash = nullable(value).map(Assertions::systemToString).getOr("null");
 			// if it's a class, there's no need to repeat the class name contained in the valueString.
 			return value instanceof Class
 					? wrap(classAndHash)

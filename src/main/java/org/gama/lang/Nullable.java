@@ -41,53 +41,53 @@ public class Nullable<T> implements Supplier<T> {
 	}
 	
 	/**
-	 * Shortcut for new Nullable(input) + {@link #apply(Function)}
+	 * Shortcut for new Nullable(input) + {@link #map(Function)}
 	 *
 	 * @param input a nullable value
 	 * @param f a function to be applied on the input
 	 * @param <I> value type
-	 * @return new Nullable(input).apply(f)
+	 * @return new Nullable(input).map(f)
 	 */
 	public static <I, O> Nullable<O> nullable(@javax.annotation.Nullable I input, Function<I, O> f) {
-		return nullable(input).apply(f);
+		return nullable(input).map(f);
 	}
 	
 	/**
-	 * Shortcut for new Nullable(input) + {@link #apply(Function)}
+	 * Shortcut for new Nullable(input) + {@link #map(Function)}
 	 *
 	 * @param input a nullable value
 	 * @param f a function to be applied on the input
 	 * @param <I> value type
-	 * @return new Nullable(input).apply(f)
+	 * @return new Nullable(input).map(f)
 	 */
 	public static <I, O> Nullable<O> nullable(Supplier<I> input, Function<I, O> f) {
-		return nullable(input).apply(f);
+		return nullable(input).map(f);
 	}
 	
 	/**
-	 * Shortcut for new Nullable(input) + {@link #apply(Function)}
+	 * Shortcut for new Nullable(input) + {@link #map(Function)}
 	 *
 	 * @param input a nullable value
 	 * @param f1 a function to be applied on the input
 	 * @param f2 a second function to be applied on the result of the first function
 	 * @param <I> value type
-	 * @return new Nullable(input).apply(f1).apply(f2)
+	 * @return new Nullable(input).map(f1).map(f2)
 	 */
 	public static <I, O, A> Nullable<O> nullable(@javax.annotation.Nullable I input, Function<I, A> f1, Function<A, O> f2) {
-		return nullable(input).apply(f1).apply(f2);
+		return nullable(input).map(f1).map(f2);
 	}
 	
 	/**
-	 * Shortcut for new Nullable(input) + {@link #apply(Function)}
+	 * Shortcut for new Nullable(input) + {@link #map(Function)}
 	 *
 	 * @param input a nullable value
 	 * @param f1 a function to be applied on the input
 	 * @param f2 a second function to be applied on the result of the first function
 	 * @param <I> value type
-	 * @return new Nullable(input).apply(f1).apply(f2)
+	 * @return new Nullable(input).map(f1).map(f2)
 	 */
 	public static <I, O, A> Nullable<O> nullable(Supplier<I> input, Function<I, A> f1, Function<A, O> f2) {
-		return nullable(input).apply(f1).apply(f2);
+		return nullable(input).map(f1).map(f2);
 	}
 	
 	/**
@@ -130,6 +130,7 @@ public class Nullable<T> implements Supplier<T> {
 	 * @return internal value
 	 */
 	@Override
+	@javax.annotation.Nullable
 	public T get() {
 		return value == null ? null : value.get();
 	}
@@ -140,8 +141,9 @@ public class Nullable<T> implements Supplier<T> {
 	 * @param anotherValue the other value to return in case of current one is null
 	 * @return {@link #get} or anotherValue if non present value
 	 */
-	public T orGet(@javax.annotation.Nullable T anotherValue) {
-		return orGet(() -> anotherValue);
+	@javax.annotation.Nullable
+	public T getOr(@javax.annotation.Nullable T anotherValue) {
+		return getOr(() -> anotherValue);
 	}
 	
 	/**
@@ -150,40 +152,21 @@ public class Nullable<T> implements Supplier<T> {
 	 * @param anotherValue the supplier called in case of current null value
 	 * @return {@link #get} or anotherValue.get() if non present value
 	 */
-	public T orGet(Supplier<T> anotherValue) {
+	public T getOr(Supplier<T> anotherValue) {
 		return !isPresent() ? anotherValue.get() : get();
 	}
 	
 	/**
-	 * Gives the value returned by the function applied on the current value if exists
-	 * 
-	 * @param function the function to apply
-	 * @param <C> result type
-	 * @return {@link #get} or {@link #apply(Function)}.get() if present value
-	 */
-	public <C> C orGet(Function<? super T, C> function) {
-		return apply(function).get();
-	}
-	
-	/**
-	 * Changes internal value by another
+	 * Gives the current value or throws the given {@link Exception} in case of missing value.
+	 * Shortcut for {@link #elseThrow(Throwable)}.get()
 	 *
-	 * @param otherValue the replacing value
-	 * @return this
+	 * @param throwable the {@link Exception} to be thrown
+	 * @param <E> the {@link Exception} type
+	 * @return this (if value is present)
+	 * @throws E the given throwable
 	 */
-	public Nullable<T> set(@javax.annotation.Nullable T otherValue) {
-		return set(() -> otherValue);
-	}
-	
-	/**
-	 * Changes internal value by another
-	 *
-	 * @param otherValue a replacing {@link java.util.function.Supplier}
-	 * @return this
-	 */
-	public Nullable<T> set(Supplier<T> otherValue) {
-		value = otherValue;
-		return this;
+	public <E extends Throwable> T getOrThrow(E throwable) throws E {
+		return elseThrow(throwable).get();
 	}
 	
 	/**
@@ -192,8 +175,8 @@ public class Nullable<T> implements Supplier<T> {
 	 * @param otherValue the replacing value
 	 * @return this
 	 */
-	public Nullable<T> orSet(@javax.annotation.Nullable T otherValue) {
-		return orSet(() -> otherValue);
+	public Nullable<T> elseSet(@javax.annotation.Nullable T otherValue) {
+		return elseSet(() -> otherValue);
 	}
 	
 	/**
@@ -202,7 +185,7 @@ public class Nullable<T> implements Supplier<T> {
 	 * @param otherValue a replacing {@link java.util.function.Supplier}
 	 * @return this
 	 */
-	public Nullable<T> orSet(Supplier<T> otherValue) {
+	public Nullable<T> elseSet(Supplier<T> otherValue) {
 		if (!isPresent()) {
 			value = otherValue;
 		}
@@ -210,25 +193,44 @@ public class Nullable<T> implements Supplier<T> {
 	}
 	
 	/**
-	 * Applies a function on current value if present
-	 * 
-	 * @param function a function to be applied on value
-	 * @param <O> the function returned type
-	 * @return a {@link Nullable} of the function result or of null if value wasn't present
+	 * Will throw the given {@link Throwable} if current value is null
+	 *
+	 * @param throwable the {@link Throwable} to be thrown
+	 * @param <E> the {@link Throwable} type
+	 * @return this (if value is present)
+	 * @throws E the given throwable
 	 */
-	public <O> Nullable<O> apply(Function<? super T, ? extends O> function) {
-		return nullable(ifPresent(function::apply));
+	public <E extends Throwable> Nullable<T> elseThrow(E throwable) throws E {
+		// NB we don't use ifPresent because it's quite too much for this case (and requires to return null in given function, ugly)
+		if (!isPresent()) {
+			throw throwable;
+		} else {
+			return this;
+		}
 	}
 	
 	/**
-	 * Same as {@link #apply(Function)}, to mimic {@link java.util.Optional#map(Function)}
+	 * Applies a function on current value if present
 	 *
 	 * @param mapper a function to be applied on value
 	 * @param <O> the function returned type
 	 * @return a {@link Nullable} of the function result or of null if value wasn't present
 	 */
 	public<O> Nullable<O> map(Function<? super T, ? extends O> mapper) {
-		return apply(mapper);
+		return nullable(ifPresent(mapper::apply));
+	}
+	
+	/**
+	 * Same as {@link #map(Function)} with a throw clause
+	 *
+	 * @param function a function to be applied on value
+	 * @param <O> the function returned type
+	 * @param <E> le type d'exception
+	 * @return a {@link Nullable} of the function result or of null if value wasn't present
+	 * @throws E type of exception thrown by the function
+	 */
+	public <O, E extends Exception> Nullable<O> mapThrower(ThrowingFunction<? super T, ? extends O, E> function) throws E {
+		return nullable(ifPresent(function));
 	}
 	
 	/**
@@ -237,22 +239,24 @@ public class Nullable<T> implements Supplier<T> {
 	 * @param consumer a value consumer
 	 * @return this
 	 */
-	public Nullable<T> accept(Consumer<T> consumer) {
+	public Nullable<T> invoke(Consumer<T> consumer) {
 		return ifPresent(consumer::accept);
 	}
 	
 	/**
-	 * Tests the value if present
+	 * Same as {@link #invoke(Consumer)} with a throw clause
 	 *
-	 * @param predicate a predicate on value type
-	 * @return a {@link Nullable} on predicate's result
+	 * @param consumer a function to be applied on value
+	 * @param <E> le type d'exception
+	 * @return this
+	 * @throws E type of exception thrown by the function
 	 */
-	public Nullable<Boolean> test(Predicate<? super T> predicate) {
-		return nullable(ifPresent(Functions.toFunction(predicate)::apply));
+	public <E extends Exception> Nullable<T> invokeThrower(ThrowingConsumer<? super T, E> consumer) throws E {
+		return ifPresent(consumer);
 	}
 	
 	/**
-	 * Tests the value if present
+	 * Tests the value if present, if not returns an empty {@link Nullable}
 	 * 
 	 * @param predicate a predicate on value type
 	 * @return this if present and predicate matches, else a {@link Nullable} of null
@@ -266,58 +270,13 @@ public class Nullable<T> implements Supplier<T> {
 	}
 	
 	/**
-	 * Same as {@link #apply(Function)} with a throw clause
-	 *
-	 * @param function a function to be applied on value
-	 * @param <O> the function returned type
-	 * @param <E> le type d'exception
-	 * @return a {@link Nullable} of the function result or of null if value wasn't present
-	 * @throws E type of exception thrown by the function
-	 */
-	public <O, E extends Exception> Nullable<O> applyThrowing(ThrowingFunction<? super T, ? extends O, E> function) throws E {
-		return nullable(ifPresent(function));
-	}
-	
-	/**
-	 * Same as {@link #accept(Consumer)} with a throw clause
-	 *
-	 * @param consumer a function to be applied on value
-	 * @param <E> le type d'exception
-	 * @return this
-	 * @throws E type of exception thrown by the function
-	 */
-	public <E extends Exception> Nullable<T> acceptThrowing(ThrowingConsumer<? super T, E> consumer) throws E {
-		return ifPresent(consumer::accept);
-	}
-	
-	/**
-	 * Will thrown the given {@link Exception} in case of missing value
+	 * Tests the value if present and returns the result
 	 * 
-	 * @param throwable the {@link Exception} to be thrown
-	 * @param <E> the {@link Exception} type
-	 * @return this (if value is present)
-	 * @throws E the given throwable
+	 * @param predicate a predicate on value type
+	 * @return {@link Predicate} result on value if present, null if value is null
 	 */
-	public <E extends Throwable> Nullable<T> orThrow(E throwable) throws E {
-		// NB we don't use ifPresent because it's quite too much for this case (and requires to return null in given function, ugly)
-		if (!isPresent()) {
-			throw throwable;
-		} else {
-			return this;
-		}
-	}
-	
-	/**
-	 * Gives the current value or throws the given {@link Exception} in case of missing value.
-	 * Shortcut for {@link #orThrow(Throwable)}.get()
-	 *
-	 * @param throwable the {@link Exception} to be thrown
-	 * @param <E> the {@link Exception} type
-	 * @return this (if value is present)
-	 * @throws E the given throwable
-	 */
-	public <E extends Throwable> T getOrThrow(E throwable) throws E {
-		return orThrow(throwable).get();
+	public Boolean test(Predicate<? super T> predicate) {
+		return ifPresent(Functions.toFunction(predicate)::apply);
 	}
 	
 	/** Applies the function if value is present */
