@@ -155,7 +155,7 @@ public final class Reflections {
 	}
 	
 	public static Map<String, Field> mapFieldsOnName(Class clazz) {
-		return Iterables.mapIdentity(() -> new FieldIterator(clazz), Field::getName);
+		return Iterables.map(() -> new FieldIterator(clazz), Field::getName);
 	}
 	
 	/**

@@ -275,7 +275,7 @@ public final class Iterables {
 	 * @param <K> keys type
 	 * @return a new (Hash)Map
 	 */
-	public static <T, K> Map<K, T> mapIdentity(Iterable<T> iterable, Function<T, K> keyMapper) {
+	public static <T, K> Map<K, T> map(Iterable<T> iterable, Function<T, K> keyMapper) {
 		return map(iterable, keyMapper, Function.identity());
 	}
 	
