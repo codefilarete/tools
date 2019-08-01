@@ -25,6 +25,12 @@ class NullableTest {
 	private static final Supplier<String> STRING_SUPPLIER = () -> "hello";
 	
 	@Test
+	void testEmpty() {
+		assertEquals(false, Nullable.empty().isPresent());
+		assertEquals(null, Nullable.empty().get());
+	}
+	
+	@Test
 	void testConstructors_object() {
 		String nullObject = null;
 		assertEquals("hello", Nullable.nullable(nullObject).getOr("hello"));

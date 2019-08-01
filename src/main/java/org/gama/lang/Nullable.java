@@ -95,7 +95,7 @@ public class Nullable<T> implements Supplier<T> {
 	 * @return a {@link Nullable} of null
 	 */
 	public static <T> Nullable<T> empty() {
-		return Nullable.nullable(null);
+		return Nullable.nullable(() -> null);
 	}
 	
 	/** The payload, may be null itself or owned value may be null */
