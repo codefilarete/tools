@@ -275,7 +275,11 @@ public final class Reflections {
 			Reflections.ensureAccessible(defaultConstructor);
 			return defaultConstructor.newInstance();
 		} catch (ReflectiveOperationException | UnsupportedOperationException e) {
-			throw new InvokationRuntimeException("Class " + toString(clazz) + " can't be instanciated", e);
+			if (e instanceof InstantiationException && Modifier.isAbstract(clazz.getModifiers()) ) {
+				throw new InvokationRuntimeException("Class " + toString(clazz) + " can't be instanciated because it is abstract", e);
+			} else {
+				throw new InvokationRuntimeException("Class " + toString(clazz) + " can't be instanciated", e);
+			}
 		}
 	}
 	

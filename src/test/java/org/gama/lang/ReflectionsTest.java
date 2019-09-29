@@ -296,6 +296,14 @@ public class ReflectionsTest {
 	}
 	
 	@Test
+	public void testNewInstance_abstract_throwsException() {
+		InvokationRuntimeException thrownException = assertThrows(InvokationRuntimeException.class,
+				() -> newInstance(AbstractClass.class));
+		assertNotNull(Exceptions.findExceptionInCauses(thrownException, InvokationRuntimeException.class,
+				"Class o.g.l.ReflectionsTest$AbstractClass can't be instanciated because it is abstract"));
+	}
+	
+	@Test
 	public void testNewInstance_constructorThrowsException_throwsException() {
 		InvokationRuntimeException thrownException = assertThrows(InvokationRuntimeException.class,
 				() -> newInstance(ThrowingConstructorClass.class));
@@ -505,6 +513,11 @@ public class ReflectionsTest {
 		
 		public ThrowingConstructorClass() {
 			throw new NullPointerException();
+		}
+	}
+	
+	private abstract static class AbstractClass {
+		private AbstractClass() {
 		}
 	}
 }
