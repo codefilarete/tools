@@ -25,14 +25,14 @@ public class Arrays {
 	
 	@SuppressWarnings("squid:S1319")	// LinkedHashSet return type is voluntary because it is the goal of this method
 	public static <T> LinkedHashSet<T> asSet(T ... a) {
-		LinkedHashSet<T> toReturn = new LinkedHashSet<>(a.length, 1);
+		LinkedHashSet<T> toReturn = new LinkedHashSet<>();
 		java.util.Collections.addAll(toReturn, a);
 		return toReturn;
 	}
 	
 	@SuppressWarnings("squid:S1319")	// HashSet return type is voluntary because it is the goal of this method
 	public static <T> HashSet<T> asHashSet(T ... a) {
-		HashSet<T> toReturn = new HashSet<>(a.length, 1);
+		HashSet<T> toReturn = new HashSet<>();
 		java.util.Collections.addAll(toReturn, a);
 		return toReturn;
 	}
