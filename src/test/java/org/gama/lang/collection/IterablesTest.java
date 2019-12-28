@@ -116,10 +116,21 @@ public class IterablesTest {
 	}
 	
 	@Test
-	public void testLast() {
+	public void testLast_list() {
 		List<String> strings = asList("a", "b");
 		assertEquals("b", last(strings));
 		strings = asList("a");
+		assertEquals("a", last(strings));
+		// test against null
+		assertNull(last(emptyList()));
+		assertNull(last(null));
+	}
+	
+	@Test
+	public void testLast_iterable() {
+		Set<String> strings = asSet("a", "b");
+		assertEquals("b", last(strings));
+		strings = asSet("a");
 		assertEquals("a", last(strings));
 		// test against null
 		assertNull(last(emptyList()));

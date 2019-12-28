@@ -2,6 +2,7 @@ package org.gama.lang.collection;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.AbstractCollection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -209,6 +210,30 @@ public final class Iterables {
 		} else {
 			return iterable.get(iterable.size()-1);
 		}
+	}
+	
+	/**
+	 * @param iterable a nullable {@link Iterable}
+	 * @return the last element of the argument or null
+	 */
+	public static <E> E last(@Nullable Iterable<E> iterable) {
+		return last(iterable, null);
+	}
+	
+	/**
+	 * @param iterable a nullable {@link Iterable}
+	 * @return the last element of the argument or the given default value if argument is empty or null
+	 */
+	public static <E> E last(@Nullable Iterable<E> iterable, E defaultValue) {
+		Iterator<E> iterator = iterable.iterator();
+		E result = null;
+		if (!iterator.hasNext()) {
+			result = defaultValue;
+		}
+		while(iterator.hasNext()) {
+			result = iterator.next();
+		}
+		return result;
 	}
 	
 	/**
@@ -560,23 +585,72 @@ public final class Iterables {
 	}
 	
 	/**
-	 * Keep elements of an {@link Iterable} that match a {@link Predicate}
+	 * Keep elements of an {@link Iterable} that doesn't match a {@link Predicate}
 	 * 
 	 * @param iterable any {@link Iterable}
-	 * @param predicate any {@link Predicate}
+	 * @param excluder any {@link Predicate}
 	 * @param <E> type of elements
 	 * @return given iterable without elements that doesn't match the given predicate
 	 */
-	public static <E> Iterable<E> filter(@Nonnull Iterable<E> iterable, @Nonnull Predicate<E> predicate) {
+	public static <E> Iterable<E> filter(@Nonnull Iterable<E> iterable, @Nonnull Predicate<E> excluder) {
 		Iterator<E> iterator = iterable.iterator();
 		while (iterator.hasNext()) {
 			E e = iterator.next();
-			if (!predicate.test(e)) {
+			if (!excluder.test(e)) {
 				iterator.remove();
 			}
 			
 		}
 		return iterable;
+	}
+	
+	/**
+	 * Keep elements of an {@link Iterator} that doesn't match a {@link Predicate}
+	 *
+	 * @param iterator any {@link Iterator}
+	 * @param excluder any {@link Predicate}
+	 * @param <E> type of elements
+	 * @return given iterator without elements that doesn't match the given predicate
+	 */
+	public static <E> Iterator<E> filter(@Nonnull Iterator<E> iterator, @Nonnull Predicate<E> excluder) {
+		return new Iterator<E>() {
+			
+			private boolean hasNext = true;
+			private E currentItem = null;
+			private Iterator<E> surrogate = iterator;
+			
+			private void lookAhead() {
+				while (hasNext = surrogate.hasNext()) {
+					E item = surrogate.next();
+					if (!excluder.test(item)) {
+						hasNext = false;
+						currentItem = null;
+					} else {
+						hasNext = true;
+						currentItem = item;
+					}
+					if (hasNext) {
+						break;
+					}
+				}
+			}
+			
+			@Override
+			public boolean hasNext() {
+				lookAhead();
+				return hasNext;
+			}
+			
+			@Override
+			public E next() {
+				return currentItem;
+			}
+			
+			@Override
+			public void remove() {
+				surrogate.remove();
+			}
+		};
 	}
 	
 	/**
@@ -722,6 +796,18 @@ public final class Iterables {
 	
 	public static <E> Iterator<E> reverseIterator(List<E> list) {
 		return new ReverseListIterator<>(list);
+	}
+	
+	/**
+	 * Creates an {@link Iterator} in reverse order of the given {@link AbstractCollection}. Be aware that it requires to create a copy of the
+	 * collection as an array, hence the collection can't be modified by the resulting iterator so it is {@link ReadOnlyIterator}.
+	 * 
+	 * @param collection any (non null) {@link AbstractCollection}
+	 * @param <E> collection elements type
+	 * @return a reverse-order {@link Iterator} of the given colleciton
+	 */
+	public static <E> ReadOnlyIterator<E> reverseIterator(AbstractCollection<E> collection) {
+		return new ReverseArrayIterator<>((E[]) collection.toArray());
 	}
 	
 	private Iterables() {}
