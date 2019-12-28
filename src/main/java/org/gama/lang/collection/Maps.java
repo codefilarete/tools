@@ -28,6 +28,20 @@ public final class Maps {
 	}
 	
 	/**
+	 * A simple factory method that takes only expected key and value types, made to avoid casting when using method factory with key and value
+	 * (that next call to add(..) requires casting of key and/or values) 
+	 * 
+	 * @param keyType key type
+	 * @param valueType value type
+	 * @param <K> key type
+	 * @param <V> value type
+	 * @return a new {@link HashMap} that allows chaining of additional key and value
+	 */
+	public static <K, V> ChainingHashMap<K, V> forHashMap(Class<K> keyType, Class<V> valueType) {
+		return new ChainingHashMap<>();
+	}
+	
+	/**
 	 * Allows chaining of the {@link ChainingMap#add(Object, Object)} method and then easily create a TreeMap
 	 * @param comparator the {@link Comparator} for the keys of the {@link TreeMap}
 	 * @return a new TreeMap instance
