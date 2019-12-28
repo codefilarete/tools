@@ -125,12 +125,13 @@ public class Assertions {
 	}
 	
 	public static <E, M> void assertAllEquals(Iterable<E> expected, Iterable<E> actual, Function<E, M> mapper) {
-		assertPredicate(new ExpectedPredicate<Iterable<M>, Iterable<M>>(Iterables.collectToList(expected, mapper),
+		final List<M> input = Iterables.collectToList(expected, mapper);
+		assertPredicate(new ExpectedPredicate<Iterable<M>, Iterable<M>>(input,
 				Predicates::equalOrNull,
 				new FailureMessageBuilder() {
 					@Override
 					protected String build(Duo<String, String> messageParameters) {
-						return super.build(new Duo<>(wrap(Iterables.collectToList(expected, mapper).toString()),
+						return super.build(new Duo<>(wrap(input.toString()),
 								wrap(Iterables.collectToList(actual, mapper).toString())));
 					}
 				}) {
