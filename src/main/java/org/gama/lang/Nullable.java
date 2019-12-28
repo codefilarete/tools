@@ -136,6 +136,17 @@ public class Nullable<T> implements Supplier<T> {
 	}
 	
 	/**
+	 * Replaces value by given one
+	 * 
+	 * @param value a new value, may be null
+	 * @return this
+	 */
+	public Nullable<T> set(@javax.annotation.Nullable T value) {
+		this.value = () -> value;
+		return this;
+	}
+	
+	/**
 	 * Gives another value if current is null
 	 * 
 	 * @param anotherValue the other value to return in case of current one is null
