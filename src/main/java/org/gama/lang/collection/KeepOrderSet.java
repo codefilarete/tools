@@ -57,7 +57,7 @@ public class KeepOrderSet<E> implements Set<E> {
 	
 	@Override
 	public boolean remove(Object o) {
-		return false;
+		return delegate.remove(o);
 	}
 	
 	public boolean containsAll(Collection<?> c) {
@@ -70,17 +70,17 @@ public class KeepOrderSet<E> implements Set<E> {
 	
 	@Override
 	public boolean retainAll(Collection<?> c) {
-		return false;
+		return delegate.retainAll(c);
 	}
 	
 	@Override
 	public boolean removeAll(Collection<?> c) {
-		return false;
+		return delegate.removeAll(c);
 	}
 	
 	@Override
 	public void clear() {
-		
+		delegate.clear();
 	}
 	
 	public boolean equals(Object o) {
