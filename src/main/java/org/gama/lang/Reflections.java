@@ -55,15 +55,28 @@ public final class Reflections {
 	public static final Predicate<Method> JAVA_BEAN_METHOD_CONVENTION_MATCHER = method ->
 			onJavaBeanPropertyWrapperNameGeneric(method.getName(), method, s -> true, s -> true, s -> true, s -> false);
 	
+	/**
+	 * Default values of primtive types
+	 * Note that it contains Object-equivalent types because in some circumstences auto-boxing happens and you won't find your type in the Map.
+	 */
 	public static final Map<Class, Object> PRIMITIVE_DEFAULT_VALUES = Collections.unmodifiableMap(Maps
-			.asHashMap((Class) boolean.class, (Object) false)
+			.forHashMap(Class.class, Object.class)
+			.add(boolean.class, false)
+			.add(Boolean.class, false)
 			.add(char.class, '\u0000')
+			.add(Character.class, '\u0000')
 			.add(byte.class, (byte) 0)
+			.add(Byte.class, (byte) 0)
 			.add(short.class, (short) 0)
+			.add(Short.class, (short) 0)
 			.add(int.class, 0)
+			.add(Integer.class, 0)
 			.add(long.class, 0L)
+			.add(Long.class, 0L)
 			.add(float.class, 0F)
+			.add(Float.class, 0F)
 			.add(double.class, 0D)
+			.add(Double.class, 0D)
 	);
 	
 	public static final ThreadLocal<Optional<String>> PACKAGES_PRINT_MODE_CONTEXT = ThreadLocal.withInitial(
