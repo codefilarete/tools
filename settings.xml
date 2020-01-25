@@ -3,8 +3,8 @@
           xmlns='http://maven.apache.org/SETTINGS/1.0.0' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'>
     <servers>
         <server>
-            <id>bintray-repo-maven-example</id>
-            <username>bintray-examples</username>
+            <id>bintray-tircis-mvn-snapshot</id>
+            <username>tircis</username>
             <password>${bintrayPass}</password>
         </server>
     </servers>
