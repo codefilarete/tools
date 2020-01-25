@@ -47,6 +47,15 @@
 		</dependency>
 	</dependencies>
 	
+	
+	<distributionManagement>
+	   <repository>
+	      <id>bintray-tircis-mvn-snapshot</id>
+	      <name>tircis-mvn-snapshot</name>
+	      <url>https://api.bintray.com/maven/tircis/mvn-snapshot/gama-tools/;publish=1</url>
+	   </repository>
+	</distributionManagement>
+	
 	<build>
 		<plugins>
 			<plugin>
