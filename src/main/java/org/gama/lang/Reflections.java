@@ -538,7 +538,7 @@ public final class Reflections {
 	 * @param invocationHandler the intercepting code
 	 * @param additionalInterfaces optional other interfaces also implemented by the proxy
 	 * @param <I> main interface type, which is also the returned-proxy type
-	 * @return
+	 * @return the created JDK proxy for the given interface and given handler
 	 */
 	public static <I> I newProxy(Class<I> iface, InvocationHandler invocationHandler, Class<?> ... additionalInterfaces) {
 		return (I) Proxy.newProxyInstance(iface.getClassLoader(), Arrays.cat(new Class[] { iface }, additionalInterfaces), invocationHandler);

@@ -123,7 +123,6 @@ public final class IOs {
 		 * 
 		 * @param source the source of bytes
 		 * @param packetSize the size of returned packets
-		 * @return a new {@link Iterable} wrapping the given {@link InputStream}
 		 */
 		public InputStreamIterator(InputStream source, int packetSize) {
 			this.source = source;

@@ -59,7 +59,7 @@ public class Arrays {
 	 * Tranforms an array of primitive integers to an array of Object integers to overcome the impossibility to cast a {@code int[]} to a {@code Integer[]}
 	 * in the Java language.
 	 * 
-	 * @param integers any {@code int[]), null included
+	 * @param integers any {@code int[]}, null included
 	 * @return a new {@code Integer[]} that contains all values of passed argument
 	 */
 	@Nullable

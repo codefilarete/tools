@@ -166,11 +166,11 @@ public class MethodDispatcher {
 	
 	/**
 	 * Invokes a method on a target
-	 * @param target
-	 * @param method
-	 * @param args
-	 * @return
-	 * @throws Throwable
+	 * @param target instance target of the method
+	 * @param method the method to be called
+	 * @param args method arguments
+	 * @return the result of invokation of the given method and arguments on given instance
+	 * @throws Throwable the one thrown by method invokation or one wrapping it for bettter understanding
 	 */
 	protected Object invoke(Object target, Method method, Object[] args) throws Throwable {
 		try {
