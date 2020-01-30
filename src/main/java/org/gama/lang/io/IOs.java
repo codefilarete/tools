@@ -16,15 +16,15 @@ import java.util.NoSuchElementException;
  */
 public final class IOs {
 	
-	public static long _1_Ko = 1024;
+	public static final long _1_Ko = 1024;
 	
-	public static long _8_Ko = 8 * _1_Ko;
+	public static final long _8_Ko = 8 * _1_Ko;
 	
-	public static long _512_Ko = 512 * _1_Ko;
+	public static final long _512_Ko = 512 * _1_Ko;
 	
-	public static long _1_Mo = 1024 * _1_Ko;
+	public static final long _1_Mo = 1024 * _1_Ko;
 	
-	public static long _1_Go = 1024 * _1_Mo;
+	public static final long _1_Go = 1024 * _1_Mo;
 	
 	/**
 	 * Convert an {@link InputStream} as a {@link ByteArrayInputStream} by using a 1024 byte buffer.
