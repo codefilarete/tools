@@ -110,7 +110,7 @@ class AssertionsTest {
 	
 	@Test
 	void assertEquals_iterable_mapper() {
-		Assertions.assertAllEquals(Arrays.asList("b", "a"), Arrays.asHashSet("a", "b"), (Function<String, String>) String::toUpperCase);
+		Assertions.assertAllEquals(Arrays.asList("a", "b"), Arrays.asHashSet("a", "b"), (Function<String, String>) String::toUpperCase);
 	}
 	
 	@Test
