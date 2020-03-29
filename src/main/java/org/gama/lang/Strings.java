@@ -5,6 +5,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.function.Function;
 
+import org.gama.lang.bean.Objects;
+
 /**
  * @author Guillaume Mary
  */
@@ -85,7 +87,7 @@ public abstract class Strings {
 		return doWithDelegate(cs, new DefaultNullOrEmptyDelegate() {
 			@Override
 			public CharSequence onNotNullNotEmpty(@Nonnull CharSequence cs) {
-				return cs.subSequence(0, Math.min(cs.length(), preventNegative(headSize)));
+				return cs.subSequence(0, Math.min(cs.length(), headSize));
 			}
 		});
 	}
@@ -94,7 +96,8 @@ public abstract class Strings {
 		return doWithDelegate(cs, new DefaultNullOrEmptyDelegate() {
 			@Override
 			public CharSequence onNotNullNotEmpty(@Nonnull CharSequence cs) {
-				return cs.subSequence(0, Math.min(cs.length(), ((String) cs).indexOf(untilIncluded)+1));
+				int index = ((String) cs).indexOf(untilIncluded);
+				return cs.subSequence(0, Math.min(cs.length(), Objects.fallback(index, -1, 0)));
 			}
 		});
 	}
@@ -103,7 +106,7 @@ public abstract class Strings {
 		return doWithDelegate(cs, new DefaultNullOrEmptyDelegate() {
 			@Override
 			public CharSequence onNotNullNotEmpty(@Nonnull CharSequence cs) {
-				return cs.subSequence(Math.min(preventNegative(headSize), cs.length()), cs.length());
+				return cs.subSequence(Math.min(headSize, cs.length()), cs.length());
 			}
 		});
 	}
@@ -112,7 +115,7 @@ public abstract class Strings {
 		return doWithDelegate(cs, new DefaultNullOrEmptyDelegate() {
 			@Override
 			public CharSequence onNotNullNotEmpty(@Nonnull CharSequence cs) {
-				return cs.subSequence(Math.max(0, cs.length() - preventNegative(tailSize)), cs.length());
+				return cs.subSequence(Math.max(0, cs.length() - tailSize), cs.length());
 			}
 		});
 	}
@@ -121,7 +124,27 @@ public abstract class Strings {
 		return doWithDelegate(cs, new DefaultNullOrEmptyDelegate() {
 			@Override
 			public CharSequence onNotNullNotEmpty(@Nonnull CharSequence cs) {
-				return cs.subSequence(0, preventNegative(cs.length() - preventNegative(tailSize)));
+				return cs.subSequence(0, preventNegative(cs.length() - tailSize));
+			}
+		});
+	}
+	
+	/**
+	 * Cuts a {@link CharSequence} and appends 3 dots ("...") at the end if its length is strictly greater than length
+	 * 
+	 * @param cs any {@link CharSequence}
+	 * @param length length at which given {@link CharSequence} must be cut and appended "..."
+	 * @return length-firsts characters of given {@link CharSequence} appended with "...", therefore its size is length+3 
+	 */
+	public static CharSequence ellipsis(@Nullable CharSequence cs, @Nonnegative int length) {
+		return doWithDelegate(cs, new DefaultNullOrEmptyDelegate() {
+			@Override
+			public CharSequence onNotNullNotEmpty(@Nonnull CharSequence cs) {
+				if (cs.length() > length) {
+					return cs.subSequence(0, length) + "...";
+				} else {
+					return cs;
+				}
 			}
 		});
 	}
@@ -131,7 +154,7 @@ public abstract class Strings {
 	 * @return 0 if i < 0
 	 */
 	private static int preventNegative(int i) {
-		return i < 0 ? 0 : i;
+		return Math.max(i, 0);
 	}
 	
 	private static CharSequence doWithDelegate(@Nullable CharSequence cs, INullOrEmptyDelegate emptyDelegate) {

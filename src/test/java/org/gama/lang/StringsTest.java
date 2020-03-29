@@ -30,14 +30,13 @@ public class StringsTest {
 		assertEquals("sn", Strings.head("snake", 2));
 		assertEquals("sna", Strings.head("snake", 3));
 		assertEquals("snake", Strings.head("snake", 42));
-		assertEquals("", Strings.head("snake", -42));
 		assertEquals(null, Strings.head(null, 2));
 	}
 	
 	@Test
 	public void testHead_stringBoundary() {
-		assertEquals("sna", Strings.head("snake", "a"));
-		assertEquals("snak", Strings.head("snake", "k"));
+		assertEquals("sn", Strings.head("snake", "a"));
+		assertEquals("sna", Strings.head("snake", "k"));
 		assertEquals("", Strings.head("snake", "w"));
 		assertEquals(null, Strings.head(null, "z"));
 	}
@@ -47,7 +46,6 @@ public class StringsTest {
 		assertEquals("ake", Strings.cutHead("snake", 2));
 		assertEquals("ke", Strings.cutHead("snake", 3));
 		assertEquals("", Strings.cutHead("snake", 42));
-		assertEquals("snake", Strings.cutHead("snake", -42));
 		assertEquals(null, Strings.cutHead(null, 2));
 	}
 	
@@ -56,7 +54,6 @@ public class StringsTest {
 		assertEquals("ke", Strings.tail("snake", 2));
 		assertEquals("ake", Strings.tail("snake", 3));
 		assertEquals("snake", Strings.tail("snake", 42));
-		assertEquals("", Strings.tail("snake", -42));
 		assertEquals(null, Strings.tail(null, 2));
 	}
 	
@@ -65,8 +62,15 @@ public class StringsTest {
 		assertEquals("sna", Strings.cutTail("snake", 2));
 		assertEquals("sn", Strings.cutTail("snake", 3));
 		assertEquals("", Strings.cutTail("snake", 42));
-		assertEquals("snake", Strings.cutTail("snake", -42));
 		assertEquals(null, Strings.cutTail(null, 2));
+	}
+	
+	@Test
+	public void ellipsis() {
+		assertEquals("a too long...", Strings.ellipsis("a too long sentense", 10));
+		assertEquals("0123456789", Strings.ellipsis("0123456789", 10));
+		assertEquals("a word", Strings.ellipsis("a word", 10));
+		assertEquals(null, Strings.ellipsis(null, 10));
 	}
 	
 	@Test
