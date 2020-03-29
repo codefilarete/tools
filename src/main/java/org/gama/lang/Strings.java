@@ -154,6 +154,7 @@ public abstract class Strings {
 	 * @param <O> object type
 	 * @return the concatenation of the results of functions invokation on the given object
 	 */
+	@SafeVarargs
 	public static <O> String footPrint(O object, Function<O, ?> ... printableProperties) {
 		StringAppender result = new StringAppender();
 		for (Function<O, ?> printableProperty : printableProperties) {

@@ -19,11 +19,13 @@ public class Arrays {
 	
 	private static final Integer[] EMPTY_INTEGER_ARRAY = {};
 	
+	@SafeVarargs
 	public static <T> List<T> asList(T... a) {
 		return new ArrayList<>(java.util.Arrays.asList(a));
 	}
 	
 	@SuppressWarnings("squid:S1319")	// LinkedHashSet return type is voluntary because it is the goal of this method
+	@SafeVarargs
 	public static <T> LinkedHashSet<T> asSet(T ... a) {
 		LinkedHashSet<T> toReturn = new LinkedHashSet<>();
 		java.util.Collections.addAll(toReturn, a);
@@ -31,6 +33,7 @@ public class Arrays {
 	}
 	
 	@SuppressWarnings("squid:S1319")	// HashSet return type is voluntary because it is the goal of this method
+	@SafeVarargs
 	public static <T> HashSet<T> asHashSet(T ... a) {
 		HashSet<T> toReturn = new HashSet<>();
 		java.util.Collections.addAll(toReturn, a);
@@ -38,6 +41,7 @@ public class Arrays {
 	}
 	
 	@SuppressWarnings("squid:S1319")	// TreeSet return type is voluntary because it is the goal of this method
+	@SafeVarargs
 	public static <T> TreeSet<T> asTreeSet(Comparator<? super T> comparator, T ... a) {
 		TreeSet<T> toReturn = new TreeSet<>(comparator);
 		java.util.Collections.addAll(toReturn, a);
