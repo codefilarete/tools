@@ -1,6 +1,7 @@
 package org.gama.lang.reflect;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collection;
@@ -11,6 +12,7 @@ import java.util.StringTokenizer;
 import org.gama.lang.Nullable;
 import org.gama.lang.StringAppender;
 import org.gama.lang.collection.Arrays;
+import org.gama.lang.exception.NotImplementedException;
 
 /**
  * A class for custom Reflection API print. Mainly for compact package presentation.
@@ -89,6 +91,16 @@ public class MemberPrinter {
 	public String toString(Method method) {
 		return new ClassAppender().cat(method.getDeclaringClass(), ".", method.getName())
 				.cat("(").ccat(method.getParameterTypes(), ", ").cat(")").toString();
+	}
+	
+	public String toString(Executable executable) {
+		if (executable instanceof Constructor) {
+			return toString((Constructor) executable);
+		} else if (executable instanceof Method) {
+			return toString((Method) executable);
+		} else {
+			throw new NotImplementedException(Nullable.nullable(executable).map(Object::getClass).map(this::toString).getOr("null instance") + " is not supported");
+		}
 	}
 	
 	public String toString(Field field) {

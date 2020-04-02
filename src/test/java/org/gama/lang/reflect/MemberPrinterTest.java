@@ -1,6 +1,7 @@
 package org.gama.lang.reflect;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collection;
@@ -10,6 +11,8 @@ import java.util.Properties;
 import org.gama.lang.Reflections;
 import org.gama.lang.ReflectionsTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.gama.lang.reflect.MemberPrinter.FLATTEN_PACKAGE_PRINTER;
 import static org.gama.lang.reflect.MemberPrinter.FULL_PACKAGE_PRINTER;
@@ -22,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class MemberPrinterTest {
 	
 	@Test
-	public void testToStringClass() throws ClassNotFoundException {
+	public void toStringClass() throws ClassNotFoundException {
 		MemberPrinter testInstance = FLATTEN_PACKAGE_PRINTER;
 		assertEquals("j.l.String", testInstance.toString(String.class));
 		assertEquals("j.u.Collection", testInstance.toString(Collection.class));
@@ -35,28 +38,47 @@ public class MemberPrinterTest {
 		assertEquals("j.u.Map$Entry", testInstance.toString(Map.Entry.class));
 	}
 	
-	@Test
-	public void testToStringConstructor() {
+	private static Object[][] toStringConstructor() {
 		Constructor stringWithStringArgConstructor = Reflections.getConstructor(String.class, String.class);
-		assertEquals("j.l.String(j.l.String)", FLATTEN_PACKAGE_PRINTER.toString(stringWithStringArgConstructor));
-		assertEquals("java.lang.String(java.lang.String)", FULL_PACKAGE_PRINTER.toString(stringWithStringArgConstructor));
 		Constructor stringWithCharIntIntArgsConstructor = Reflections.getConstructor(String.class, char[].class, int.class, int.class);
-		assertEquals("j.l.String(char[], int, int)", FLATTEN_PACKAGE_PRINTER.toString(stringWithCharIntIntArgsConstructor));
-		assertEquals("java.lang.String(char[], int, int)", FULL_PACKAGE_PRINTER.toString(stringWithCharIntIntArgsConstructor));
+		return new Object[][] {
+				new Object[] { stringWithStringArgConstructor, "j.l.String(j.l.String)", "java.lang.String(java.lang.String)" },
+				new Object[] { stringWithCharIntIntArgsConstructor, "j.l.String(char[], int, int)", "java.lang.String(char[], int, int)" },
+		};
 	}
 	
-	@Test
-	public void testToStringMethod() {
+	@ParameterizedTest
+	@MethodSource
+	public void toStringConstructor(Constructor constructor, String expectedFlattenPkgePrint, String expectedFullPkgePrint) {
+		assertEquals(expectedFlattenPkgePrint, FLATTEN_PACKAGE_PRINTER.toString(constructor));
+		assertEquals(expectedFullPkgePrint, FULL_PACKAGE_PRINTER.toString(constructor));
+	}
+	
+	private static Object[][] toStringMethod() {
 		Method equalsIgnoreCaseMethod = Reflections.getMethod(String.class, "equalsIgnoreCase", String.class);
-		assertEquals("j.l.String.equalsIgnoreCase(j.l.String)", FLATTEN_PACKAGE_PRINTER.toString(equalsIgnoreCaseMethod));
-		assertEquals("java.lang.String.equalsIgnoreCase(java.lang.String)", FULL_PACKAGE_PRINTER.toString(equalsIgnoreCaseMethod));
 		Method substringMethod = Reflections.getMethod(String.class, "substring", int.class, int.class);
-		assertEquals("j.l.String.substring(int, int)", FLATTEN_PACKAGE_PRINTER.toString(substringMethod));
-		assertEquals("java.lang.String.substring(int, int)", FULL_PACKAGE_PRINTER.toString(substringMethod));
+		return new Object[][] {
+				new Object[] { equalsIgnoreCaseMethod, "j.l.String.equalsIgnoreCase(j.l.String)", "java.lang.String.equalsIgnoreCase(java.lang.String)" },
+				new Object[] { substringMethod, "j.l.String.substring(int, int)", "java.lang.String.substring(int, int)" },
+		};
+	}
+	
+	@ParameterizedTest
+	@MethodSource
+	public void toStringMethod(Method method, String expectedFlattenPkgePrint, String expectedFullPkgePrint) {
+		assertEquals(expectedFlattenPkgePrint, FLATTEN_PACKAGE_PRINTER.toString(method));
+		assertEquals(expectedFullPkgePrint, FULL_PACKAGE_PRINTER.toString(method));
+	}
+	
+	@ParameterizedTest
+	@MethodSource({ "toStringConstructor", "toStringMethod" })
+	public void toStringExecutable(Executable executable, String expectedFlattenPkgePrint, String expectedFullPkgePrint) {
+		assertEquals(expectedFlattenPkgePrint, FLATTEN_PACKAGE_PRINTER.toString(executable));
+		assertEquals(expectedFullPkgePrint, FULL_PACKAGE_PRINTER.toString(executable));
 	}
 	
 	@Test
-	public void testToStringField() {
+	public void toStringField() {
 		Field valueField = Reflections.getField(String.class, "value");
 		assertEquals("j.l.String.value", MemberPrinter.FLATTEN_PACKAGE_PRINTER.toString(valueField));
 		assertEquals("java.lang.String.value", FULL_PACKAGE_PRINTER.toString(valueField));
@@ -66,7 +88,7 @@ public class MemberPrinterTest {
 	}
 	
 	@Test
-	public void testToStringClass_wellKnowPackage() throws ClassNotFoundException {
+	public void toStringClass_wellKnowPackage() throws ClassNotFoundException {
 		MemberPrinter testInstance = WELL_KNOWN_FLATTEN_PACKAGE_PRINTER;
 		assertEquals("String", testInstance.toString(String.class));
 		assertEquals("Collection", testInstance.toString(Collection.class));

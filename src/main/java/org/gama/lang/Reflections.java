@@ -4,6 +4,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -350,17 +351,6 @@ public final class Reflections {
 	}
 	
 	/**
-	 * Gives the type of eventualy-wrapped property by a method (works even if the field doesn't exists), which means:
-	 * - the input if the method is a setter
-	 * - the return type if it's a getter
-	 * @param method a method matching the Java Bean Convention naming
-	 * @return the eventualy-wrapped field type, not null
-	 */
-	public static Class propertyType(Method method) {
-		return onJavaBeanPropertyWrapper(method, Method::getReturnType, m -> m.getParameterTypes()[0], m -> boolean.class);
-	}
-	
-	/**
 	 * Calls a {@link Supplier} according to the detected kind of getter or setter a method is. The implementation tests method name and parameter count
 	 * (or method return type for boolean getter), hence it is a little bit more stricter that {@link #onJavaBeanPropertyWrapperName(Method, Function, Function, Function)}.
 	 * This does not ensure that a real field matches the wrapped method.
@@ -468,14 +458,14 @@ public final class Reflections {
 	}
 	
 	/**
-	 * Gives the "target" type of some method. Target type is the returned type for getter, and first arg type for setter. boolean if getter startint with "is".
+	 * Gives the "target" type of some method. Target type is the returned type for getter and the first arg type for setter.
 	 * The method must follow the Java Bean Convention : starts by "get", "set", or "is", else it will throw an {@link IllegalArgumentException}
 	 * 
 	 * @param method not null, expected to be a getter or setter
 	 * @return the target type of the getter/setter
 	 */
-	public static Class javaBeanTargetType(Method method) {
-		return Reflections.onJavaBeanPropertyWrapper(method, Method::getReturnType, m -> m.getParameterTypes()[0], m -> boolean.class);
+	public static <C> Class<C> javaBeanTargetType(Method method) {
+		return (Class<C>) Reflections.onJavaBeanPropertyWrapper(method, Method::getReturnType, m -> m.getParameterTypes()[0], m -> boolean.class);
 	}
 	
 	public static String toString(Field field) {
@@ -488,6 +478,10 @@ public final class Reflections {
 	
 	public static String toString(Method method) {
 		return MEMBER_PRINTER.get().toString(method);
+	}
+	
+	public static String toString(Executable executable) {
+		return MEMBER_PRINTER.get().toString(executable);
 	}
 	
 	public static String toString(Class clazz) {
