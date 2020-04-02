@@ -1,8 +1,10 @@
 package org.gama.lang;
 
 import java.time.Clock;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Date;
 
 /**
  * Tool class around Date concept.
@@ -20,7 +22,7 @@ public class Dates {
 	/**
 	 * Executes some code at a given {@link LocalDateTime}. Made to test some code in past or future to ensures that some code doesn't depend on
 	 * system current millis.
-	 * Be aware that this method will ask for a lock on a static-shared instance, hence will block until the lock is released.
+	 * Be aware that this method will ask for a lock on a static-shared instance, therefore will block until the lock is released.
 	 * 
 	 * Prefer {@link #doWithClock(Clock, Runnable)} for a more fine-grained method
 	 * 
@@ -48,19 +50,42 @@ public class Dates {
 			clock = newClock;
 			try {
 				runnable.run();
-			} catch (RuntimeException e) {
+			} finally {
 				clock = SYSTEM_CLOCK;
 			}
 		}
 	}
 	
 	/**
-	 * Gives "now instant". Should be used in preference to {@link LocalDateTime#now()} for code that must be tested in future or past because this
+	 * Gives "now instant".
+	 * Should be used in preference to {@link LocalDateTime#now()} for code that must be tested in future or past because this
 	 * method will take {@link Clock} set on {@link Dates} class which can be changed when using {@link #doWithClock(Clock, Runnable)}.
 	 * 
 	 * @return "now instant" according to clock defined in this class, which is the system one by default
 	 */
 	public static LocalDateTime now() {
 		return LocalDateTime.now(clock);
+	}
+	
+	/**
+	 * Gives "today".
+	 * Should be used in preference to {@link LocalDate#now()} for code that must be tested in future or past because this
+	 * method will take {@link Clock} set on {@link Dates} class which can be changed when using {@link #doWithClock(Clock, Runnable)}.
+	 *
+	 * @return "now instant" according to clock defined in this class, which is the system one by default
+	 */
+	public static LocalDate today() {
+		return LocalDate.now(clock);
+	}
+	
+	/**
+	 * Gives "now instant" as an old-fashion {@link Date}.
+	 * Should be used in preference to {@link Date#Date() new Date()} for code that must be tested in future or past because this
+	 * method will take {@link Clock} set on {@link Dates} class which can be changed when using {@link #doWithClock(Clock, Runnable)}.
+	 *
+	 * @return "now instant" according to clock defined in this class, which is the system one by default
+	 */
+	public static Date nowAsDate() {
+		return Date.from(now().atZone(ZoneId.systemDefault()).toInstant());
 	}
 }
