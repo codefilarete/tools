@@ -26,8 +26,16 @@ class AssertionsTest {
 	}
 	
 	@Test
-	void assertEquals_null_null() {
+	void assertAllEquals_null_null() {
 		Assertions.assertAllEquals(null, null);
+	}
+	
+	@Test
+	void assertAllEquals_Set_List() {
+		Assertions.assertAllEquals(Arrays.asSet("a", "b", "c"), Arrays.asList("a", "b", "c"));
+		Assertions.assertAllEquals(Arrays.asHashSet("b", "c", "a"), Arrays.asList("a", "b", "c"));
+		assertAssertion(() -> Assertions.assertAllEquals(Arrays.asSet("b", "c", "a"), Arrays.asList("a", "b", "c")),
+				"expected: <[b, c, a]> but was: <[a, b, c]>");
 	}
 	
 	@Test

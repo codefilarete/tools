@@ -116,12 +116,13 @@ public class Assertions {
 	}
 	
 	public static <E> void assertAllEquals(Iterable<E> expected, Iterable<E> actual) {
-		assertPredicate(new ExpectedPredicate<Iterable<E>, Iterable<E>>(expected, Predicates::equalOrNull) {
-			@Override
-			public Iterable<E> giveExpectedFromActual(Iterable<E> actual) {
-				return actual;
-			}
-		}, actual);
+		IterableTester<E, E> iterableTester = new IterableTester<>(Predicates::equalOrNull);
+		boolean areEquals = iterableTester.test(expected, actual);
+		if (!areEquals) {
+			FailureMessageBuilder failureMessageBuilder = new FailureMessageBuilder();
+			String failureMessage = failureMessageBuilder.build(expected, actual);
+			throw new AssertionFailedError(failureMessage, expected, actual);
+		}
 	}
 	
 	public static <E, M> void assertAllEquals(Iterable<E> expected, Iterable<E> actual, Function<E, M> mapper) {
@@ -449,6 +450,7 @@ public class Assertions {
 		}
 		
 		public boolean test(Iterable<A> expected, Iterable<B> actual) {
+			if (expected == null && actual == null) return true;
 			boolean areEquals = true;
 			PairIterator<A, B> duoIterator = new PairIterator<>(expected, actual);
 			while (duoIterator.hasNext()) {
