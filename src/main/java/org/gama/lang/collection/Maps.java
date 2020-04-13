@@ -72,6 +72,22 @@ public final class Maps {
 	}
 	
 	/**
+	 * Puts all elements of map1 and map2 into a new {@link HashMap}.
+	 * Made to have a putAll(..) method inlined.
+	 * 
+	 * @param map1 any non null {@link Map}
+	 * @param map2 any non null {@link Map}
+	 * @param <K> {@link Map}s key type
+	 * @param <V> {@link Map}s value type
+	 * @return a new {@link HashMap} containing elements of map1 and
+	 */
+	public static <K, V> Map<K, V> putAll(Map<? extends K, ? extends V> map1, Map<? extends K, ? extends V> map2) {
+		Map<K, V> result = new HashMap<>(map1);
+		result.putAll(map2);
+		return result;
+	}
+	
+	/**
 	 * Simple {@link LinkedHashMap} that allows to chain calls to {@link #add(Object, Object)} (same as put) and so quickly create a Map.
 	 * 
 	 * @param <K>
