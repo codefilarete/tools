@@ -188,7 +188,7 @@ public final class Iterables {
 	 */
 	public static boolean isEmpty(@Nullable Iterable iterable) {
 		return iterable == null
-				|| ((iterable instanceof Collection) ? ((Collection) iterable).isEmpty() : iterable.iterator().hasNext()) ;
+				|| ((iterable instanceof Collection) ? ((Collection) iterable).isEmpty() : !iterable.iterator().hasNext()) ;
 	}
 	
 	/**
