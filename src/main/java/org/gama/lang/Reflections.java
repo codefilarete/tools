@@ -284,15 +284,30 @@ public final class Reflections {
 	 */
 	public static <E> E newInstance(Class<E> clazz) {
 		try {
-			Constructor<E> defaultConstructor = getDefaultConstructor(clazz);
+			return newInstance(getDefaultConstructor(clazz));
+		} catch (UnsupportedOperationException e) {
+			throw new InvokationRuntimeException("Class " + toString(clazz) + " can't be instanciated", e);
+		}
+	}
+	
+	/**
+	 * Instanciates a class from given contructor and parameters
+	 *
+	 * @param constructor the constructor to use
+	 * @param args arguments to use with given constructor
+	 * @param <E> the target instance type
+	 * @return a new instance of type E, never null
+	 */
+	public static <E> E newInstance(Constructor<E> constructor, Object ... args) {
+		try {
 			// safeguard for non-accessible accessor
-			Reflections.ensureAccessible(defaultConstructor);
-			return defaultConstructor.newInstance();
-		} catch (ReflectiveOperationException | UnsupportedOperationException e) {
-			if (e instanceof InstantiationException && Modifier.isAbstract(clazz.getModifiers()) ) {
-				throw new InvokationRuntimeException("Class " + toString(clazz) + " can't be instanciated because it is abstract", e);
+			Reflections.ensureAccessible(constructor);
+			return constructor.newInstance(args);
+		} catch (ReflectiveOperationException e) {
+			if (e instanceof InstantiationException && Modifier.isAbstract(constructor.getDeclaringClass().getModifiers()) ) {
+				throw new InvokationRuntimeException("Class " + toString(constructor.getDeclaringClass()) + " can't be instanciated because it is abstract", e);
 			} else {
-				throw new InvokationRuntimeException("Class " + toString(clazz) + " can't be instanciated", e);
+				throw new InvokationRuntimeException("Class " + toString(constructor.getDeclaringClass()) + " can't be instanciated", e);
 			}
 		}
 	}

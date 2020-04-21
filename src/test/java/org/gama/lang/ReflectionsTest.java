@@ -20,19 +20,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.gama.lang.Reflections.PACKAGES_PRINT_MODE_CONTEXT;
-import static org.gama.lang.Reflections.findConstructor;
 import static org.gama.lang.Reflections.findField;
 import static org.gama.lang.Reflections.findMethod;
-import static org.gama.lang.Reflections.forName;
-import static org.gama.lang.Reflections.getConstructor;
-import static org.gama.lang.Reflections.getDefaultConstructor;
-import static org.gama.lang.Reflections.invoke;
-import static org.gama.lang.Reflections.isAssignableFrom;
-import static org.gama.lang.Reflections.newInstance;
 import static org.gama.lang.Reflections.onJavaBeanPropertyWrapper;
 import static org.gama.lang.Reflections.onJavaBeanPropertyWrapperName;
-import static org.gama.lang.Reflections.propertyName;
-import static org.gama.lang.Reflections.wrappedField;
 import static org.gama.lang.ThreadLocals.doWithThreadLocal;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -46,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ReflectionsTest {
 	
 	@Test
-	public void testToString_flatPackagePrintOtionSwitching() {
+	void toString_flatPackagePrintOtionSwitching() {
 		assertEquals("j.l.String", Reflections.toString(String.class));
 		Runnable fullPackagePrintAssertion = () -> assertEquals("java.lang.String", Reflections.toString(String.class));
 		
@@ -68,26 +59,26 @@ public class ReflectionsTest {
 	
 	
 	@Test
-	public void testGetDefaultConstructor() {
-		Constructor<Toto> defaultConstructor = getDefaultConstructor(Toto.class);
+	void getDefaultConstructor() {
+		Constructor<Toto> defaultConstructor = Reflections.getDefaultConstructor(Toto.class);
 		assertNotNull(defaultConstructor);
 	}
 	
 	@Test
-	public void testGetDefaultConstructor_closedClass() {
-		Constructor<ClosedClass> defaultConstructor = getDefaultConstructor(ClosedClass.class);
+	void getDefaultConstructor_closedClass() {
+		Constructor<ClosedClass> defaultConstructor = Reflections.getDefaultConstructor(ClosedClass.class);
 		assertNotNull(defaultConstructor);
 	}
 	
 	@Test
-	public void testGetDefaultConstructor_innerStaticClass() {
-		Constructor<InnerStaticClass> defaultConstructor = getDefaultConstructor(InnerStaticClass.class);
+	void getDefaultConstructor_innerStaticClass() {
+		Constructor<InnerStaticClass> defaultConstructor = Reflections.getDefaultConstructor(InnerStaticClass.class);
 		assertNotNull(defaultConstructor);
 	}
 	
 	@Test
-	public void testGetDefaultConstructor_abstractClass() {
-		Constructor<AbstractMap> defaultConstructor = getDefaultConstructor(AbstractMap.class);
+	void getDefaultConstructor_abstractClass() {
+		Constructor<AbstractMap> defaultConstructor = Reflections.getDefaultConstructor(AbstractMap.class);
 		assertNotNull(defaultConstructor);
 	}
 	
@@ -105,23 +96,23 @@ public class ReflectionsTest {
 	
 	@ParameterizedTest
 	@MethodSource("testGetDefaultConstructor_throwingCases_data")
-	public void testGetDefaultConstructor_throwingCases(Class clazz, String expectedMessage) {
+	void getDefaultConstructor_throwingCases(Class clazz, String expectedMessage) {
 		assertEquals(expectedMessage,
-				assertThrows(UnsupportedOperationException.class, () -> getDefaultConstructor(clazz)).getMessage());
+				assertThrows(UnsupportedOperationException.class, () -> Reflections.getDefaultConstructor(clazz)).getMessage());
 	}
 	
 	@Test
-	public void testGetConstructor_private() {
-		Constructor<InnerStaticClassWithPrivateConstructor> constructor1 = getConstructor(InnerStaticClassWithPrivateConstructor.class);
+	void getConstructor_private() {
+		Constructor<InnerStaticClassWithPrivateConstructor> constructor1 = Reflections.getConstructor(InnerStaticClassWithPrivateConstructor.class);
 		assertNotNull(constructor1);
-		Constructor<InnerClassWithPrivateConstructor> constructor2 = getConstructor(InnerClassWithPrivateConstructor.class, ReflectionsTest.class);
+		Constructor<InnerClassWithPrivateConstructor> constructor2 = Reflections.getConstructor(InnerClassWithPrivateConstructor.class, ReflectionsTest.class);
 		assertNotNull(constructor2);
 	}
 	
 	@Test
-	public void testGetConstructor_innerNonStaticClass_missingEnclosingClassAsParameter_throwsException() {
+	void getConstructor_innerNonStaticClass_missingEnclosingClassAsParameter_throwsException() {
 		assertEquals("Non static inner classes require an enclosing class parameter as first argument",
-				assertThrows(MemberNotFoundException.class, () -> getConstructor(InnerClassWithPrivateConstructor.class)).getMessage());
+				assertThrows(MemberNotFoundException.class, () -> Reflections.getConstructor(InnerClassWithPrivateConstructor.class)).getMessage());
 	}
 	
 	public static Object[][] testGetFieldData() {
@@ -136,7 +127,7 @@ public class ReflectionsTest {
 	
 	@ParameterizedTest
 	@MethodSource("testGetFieldData")
-	public void testGetField(Class<Toto> fieldClass, String fieldName, Class expectedDeclaringClass) {
+	void getField(Class<Toto> fieldClass, String fieldName, Class expectedDeclaringClass) {
 		Field field = findField(fieldClass, fieldName);
 		assertNotNull(field);
 		assertEquals(fieldName, field.getName());
@@ -160,7 +151,7 @@ public class ReflectionsTest {
 	
 	@ParameterizedTest
 	@MethodSource("testGetMethodData")
-	public void testGetMethod(Class<Toto> methodClass, String methodName, Class parameterType, Class expectedDeclaringClass, int exectedParameterCount) {
+	void getMethod(Class<Toto> methodClass, String methodName, Class parameterType, Class expectedDeclaringClass, int exectedParameterCount) {
 		Method method;
 		if (parameterType == null) {
 			method = findMethod(methodClass, methodName);
@@ -174,19 +165,19 @@ public class ReflectionsTest {
 	}
 	
 	@Test
-	public void testGetConstructor() throws NoSuchMethodException {
-		assertEquals(String.class.getConstructor(String.class), getConstructor(String.class, String.class));
-		assertThrows(MemberNotFoundException.class, () -> getConstructor(String.class, Reflections.class));
+	void getConstructor() throws NoSuchMethodException {
+		assertEquals(String.class.getConstructor(String.class), Reflections.getConstructor(String.class, String.class));
+		assertThrows(MemberNotFoundException.class, () -> Reflections.getConstructor(String.class, Reflections.class));
 	}
 	
 	@Test
-	public void testFindConstructor() throws NoSuchMethodException {
-		assertEquals(String.class.getConstructor(String.class), findConstructor(String.class, String.class));
-		assertNull(findConstructor(String.class, Reflections.class));
+	void findConstructor() throws NoSuchMethodException {
+		assertEquals(String.class.getConstructor(String.class), Reflections.findConstructor(String.class, String.class));
+		assertNull(Reflections.findConstructor(String.class, Reflections.class));
 	}
 	
 	@Test
-	public void testOnJavaBeanPropertyWrapperName_getterIsRecognized() throws NoSuchMethodException {
+	void onJavaBeanPropertyWrapperName_getterIsRecognized() throws NoSuchMethodException {
 		class X {
 			void getA() {
 			}
@@ -196,7 +187,7 @@ public class ReflectionsTest {
 	}
 	
 	@Test
-	public void testOnJavaBeanPropertyWrapperName_getterIsRecognized_boolean() throws NoSuchMethodException {
+	void onJavaBeanPropertyWrapperName_getterIsRecognized_boolean() throws NoSuchMethodException {
 		class X {
 			void isA() {
 			}
@@ -206,7 +197,7 @@ public class ReflectionsTest {
 	}
 	
 	@Test
-	public void testOnJavaBeanPropertyWrapperName_setterIsRecognized() throws NoSuchMethodException {
+	void onJavaBeanPropertyWrapperName_setterIsRecognized() throws NoSuchMethodException {
 		class X {
 			void setA() {
 			}
@@ -216,39 +207,39 @@ public class ReflectionsTest {
 	}
 	
 	@Test
-	public void testOnJavaBeanPropertyWrapperName_doesntMatchJavaBeanStandard_throwsException() {
+	void onJavaBeanPropertyWrapperName_doesntMatchJavaBeanStandard_throwsException() {
 		MemberNotFoundException thrownException = assertThrows(MemberNotFoundException.class, () -> onJavaBeanPropertyWrapperName(String.class.getMethod("toString"),
 				m -> false, m -> true, m -> false));
 		assertEquals("Field wrapper j.l.String.toString() doesn't fit encapsulation naming convention", thrownException.getMessage());
 	}
 	
 	@Test
-	public void testOnJavaBeanPropertyWrapperName_inputMethodName_getterIsRecognized() {
+	void onJavaBeanPropertyWrapperName_inputMethodName_getterIsRecognized() {
 		boolean found = onJavaBeanPropertyWrapperName("getA", m -> true, m -> false, m -> false);
 		assertTrue(found);
 	}
 	
 	@Test
-	public void testOnJavaBeanPropertyWrapperName_inputMethodName_getterIsRecognized_boolean() {
+	void onJavaBeanPropertyWrapperName_inputMethodName_getterIsRecognized_boolean() {
 		boolean found = onJavaBeanPropertyWrapperName("isA", m -> false, m -> false, m -> true);
 		assertTrue(found);
 	}
 	
 	@Test
-	public void testOnJavaBeanPropertyWrapperName_inputMethodName_setterIsRecognized() {
+	void onJavaBeanPropertyWrapperName_inputMethodName_setterIsRecognized() {
 		boolean found = onJavaBeanPropertyWrapperName("setA", m -> false, m -> true, m -> false);
 		assertTrue(found);
 	}
 	
 	@Test
-	public void testOnJavaBeanPropertyWrapperName_inputMethodName_doesntMatchJavaBeanStandard_throwsException() {
+	void onJavaBeanPropertyWrapperName_inputMethodName_doesntMatchJavaBeanStandard_throwsException() {
 		MemberNotFoundException thrownException = assertThrows(MemberNotFoundException.class, () -> onJavaBeanPropertyWrapperName("doSomething",
 				m -> false, m -> true, m -> false));
 		assertEquals("Field wrapper doSomething doesn't fit encapsulation naming convention", thrownException.getMessage());
 	}
 	
 	@Test
-	public void testOnJavaBeanPropertyWrapper_getterIsRecognized() throws NoSuchMethodException {
+	void onJavaBeanPropertyWrapper_getterIsRecognized() throws NoSuchMethodException {
 		class X {
 			String getA() {
 				return null;
@@ -259,7 +250,7 @@ public class ReflectionsTest {
 	}
 	
 	@Test
-	public void testOnJavaBeanPropertyWrapper_getterIsRecognized_boolean() throws NoSuchMethodException {
+	void onJavaBeanPropertyWrapper_getterIsRecognized_boolean() throws NoSuchMethodException {
 		class X {
 			boolean isA() {
 				return true;
@@ -270,7 +261,7 @@ public class ReflectionsTest {
 	}
 	
 	@Test
-	public void testOnJavaBeanPropertyWrapper_setterIsRecognized() throws NoSuchMethodException {
+	void onJavaBeanPropertyWrapper_setterIsRecognized() throws NoSuchMethodException {
 		class X {
 			void setA(String a) {
 			}
@@ -280,33 +271,33 @@ public class ReflectionsTest {
 	}
 	
 	@Test
-	public void testNewInstance_privateConstructor() {
+	void newInstance_class_privateConstructor() {
 		// This shouldn't cause problem
-		ClosedClass closedClass = newInstance(ClosedClass.class);
+		ClosedClass closedClass = Reflections.newInstance(ClosedClass.class);
 		// minimal test
 		assertNotNull(closedClass);
 	}
 	
 	@Test
-	public void testNewInstance_interface_throwsException() {
+	void newInstance_interface_throwsException() {
 		InvokationRuntimeException thrownException = assertThrows(InvokationRuntimeException.class,
-				() -> newInstance(CharSequence.class));
+				() -> Reflections.newInstance(CharSequence.class));
 		assertNotNull(Exceptions.findExceptionInCauses(thrownException, UnsupportedOperationException.class,
 				"Class j.l.CharSequence has no default constructor because it is an interface"));
 	}
 	
 	@Test
-	public void testNewInstance_abstract_throwsException() {
+	void newInstance_abstractClass_throwsException() {
 		InvokationRuntimeException thrownException = assertThrows(InvokationRuntimeException.class,
-				() -> newInstance(AbstractClass.class));
+				() -> Reflections.newInstance(AbstractClass.class));
 		assertNotNull(Exceptions.findExceptionInCauses(thrownException, InvokationRuntimeException.class,
 				"Class o.g.l.ReflectionsTest$AbstractClass can't be instanciated because it is abstract"));
 	}
 	
 	@Test
-	public void testNewInstance_constructorThrowsException_throwsException() {
+	void newInstance_classWhichConstructorThrowsException_throwsException() {
 		InvokationRuntimeException thrownException = assertThrows(InvokationRuntimeException.class,
-				() -> newInstance(ThrowingConstructorClass.class));
+				() -> Reflections.newInstance(ThrowingConstructorClass.class));
 		
 		assertNotNull(Exceptions.findExceptionInCauses(thrownException, InvokationRuntimeException.class,
 				"Class o.g.l.ReflectionsTest$ThrowingConstructorClass can't be instanciated"),
@@ -320,71 +311,93 @@ public class ReflectionsTest {
 	}
 	
 	@Test
-	public void testInvoke() throws NoSuchMethodException {
+	void newInstance_constructor() throws NoSuchMethodException {
+		assertEquals("", Reflections.newInstance(String.class.getConstructor()));
+		assertEquals("AB", Reflections.newInstance(String.class.getConstructor(byte[].class), new byte[] { 'A', 'B' }));
+	}
+	
+	@Test
+	void newInstance_constructor_throwsException_throwsException() {
+		InvokationRuntimeException thrownException = assertThrows(InvokationRuntimeException.class,
+				() -> Reflections.newInstance(ThrowingConstructorClass.class.getConstructor()));
+		
+		assertNotNull(Exceptions.findExceptionInCauses(thrownException, InvokationRuntimeException.class,
+				"Class o.g.l.ReflectionsTest$ThrowingConstructorClass can't be instanciated"),
+				() -> {
+					StringWriter exceptionAsString = new StringWriter();
+					thrownException.printStackTrace(new PrintWriter(exceptionAsString));
+					return "Can't find exception in " + exceptionAsString;
+				});
+		// looking for exception thrown by constructor
+		assertNotNull(Exceptions.findExceptionInCauses(thrownException, NullPointerException.class));
+	}
+	
+	@Test
+	void invoke() throws NoSuchMethodException {
 		Toto toto = new Toto();
 		Method setter = Toto.class.getMethod("setA", int.class);
 		
 		// minimal test
-		invoke(setter, toto, 42);
+		Reflections.invoke(setter, toto, 42);
 		assertEquals(42, toto.getA());
 		
 		// wrong input type (throws IllegalArgumentException)
-		assertThrows(InvokationRuntimeException.class, () -> invoke(setter, toto, "dummyString"));
+		assertThrows(InvokationRuntimeException.class, () -> Reflections.invoke(setter, toto, "dummyString"));
 		
 		// Non accessible method
 		Method privateMethod = Toto.class.getDeclaredMethod("toto");
-		assertThrows(InvokationRuntimeException.class, () -> invoke(privateMethod, toto));
+		assertThrows(InvokationRuntimeException.class, () -> Reflections.invoke(privateMethod, toto));
 	}
 	
 	@Test
-	public void testWrappedField() throws NoSuchMethodException, NoSuchFieldException {
+	void wrappedField() throws NoSuchMethodException, NoSuchFieldException {
 		// simple case
-		Field field = wrappedField(Toto.class.getDeclaredMethod("setB", String.class));
+		Field field = Reflections.wrappedField(Toto.class.getDeclaredMethod("setB", String.class));
 		assertEquals(Toto.class.getDeclaredField("b"), field);
 		
 		// Tata.b hides Toto.b
-		field = wrappedField(Tata.class.getDeclaredMethod("setB", String.class));
+		field = Reflections.wrappedField(Tata.class.getDeclaredMethod("setB", String.class));
 		assertEquals(Tata.class.getDeclaredField("b"), field);
 		
 		// true override : Tata.setA overrides Toto.setA, field is in Toto
-		field = wrappedField(Tata.class.getDeclaredMethod("setA", Integer.TYPE));
+		field = Reflections.wrappedField(Tata.class.getDeclaredMethod("setA", Integer.TYPE));
 		assertEquals(Toto.class.getDeclaredField("a"), field);
 	}
 	
 	@Test
-	public void testPropertyName() throws NoSuchMethodException {
+	void propertyName() throws NoSuchMethodException {
 		// simple case
-		String propertyName = propertyName(Toto.class.getDeclaredMethod("setB", String.class));
+		String propertyName = Reflections.propertyName(Toto.class.getDeclaredMethod("setB", String.class));
 		assertEquals("b", propertyName);
 	}
 	
 	@Test
-	public void testPropertyName_methodDoesntFitJavaBeanConvention_exceptionIsThrown() throws NoSuchMethodException {
+	void propertyName_methodDoesntFitJavaBeanConvention_exceptionIsThrown() throws NoSuchMethodException {
 		Method fixBMethod = Toto.class.getDeclaredMethod("fixB", String.class);
 		assertEquals("Field wrapper o.g.l.ReflectionsTest$Toto.fixB(j.l.String) doesn't fit encapsulation naming convention",
-				assertThrows(MemberNotFoundException.class, () -> propertyName(fixBMethod)).getMessage());
+				assertThrows(MemberNotFoundException.class, () -> Reflections.propertyName(fixBMethod)).getMessage());
 	}
 	
 	@Test
-	public void testForName() {
-		assertEquals(boolean.class, forName("Z"));
-		assertEquals(int.class, forName("I"));
-		assertEquals(long.class, forName("J"));
-		assertEquals(short.class, forName("S"));
-		assertEquals(byte.class, forName("B"));
-		assertEquals(double.class, forName("D"));
-		assertEquals(float.class, forName("F"));
-		assertEquals(char.class, forName("C"));
-		assertEquals(void.class, forName("V"));
-		assertEquals(String.class, forName(String.class.getName()));
-		assertEquals(Object[].class, forName("[Ljava.lang.Object;"));
-		assertEquals(Object.class, forName("java.lang.Object"));
-		assertEquals(boolean[].class, forName("[Z"));
-		assertEquals(boolean[][].class, forName("[[Z"));
+	void forName() {
+		assertEquals(boolean.class, Reflections.forName("Z"));
+		assertEquals(int.class, Reflections.forName("I"));
+		assertEquals(long.class, Reflections.forName("J"));
+		assertEquals(short.class, Reflections.forName("S"));
+		assertEquals(byte.class, Reflections.forName("B"));
+		assertEquals(double.class, Reflections.forName("D"));
+		assertEquals(float.class, Reflections.forName("F"));
+		assertEquals(char.class, Reflections.forName("C"));
+		assertEquals(void.class, Reflections.forName("V"));
+		assertEquals(String.class, Reflections.forName(String.class.getName()));
+		assertEquals(Object[].class, Reflections.forName("[Ljava.lang.Object;"));
+		assertEquals(Object.class, Reflections.forName("java.lang.Object"));
+		assertEquals(boolean[].class, Reflections.forName("[Z"));
+		assertEquals(boolean[][].class, Reflections.forName("[[Z"));
 	}
 	
 	@Test
-	public void testWrapperClass() {
+	void wrapperClass() {
 		assertEquals(Boolean.class, Reflections.giveWrapperClass(boolean.class));
 		assertEquals(Integer.class, Reflections.giveWrapperClass(int.class));
 		assertEquals(Long.class, Reflections.giveWrapperClass(long.class));
@@ -399,15 +412,15 @@ public class ReflectionsTest {
 	}
 	
 	@Test
-	public void testIsAssignableFrom() {
-		Assertions.assertEquals(true, isAssignableFrom(boolean.class, Boolean.class));
-		Assertions.assertEquals(true, isAssignableFrom(Boolean.class, boolean.class));
-		Assertions.assertEquals(true, isAssignableFrom(CharSequence.class, String.class));
-		Assertions.assertEquals(false, isAssignableFrom(String.class, CharSequence.class));
-		Assertions.assertEquals(true, isAssignableFrom(String.class, String.class));
-		Assertions.assertEquals(true, isAssignableFrom(CharSequence.class, CharSequence.class));
-		Assertions.assertEquals(false, isAssignableFrom(CharSequence.class, Object.class));
-		Assertions.assertEquals(true, isAssignableFrom(Object.class, CharSequence.class));
+	void isAssignableFrom() {
+		Assertions.assertEquals(true, Reflections.isAssignableFrom(boolean.class, Boolean.class));
+		Assertions.assertEquals(true, Reflections.isAssignableFrom(Boolean.class, boolean.class));
+		Assertions.assertEquals(true, Reflections.isAssignableFrom(CharSequence.class, String.class));
+		Assertions.assertEquals(false, Reflections.isAssignableFrom(String.class, CharSequence.class));
+		Assertions.assertEquals(true, Reflections.isAssignableFrom(String.class, String.class));
+		Assertions.assertEquals(true, Reflections.isAssignableFrom(CharSequence.class, CharSequence.class));
+		Assertions.assertEquals(false, Reflections.isAssignableFrom(CharSequence.class, Object.class));
+		Assertions.assertEquals(true, Reflections.isAssignableFrom(Object.class, CharSequence.class));
 	}
 	
 	@Test
