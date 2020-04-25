@@ -363,6 +363,20 @@ public class IterablesTest {
 	}
 	
 	@Test
+	public void contains_iterable() {
+		List<String> strings = asList("a", "b");
+		assertTrue(Iterables.contains(strings, s -> s.equalsIgnoreCase("B")));
+		assertFalse(Iterables.contains(strings, s -> s.equalsIgnoreCase("C")));
+	}
+	
+	@Test
+	public void contains_iterable_mapped() {
+		List<String> strings = asList("a", "b");
+		assertTrue(Iterables.contains(strings, String::toUpperCase, s -> s.equals("B")));
+		assertFalse(Iterables.contains(strings, String::toUpperCase, s -> s.equals("C")));
+	}
+	
+	@Test
 	public void pair() {
 		List<String> strings = asList("a", "b");
 		List<Integer> integers = asList(1, 2);

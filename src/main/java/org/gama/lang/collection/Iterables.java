@@ -771,7 +771,7 @@ public final class Iterables {
 	}
 	
 	/**
-	 * Finds the first predicate-matching element into an {@link Iterator}
+	 * Indicates if an {@link Iterator} contains a predicate-matching element
 	 *
 	 * @param iterator the {@link Iterator} to scan
 	 * @param <I> input type
@@ -782,7 +782,18 @@ public final class Iterables {
 	}
 	
 	/**
-	 * Finds the first predicate-matching element (according to mapper) into an {@link Iterator}
+	 * Indicates if an {@link Iterable} contains a predicate-matching element
+	 *
+	 * @param iterable the {@link Iterable} to scan
+	 * @param <I> input type
+	 * @return true if a value that matches the {@link Predicate} is found
+	 */
+	public static <I> boolean contains(Iterable<I> iterable, Predicate<I> predicate) {
+		return find(iterable.iterator(), predicate) != null;
+	}
+	
+	/**
+	 * Indicates if an {@link Iterator} contains a predicate-matching element after applying a mapper to the elements
 	 *
 	 * @param iterator the {@link Iterator} to scan
 	 * @param mapper the mapper to extract the value to test
@@ -792,6 +803,19 @@ public final class Iterables {
 	 */
 	public static <I, O> boolean contains(Iterator<I> iterator, Function<I, O> mapper, Predicate<O> predicate) {
 		return find(iterator, mapper, predicate) != null;
+	}
+	
+	/**
+	 * Indicates if an {@link Iterable} contains a predicate-matching element after applying a mapper to the elements
+	 *
+	 * @param iterable the {@link Iterable} to scan
+	 * @param mapper the mapper to extract the value to test
+	 * @param <I> input type
+	 * @param <O> output type
+	 * @return true if a value that matches the {@link Predicate} is found
+	 */
+	public static <I, O> boolean contains(Iterable<I> iterable, Function<I, O> mapper, Predicate<O> predicate) {
+		return find(iterable.iterator(), mapper, predicate) != null;
 	}
 	
 	public static <E> Iterator<E> reverseIterator(List<E> list) {
