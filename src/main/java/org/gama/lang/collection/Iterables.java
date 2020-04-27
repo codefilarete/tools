@@ -588,15 +588,15 @@ public final class Iterables {
 	 * Keep elements of an {@link Iterable} that doesn't match a {@link Predicate}
 	 * 
 	 * @param iterable any {@link Iterable}
-	 * @param excluder any {@link Predicate}
+	 * @param includer any {@link Predicate}
 	 * @param <E> type of elements
 	 * @return given iterable without elements that doesn't match the given predicate
 	 */
-	public static <E> Iterable<E> filter(@Nonnull Iterable<E> iterable, @Nonnull Predicate<E> excluder) {
+	public static <E> Iterable<E> filter(@Nonnull Iterable<E> iterable, @Nonnull Predicate<E> includer) {
 		Iterator<E> iterator = iterable.iterator();
 		while (iterator.hasNext()) {
 			E e = iterator.next();
-			if (!excluder.test(e)) {
+			if (!includer.test(e)) {
 				iterator.remove();
 			}
 			
@@ -608,11 +608,11 @@ public final class Iterables {
 	 * Keep elements of an {@link Iterator} that doesn't match a {@link Predicate}
 	 *
 	 * @param iterator any {@link Iterator}
-	 * @param excluder any {@link Predicate}
+	 * @param includer any {@link Predicate}
 	 * @param <E> type of elements
 	 * @return given iterator without elements that doesn't match the given predicate
 	 */
-	public static <E> Iterator<E> filter(@Nonnull Iterator<E> iterator, @Nonnull Predicate<E> excluder) {
+	public static <E> Iterator<E> filter(@Nonnull Iterator<E> iterator, @Nonnull Predicate<E> includer) {
 		return new Iterator<E>() {
 			
 			private boolean hasNext = true;
@@ -622,7 +622,7 @@ public final class Iterables {
 			private void lookAhead() {
 				while (hasNext = surrogate.hasNext()) {
 					E item = surrogate.next();
-					if (!excluder.test(item)) {
+					if (!includer.test(item)) {
 						hasNext = false;
 						currentItem = null;
 					} else {

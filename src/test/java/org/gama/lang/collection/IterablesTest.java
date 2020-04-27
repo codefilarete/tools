@@ -150,7 +150,7 @@ public class IterablesTest {
 	}
 	
 	@Test
-	public void Copy_iterator() {
+	public void copy_iterator() {
 		// test with content
 		ArrayIterator<String> iterator = new ArrayIterator<>("d", "a");
 		assertEquals(asList("d", "a"), copy(iterator, new ArrayList<>()));
