@@ -176,6 +176,12 @@ class NullableTest {
 	}
 	
 	@Test
+	void testElseThrow_supplier() throws IOException {
+		Object value = new Object();
+		assertEquals(value, Nullable.nullable(value).<IOException>elseThrow(IOException::new).get());
+	}
+	
+	@Test
 	void testGetElseThrow() throws IOException {
 		Object value = new Object();
 		assertEquals(value, Nullable.nullable(value).getOrThrow(new IOException()));

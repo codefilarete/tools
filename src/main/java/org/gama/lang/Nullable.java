@@ -212,9 +212,25 @@ public class Nullable<T> implements Supplier<T> {
 	 * @throws E the given throwable
 	 */
 	public <E extends Throwable> Nullable<T> elseThrow(E throwable) throws E {
+		return this.<E>elseThrow(() -> throwable);
+	}
+	
+	/**
+	 * Will throw supplied {@link Throwable} if current value is null.
+	 * Tips to avoid invokation conflict with {@link #elseThrow(Throwable)} : one should specify generics before method call sush as:
+	 * <code>
+	 *     Nullable.empty().&lt;IOException&gt;elseThrow(IOException::new);
+	 * </code>
+	 *
+	 * @param throwableSupplier the {@link Supplier} that will give the {@link Throwable} to be thrown
+	 * @param <E> the {@link Throwable} type
+	 * @return this (if value is present)
+	 * @throws E the given throwable
+	 */
+	public <E extends Throwable> Nullable<T> elseThrow(Supplier<E> throwableSupplier) throws E {
 		// NB we don't use ifPresent because it's quite too much for this case (and requires to return null in given function, ugly)
 		if (!isPresent()) {
-			throw throwable;
+			throw throwableSupplier.get();
 		} else {
 			return this;
 		}
