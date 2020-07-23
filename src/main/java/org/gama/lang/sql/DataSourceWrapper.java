@@ -20,6 +20,10 @@ public class DataSourceWrapper implements DataSource {
 	public DataSourceWrapper() {
 	}
 	
+	public DataSourceWrapper(DataSource delegate) {
+		this.delegate = delegate;
+	}
+	
 	public void setDelegate(DataSource delegate) {
 		this.delegate = delegate;
 	}
