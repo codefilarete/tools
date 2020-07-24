@@ -19,6 +19,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 
+import org.gama.lang.Reflections;
+
 /**
  * {@link Connection} that wraps another one and delegates all its methods to it without any additionnal feature.
  * Made for overriding only some targeted methods.
@@ -301,13 +303,27 @@ public class ConnectionWrapper implements Connection {
 		return surrogate.getNetworkTimeout();
 	}
 	
+	/**
+	 * Implementation that gives access to delegate {@link Connection} if given parameter if {@link Connection} class.
+	 *
+	 * @param <T> the type of the class modeled by this Class object
+	 * @param iface A Class defining an interface that the result must implement.
+	 * @return an object that implements the interface. May be a proxy for the actual implementing object.
+	 * @throws SQLException If no object found that implements the interface
+	 */
 	@Override
 	public <T> T unwrap(Class<T> iface) throws SQLException {
-		return surrogate.unwrap(iface);
+		if (iface == Connection.class) {
+			return (T) this.surrogate;
+		} else if (isWrapperFor(iface)) {
+			// made for subclasses
+			return (T) this;
+		}
+		throw new SQLException(Reflections.toString(ConnectionWrapper.class) + " cannot be unwrapped as " + Reflections.toString(iface));
 	}
 	
 	@Override
 	public boolean isWrapperFor(Class<?> iface) throws SQLException {
-		return surrogate.isWrapperFor(iface);
+		return iface.isInstance(this);
 	}
 }
