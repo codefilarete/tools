@@ -465,7 +465,22 @@ public final class Iterables {
 	 * @return the complement of c1 in c2
 	 */
 	public static <E> Set<E> minus(Collection<E> c1, Collection<E> c2) {
-		Set<E> copy = new HashSet<>(c1);
+		return minus(c1, c2, (Function<Collection<E>, HashSet<E>>) HashSet::new);
+	}
+	
+	/**
+	 * Gives the complement of c2 in c1 : all elements of c1 that are not member of c2
+	 * Implementation has no particular optimization, it is based on a {@link HashSet#removeAll(Collection)}.
+	 * Result is pushed to given resultHolder
+	 *
+	 * @param c1 a {@link Collection}, not null
+	 * @param c2 a {@link Collection}, not null
+	 * @param resultHolder function expected to give resulting {@link Set}. Argument is c1.
+	 * @param <E> type of elements
+	 * @return the complement of c1 in c2
+	 */
+	public static <E, S extends Set<E>> S minus(Collection<E> c1, Collection<E> c2, Function<Collection<E>, S> resultHolder) {
+		S copy = resultHolder.apply(c1);
 		copy.removeAll(c2);
 		return copy; 
 	}
