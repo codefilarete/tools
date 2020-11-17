@@ -3,13 +3,10 @@ package org.gama.lang.collection;
 import java.util.Iterator;
 
 /**
- * Iterator qui appelle une méthode périodiquement toutes les N itérations.
- * C'est {@link #hasNext()} qui déclenche l'appel à {@link #onStep()} afin
- * de correspondre à une boucle while(hasNext) ou foreach. Ce n'est pas {@link #next()}
- * qui déclenche l'appel car ça semble un peu tard : une incrémentation de trop.
- * {@link #onStep()} est également appelé quand {@link #hasNext()} renvoie false (sauf
- * lors du premier appel) afin de traiter le reliquat d'objet depuis le dernier
- * appel à {@link #onStep()}
+ * {@link Iterator} that invokes a method every N iterations
+ * {@link #hasNext()} triggers the invokation to {@link #onStep()} to mimic a while(hasNext) or a foreach : {@link #next()} doesn't do it because
+ * it seems to be one iteration too late in this context of usage.
+ * {@link #onStep()} os also invoked when {@link #hasNext()} returns false (except if it is the very first call) to treat the remaining objects.
  * 
  * @author Guillaume Mary
  */

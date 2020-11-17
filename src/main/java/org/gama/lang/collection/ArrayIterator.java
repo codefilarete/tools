@@ -9,8 +9,9 @@ import java.util.NoSuchElementException;
  */
 public class ArrayIterator<O> extends ReadOnlyIterator<O> {
 
-	private O[] array;
-	private int currentIndex = 0, maxIndex;
+	private final O[] array;
+	private int currentIndex = 0;
+	private final int maxIndex;
 	
 	@SafeVarargs // method body doesn't handle improperly varargs parameter so it would generate ClassCastException 
 	public ArrayIterator(O ... array) {
