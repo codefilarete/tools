@@ -17,8 +17,6 @@ public class FilteringIterator<T> implements Iterator<T> {
 	public FilteringIterator(Iterator<T> delegate, Predicate<T> acceptFilter) {
 		this.delegate = delegate;
 		this.acceptFilter = acceptFilter;
-		// forwarding to very first matcher to allow next() to be invoked without hasNext()
-		consumeDelegateUntilMatch();
 	}
 	
 	@Override
