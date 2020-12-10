@@ -39,6 +39,12 @@ class AssertionsTest {
 	}
 	
 	@Test
+	void assertAllEquals_Set_List_false() {
+		assertAssertion(() -> Assertions.assertAllEquals(Arrays.asSet("a", "b", "c"), Arrays.asList("1", "2", "3")), "expected: <[a, b, c]> but was: <[1, 2, 3]>");
+		assertAssertion(() -> Assertions.assertAllEquals(Arrays.asSet("a", "b", "c"), Arrays.asList("a", "b")), "expected: <[a, b, c]> but was: <[a, b]>");
+	}
+	
+	@Test
 	void assertEquals_nonNull_null_fails() {
 		Object expected = new Object();
 		assertAssertion(() -> assertEquals(expected, null), "expected: <" + expected + "> but was: <null>");

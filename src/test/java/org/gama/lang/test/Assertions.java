@@ -10,6 +10,7 @@ import java.util.function.Predicate;
 import org.gama.lang.Duo;
 import org.gama.lang.collection.Iterables;
 import org.gama.lang.collection.PairIterator;
+import org.gama.lang.collection.PairIterator.UntilBothIterator;
 import org.gama.lang.exception.Exceptions;
 import org.gama.lang.function.Predicates;
 import org.gama.lang.function.ThrowingRunnable;
@@ -452,7 +453,7 @@ public class Assertions {
 		public boolean test(Iterable<A> expected, Iterable<B> actual) {
 			if (expected == null && actual == null) return true;
 			boolean areEquals = true;
-			PairIterator<A, B> duoIterator = new PairIterator<>(expected, actual);
+			PairIterator<A, B> duoIterator = new UntilBothIterator<>(expected, actual);
 			while (duoIterator.hasNext()) {
 				Duo<A, B> next = duoIterator.next();
 				areEquals &= biPredicate.test(next.getLeft(), next.getRight());
