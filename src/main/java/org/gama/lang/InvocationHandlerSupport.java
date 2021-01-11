@@ -53,7 +53,7 @@ public class InvocationHandlerSupport implements InvocationHandler {
 	 * @param proxy the target on which method must be called
 	 * @param method the method to invoke
 	 * @param args the method arguments
-	 * @return null
+	 * @return result of method invokation on handler given at construction time, except for equals / hashCode / toString which are handled specifically
 	 * @throws Throwable in case of invokation error
 	 */
 	@Override
@@ -71,7 +71,7 @@ public class InvocationHandlerSupport implements InvocationHandler {
 			if (proxy == null) {
 				throw new NullPointerException("hashCode() invoked on a null reference");
 			} else {
-				if (Proxy.isProxyClass(proxy.getClass()) && Proxy.getInvocationHandler(proxy) == this) {
+				if (Proxy.isProxyClass(proxy.getClass()) && Proxy.getInvocationHandler(proxy) == this) {	// prevent infinite loop
 					return this.hashCode();
 				} else {
 					return proxy.hashCode();
@@ -90,7 +90,7 @@ public class InvocationHandlerSupport implements InvocationHandler {
 	}
 	
 	/**
-	 * Ease the creation of an interface stub
+	 * Eases the creation of an interface stub
 	 *
 	 * @param interfazz an interface
 	 * @param <T> type interface
