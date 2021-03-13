@@ -115,12 +115,12 @@ class NullableTest {
 	@Test
 	void testTest() {
 		// simple case
-		assertTrue(Nullable.nullable("Hello").test(o -> o.equals("Hello")));
+		assertTrue(Nullable.nullable("Hello").test(o -> o.equals("Hello")).get());
 		// with null value
-		assertNull(Nullable.nullable((Object) null).test(o -> {
+		assertFalse(Nullable.nullable((Object) null).test(o -> {
 			fail("this code should not even be invoked");
 			return false;
-		}));
+		}).isPresent());
 	}
 	
 	@Test

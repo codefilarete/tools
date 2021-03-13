@@ -299,11 +299,11 @@ public class Nullable<T> implements Supplier<T> {
 	/**
 	 * Tests the value if present and returns the result
 	 * 
-	 * @param predicate a predicate on value type
-	 * @return {@link Predicate} result on value if present, null if value is null
+	 * @param predicate a predicate on value type, invoked only if value is present
+	 * @return {@link Predicate} result wrapped into a {@link Nullable}
 	 */
-	public Boolean test(Predicate<? super T> predicate) {
-		return ifPresent(Functions.toFunction(predicate)::apply);
+	public Nullable<Boolean> test(Predicate<? super T> predicate) {
+		return Nullable.nullable(ifPresent(Functions.toFunction(predicate)::apply));
 	}
 	
 	/** Applies the function if value is present */
