@@ -1,5 +1,6 @@
 package org.gama.lang.function;
 
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiPredicate;
@@ -9,6 +10,7 @@ import java.util.function.Predicate;
 import org.gama.lang.collection.Arrays;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -46,6 +48,14 @@ class PredicatesTest {
 		Predicate<Integer> testInstance = Predicates.predicate(Object::toString, data::contains);
 		assertTrue(testInstance.test(1));
 		assertFalse(testInstance.test(4));
+	}
+	
+	@Test
+	void toCompartor() {
+		Comparator<Object> comparator = Predicates.toComparator(Objects::equals);
+		assertEquals(comparator.compare("a", "b"), -1);
+		assertEquals(comparator.compare("b", "a"), -1);
+		assertEquals(comparator.compare("a", "a"), 0);
 	}
 	
 	@Test

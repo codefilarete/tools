@@ -1,6 +1,7 @@
 package org.gama.lang.function;
 
 import javax.annotation.Nullable;
+import java.util.Comparator;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -44,6 +45,16 @@ public class Predicates {
 	public static <I, O> Predicate<I> predicate(Function<I, O> mapper, Predicate<O> predicate) {
 		return predicate(mapper.andThen(Functions.toFunction(predicate)));
 	}
+	
+	/**
+	 * Creates a new {@link Comparator} returning 0 if given predicate returns true, -1 if false
+	 * @param predicate any {@link Predicate} checking for element equality
+	 * @param <E> element type to be compared
+	 * @return a new {@link Comparator} returning 0 if given predicate returns true, -1 if false
+	 */
+	public static <E> Comparator<E> toComparator(BiPredicate<E, E> predicate) {
+		return (o1, o2) -> predicate.test(o1, o2) ? 0 : -1; 
+	} 
 	
 	/**
 	 * Creates a {@link BiPredicate} which makes a logical AND between the results of the given {@link Function}s.
