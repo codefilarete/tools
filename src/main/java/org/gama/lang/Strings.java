@@ -16,7 +16,7 @@ public abstract class Strings {
 		return charSequence == null || charSequence.length() == 0;
 	}
 	
-	public static CharSequence preventEmpty(CharSequence charSequence, CharSequence replacement) {
+	public static <C extends CharSequence> C preventEmpty(C charSequence, C replacement) {
 		return isEmpty(charSequence) ? replacement : charSequence;
 	}
 	
