@@ -29,6 +29,18 @@ public class ModifiableInt {
 		return value += increment;
 	}
 	
+	public int decrement() {
+		return --value;
+	}
+	
+	public int decrement(int decrement) {
+		return value -= decrement;
+	}
+	
+	public void reset(int value) {
+		this.value = value;
+	}
+	
 	@Override
 	public String toString() {
 		return String.valueOf(value);
