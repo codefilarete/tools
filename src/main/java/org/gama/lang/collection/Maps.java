@@ -42,15 +42,6 @@ public final class Maps {
 	}
 	
 	/**
-	 * Allows chaining of the {@link ChainingMap#add(Object, Object)} method and then easily create a TreeMap
-	 * @param comparator the {@link Comparator} for the keys of the {@link TreeMap}
-	 * @return a new TreeMap instance
-	 */
-	public static <K, V> ChainingComparingMap<K, V> asComparingMap(Comparator<K> comparator, K key, V value) {
-		return new ChainingComparingMap<K, V>(comparator).add(key, value);
-	}
-	
-	/**
 	 * Returns a {@link Map} of given {@link Map}s values that are mapped on the same keys in both {@link Map}s.
 	 * 
 	 * @param map1 a {@link Map}
