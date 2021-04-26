@@ -1,9 +1,13 @@
 package org.gama.lang.collection;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
 
 /**
  * @author Guillaume Mary
@@ -28,6 +32,36 @@ public class Collections {
 	 */
 	public static boolean isEmpty(Map m) {
 		return m == null || m.isEmpty();
+	}
+	
+	/**
+	 * Creates a {@link Set} based on object identity for its comparison
+	 * @param <E> element type
+	 * @return a new {@link Set} based on object identity for its comparison
+	 */
+	public static <E> Set<E> newIdentitySet() {
+		return java.util.Collections.newSetFromMap(new IdentityHashMap<>());
+	}
+	
+	/**
+	 * Creates a {@link Set} based on object identity for its comparison
+	 * 
+	 * @param initialCapacity the wanted initial capacity of the {@link Set}
+	 * @param <E> element type
+	 * @return a new {@link Set} based on object identity for its comparison
+	 */
+	public static <E> Set<E> newIdentitySet(int initialCapacity) {
+		return java.util.Collections.newSetFromMap(new IdentityHashMap<>(initialCapacity));
+	}
+	
+	/**
+	 * Create a Last-In-Firt-Out {@link Queue}
+	 * 
+	 * @param <E> element type
+	 * @return a new Last-In-Firt-Out {@link Queue}
+	 */
+	public static <E> Queue<E> newLifoQueue() {
+		return java.util.Collections.asLifoQueue(new ArrayDeque<>());
 	}
 	
 	/**

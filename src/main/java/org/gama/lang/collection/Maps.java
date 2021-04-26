@@ -72,6 +72,26 @@ public final class Maps {
 	}
 	
 	/**
+	 * Returns a {@link Map} of given first {@link Map} keys and second {@link Map} values
+	 * by joining them on first {@link Map} values and second {@link Map} keys.
+	 *
+	 * @param map1 a {@link Map}
+	 * @param map2 a {@link Map}
+	 * @param <K> {@link Map}s key type
+	 * @param <V1> first {@link Map} values and second {@link Map} keys type
+	 * @param <V2> second {@link Map} values type
+	 * @return a {@link Map} of first {@link Map} keys and second {@link Map} values joined on first {@link Map} values and second {@link Map} keys.
+	 */
+	public static <K, V1, V2> Map<K, V2> innerJoinOnValuesAndKeys(Map<K, V1> map1, Map<V1, V2> map2) {
+		Map<K, V2> result = new HashMap<>();
+		map1.forEach((k, v1) -> {
+			V2 v2 = map2.get(v1);
+			result.put(k, v2);
+		});
+		return result;
+	}
+	
+	/**
 	 * Puts all elements of map1 and map2 into a new {@link HashMap}.
 	 * Made to have a putAll(..) method inlined.
 	 * 

@@ -12,13 +12,29 @@ class MapsTest {
 	
 	@Test
 	void innerJoin() {
-		Map<Integer, Integer> result = Maps.innerJoin(Maps.asHashMap("a", 1).add("b", 2).add("c", 3), Maps.asHashMap("b", 4).add("c", 5).add("d", 6));
-		Assertions.assertEquals(Maps.asHashMap(2, 4).add(3, 5), result);
+		Map<Integer, Integer> result = Maps.innerJoin(
+				Maps.forHashMap(String.class, Integer.class)
+				.add("a", 1).add("b", 2).add("c", 3),
+				Maps.forHashMap(String.class, Integer.class)
+				.add("b", 4).add("c", 5).add("d", 6));
+		Assertions.assertEquals(Maps.forHashMap(Integer.class, Integer.class).add(2, 4).add(3, 5), result);
+	}
+	
+	@Test
+	void innerJoinOnValuesAndKeys() {
+		Map<String, String> result = Maps.innerJoinOnValuesAndKeys(
+				Maps.forHashMap(String.class, Integer.class)
+						.add("a", 1).add("b", 2).add("c", 3),
+				Maps.forHashMap(Integer.class, String.class)
+						.add(1, "A").add(2, "B").add(3, "C"));
+		Assertions.assertEquals(Maps.forHashMap(String.class, String.class).add("a", "A").add("b", "B").add("c", "C"), result);
 	}
 	
 	@Test
 	void putAll() {
-		Map<String, Integer> result = Maps.putAll(Maps.asHashMap("a", 1).add("b", 2).add("c", 3), Maps.asHashMap("b", 4).add("c", 5).add("d", 6));
-		Assertions.assertEquals(Maps.asHashMap("a", 1).add("b", 4).add("c", 5).add("d", 6), result);
+		Map<String, Integer> result = Maps.putAll(
+				Maps.forHashMap(String.class, Integer.class).add("a", 1).add("b", 2).add("c", 3),
+				Maps.forHashMap(String.class, Integer.class).add("b", 4).add("c", 5).add("d", 6));
+		Assertions.assertEquals(Maps.forHashMap(String.class, Integer.class).add("a", 1).add("b", 4).add("c", 5).add("d", 6), result);
 	}
 }
