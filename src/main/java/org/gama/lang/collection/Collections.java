@@ -77,9 +77,9 @@ public class Collections {
 		return c;
 	}
 	
-	public static <E> List<E> cat(Collection<E>... collections) {
+	public static <E> List<E> cat(Collection<? extends E>... collections) {
 		List<E> toReturn = new ArrayList<>(collections.length * 10);    // arbitrary size, ArrayList.addAll will adapt
-		for (Collection<E> collection : collections) {
+		for (Collection<? extends E> collection : collections) {
 			toReturn.addAll(collection);
 		}
 		return toReturn;
