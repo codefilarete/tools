@@ -1,8 +1,14 @@
 package org.gama.lang;
 
-import java.util.Objects;
+import org.gama.lang.bean.Objects;
 
 /**
+ * Stores a couple. Expected to be used for a very temporary structure of an algorithm or an internal process. For anyelse kind of usage please prefer
+ * the creation of a dedicated class with better name and on-purpose methods. Since an anonymous couple class such as this one shouldn't exist beyond
+ * a very local usage, a trio one shouldn't exist even more, as such a Trio class will never be created.
+ * 
+ * {@link #equals(Object)} and {@link #hashCode()} are bounded to content.
+ * 
  * @author Guillaume Mary
  */
 public class Duo<A, B> {
@@ -39,13 +45,13 @@ public class Duo<A, B> {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		Duo<?, ?> duo = (Duo<?, ?>) o;
-		return Objects.equals(left, duo.left) &&
-				Objects.equals(right, duo.right);
+		return org.gama.lang.bean.Objects.equals(left, duo.left)
+				&& org.gama.lang.bean.Objects.equals(right, duo.right);
 	}
 	
 	@Override
 	public int hashCode() {
-		return Objects.hash(left, right);
+		return Objects.hashCode(left, right);
 	}
 	
 	/**
