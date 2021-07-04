@@ -5,9 +5,9 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 
-import com.google.common.annotations.VisibleForTesting;
 import org.gama.lang.Duo;
 import org.gama.lang.StringAppender;
+import org.gama.lang.VisibleForTesting;
 
 /**
  * Class aimed at mesuring time between 2 events.
