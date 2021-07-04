@@ -13,11 +13,10 @@ import org.gama.lang.bean.ClassIterator;
 import org.gama.lang.bean.InterfaceIterator;
 import org.gama.lang.bean.MethodIterator;
 import org.gama.lang.collection.Iterables;
-import org.gama.lang.test.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Guillaume Mary
@@ -28,7 +27,7 @@ class ConnectionWrapperTest {
 	void unwrap_parameterIsConnectionClass_returnsDelegate() throws SQLException {
 		Connection delegate = Mockito.mock(Connection.class);
 		ConnectionWrapper testInstance = new ConnectionWrapper(delegate);
-		assertEquals(delegate, testInstance.unwrap(Connection.class));
+		assertThat(testInstance.unwrap(Connection.class)).isEqualTo(delegate);
 	}
 	
 	@Test
@@ -62,7 +61,7 @@ class ConnectionWrapperTest {
 				if (method.getName().equals("getTypeMap")) {
 					delegateResult = new HashMap<>();
 				}
-				Assertions.assertEquals(delegateResult, invokationResult);
+				assertThat(invokationResult).isEqualTo(delegateResult);
 				Mockito.clearInvocations(delegate);
 				methodCount++;
 			} catch (ReflectiveOperationException | IllegalArgumentException e) {
@@ -70,6 +69,6 @@ class ConnectionWrapperTest {
 			}
 		}
 		// checking that iteration over methods really worked
-		org.junit.jupiter.api.Assertions.assertEquals(53, methodCount);
+		assertThat(methodCount).isEqualTo(53);
 	}
 }

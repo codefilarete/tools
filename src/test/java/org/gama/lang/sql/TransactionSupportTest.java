@@ -6,10 +6,8 @@ import java.sql.SQLException;
 import org.gama.lang.trace.ModifiableBoolean;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -40,11 +38,11 @@ public class TransactionSupportTest {
 		
 		// begin() must set auto-commit to false
 		testInstance.begin();
-		assertFalse(commitState.getValue());
+		assertThat(commitState.getValue()).isFalse();
 		
 		// end() must set auto-commit back to true
 		testInstance.end();
-		assertTrue(commitState.getValue());
+		assertThat(commitState.getValue()).isTrue();
 	}
 	
 	@Test
@@ -65,11 +63,11 @@ public class TransactionSupportTest {
 		
 		// begin() must set auto-commit to false
 		testInstance.begin();
-		assertFalse(commitState.getValue());
+		assertThat(commitState.getValue()).isFalse();
 		
 		// end() must set auto-commit back to true
 		testInstance.end();
-		assertFalse(commitState.getValue());
+		assertThat(commitState.getValue()).isFalse();
 	}
 	
 	@Test
@@ -102,7 +100,7 @@ public class TransactionSupportTest {
 		verify(spy).commit();
 		verify(connectionMock).commit();
 		verify(spy).begin();
-		assertSame(connectionMock, consumerState[0]);
+		assertThat(consumerState[0]).isSameAs(connectionMock);
 		verify(spy).end();
 	}
 	
@@ -112,15 +110,9 @@ public class TransactionSupportTest {
 		TransactionSupport testInstance = new TransactionSupport(connectionMock);
 		TransactionSupport spy = spy(testInstance);
 		
-		SQLException caughtException = null;
-		try {
-			spy.runAtomically(c -> {
-				throw new SQLException();
-			});
-		} catch (SQLException e) {
-			caughtException = e;
-		}
-		assertNotNull(caughtException);
+		assertThatThrownBy(() -> spy.runAtomically(c -> {
+			throw new SQLException();
+		})).isNotNull();
 		
 		verify(spy, never()).commit();
 		verify(connectionMock, never()).commit();

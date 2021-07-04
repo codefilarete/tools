@@ -13,6 +13,7 @@
 		<jsr305.version>3.0.2</jsr305.version>
 		<mockito.version>2.22.0</mockito.version>
 		<junit.version>5.3.1</junit.version>
+		<assertj.version>3.20.2</assertj.version>
 	</properties>
 	
 	<dependencies>
@@ -38,6 +39,12 @@
 			<groupId>com.google.code.findbugs</groupId>
 			<artifactId>jsr305</artifactId>
 			<version>${jsr305.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<version>${assertj.version}</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 	

@@ -4,8 +4,7 @@ import java.util.function.Function;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Guillaume Mary
@@ -16,8 +15,8 @@ public class ThreadLocalsTest {
 	void withThreadLocal_function_noValuePresent() {
 		ThreadLocal<String> targetThreadLocal = new ThreadLocal<>();
 		String result = ThreadLocals.doWithThreadLocal(targetThreadLocal, () -> "Hello ", (Function<String, String>) s -> s + "world !");
-		assertEquals("Hello world !", result);
-		assertNull(targetThreadLocal.get());
+		assertThat(result).isEqualTo("Hello world !");
+		assertThat(targetThreadLocal.get()).isNull();
 	}
 	
 	@Test
@@ -25,7 +24,7 @@ public class ThreadLocalsTest {
 		ThreadLocal<String> targetThreadLocal = new ThreadLocal<>();
 		targetThreadLocal.set("Hi ");
 		String result = ThreadLocals.doWithThreadLocal(targetThreadLocal, () -> "Hello ", (Function<String, String>) s -> s + "world !");
-		assertEquals("Hi world !", result);
-		assertNull(targetThreadLocal.get());
+		assertThat(result).isEqualTo("Hi world !");
+		assertThat(targetThreadLocal.get()).isNull();
 	}
 }

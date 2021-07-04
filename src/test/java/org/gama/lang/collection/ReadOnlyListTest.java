@@ -17,14 +17,12 @@ import org.gama.lang.Reflections;
 import org.gama.lang.bean.ClassIterator;
 import org.gama.lang.bean.InterfaceIterator;
 import org.gama.lang.bean.MethodIterator;
-import org.junit.jupiter.api.Assertions;
+import org.gama.lang.exception.Exceptions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import static org.gama.lang.test.Assertions.assertEquals;
-import static org.gama.lang.test.Assertions.assertThrows;
-import static org.gama.lang.test.Assertions.hasExceptionInCauses;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.eq;
 
 /**
@@ -117,7 +115,7 @@ class ReadOnlyListTest {
 						break;
 					case "listIterator":
 						Mockito.verify(delegate).listIterator(eq(0));
-						assertTrue(invokationResult instanceof ReadOnlyIterator);
+						assertThat(invokationResult instanceof ReadOnlyIterator).isTrue();
 						break;
 					default:
 						Object delegateResult = method.invoke(Mockito.verify(delegate), args);
@@ -125,7 +123,7 @@ class ReadOnlyListTest {
 						if (method.equals(List.class.getMethod("subList", int.class, int.class))) {
 							delegateResult = new ReadOnlyList();
 						}
-						assertEquals(delegateResult, invokationResult);
+						assertThat(invokationResult).isEqualTo(delegateResult);
 						break;
 				}
 				Mockito.clearInvocations(delegate);
@@ -135,7 +133,7 @@ class ReadOnlyListTest {
 			}
 		}
 		// checking that iteration over methods really worked
-		Assertions.assertEquals(24, methodCount);
+		assertThat(methodCount).isEqualTo(24);
 	}
 	
 	@Test
@@ -155,13 +153,13 @@ class ReadOnlyListTest {
 					args[i] = Reflections.PRIMITIVE_DEFAULT_VALUES.getOrDefault(arg, null /* default value for any non-primitive Object */);
 				}
 			}
-			assertThrows(() -> {
+			assertThatThrownBy(() -> {
 				try {
 					method.invoke(testInstance, args);
 				} catch (ReflectiveOperationException | IllegalArgumentException e) {
 					throw new RuntimeException("Error executing " + Reflections.toString(method), e);
 				}
-			}, hasExceptionInCauses(UnsupportedOperationException.class));
+			}).satisfies(thrownException -> Exceptions.findExceptionInCauses(thrownException, UnsupportedOperationException.class));
 		}
 	}
 	
@@ -204,7 +202,7 @@ class ReadOnlyListTest {
 				if (method.equals(List.class.getMethod("subList", int.class, int.class))) {
 					delegateResult = new ReadOnlyList();
 				}
-				assertEquals(delegateResult, invokationResult);
+				assertThat(invokationResult).isEqualTo(delegateResult);
 				Mockito.clearInvocations(delegate);
 				methodCount++;
 			} catch (ReflectiveOperationException | IllegalArgumentException e) {
@@ -212,7 +210,7 @@ class ReadOnlyListTest {
 			}
 		}
 		// checking that iteration over methods really worked
-		Assertions.assertEquals(9, methodCount);
+		assertThat(methodCount).isEqualTo(9);
 	}
 	
 	@Test
@@ -232,13 +230,13 @@ class ReadOnlyListTest {
 					args[i] = Reflections.PRIMITIVE_DEFAULT_VALUES.getOrDefault(arg, null /* default value for any non-primitive Object */);
 				}
 			}
-			assertThrows(() -> {
+			assertThatThrownBy(() -> {
 				try {
 					method.invoke(testInstance, args);
 				} catch (ReflectiveOperationException | IllegalArgumentException e) {
 					throw new RuntimeException("Error executing " + Reflections.toString(method), e);
 				}
-			}, hasExceptionInCauses(UnsupportedOperationException.class));
+			}).satisfies(thrownException -> Exceptions.findExceptionInCauses(thrownException, UnsupportedOperationException.class));
 		}
 	}
 	

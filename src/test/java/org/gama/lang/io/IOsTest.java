@@ -8,8 +8,8 @@ import java.util.NoSuchElementException;
 import org.gama.lang.io.IOs.InputStreamIterator;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 /**
  * @author Guillaume Mary
@@ -25,13 +25,13 @@ public class IOsTest {
 				result.add(aByte);
 			}
 		}
-		assertArrayEquals(new Byte[] { 0, 1, 2, 3, 4 }, result.toArray(new Byte[5]));
+		assertThat(result.toArray(new Byte[5])).isEqualTo(new Byte[] { 0, 1, 2, 3, 4 });
 	}
 	
 	@Test
 	public void testByteIterator_noSuchElementException() {
 		InputStreamIterator testInstance = new InputStreamIterator(new ByteArrayInputStream(new byte[] {}), 2);
-		assertThrows(NoSuchElementException.class, testInstance::next);
+		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(testInstance::next);
 	}
 	
 }

@@ -10,10 +10,8 @@ import org.gama.lang.collection.Arrays;
 import org.gama.lang.collection.Iterables;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 /**
  * @author Guillaume Mary
@@ -30,23 +28,23 @@ public class InstanceMethodIteratorTest {
 				MethodsContainer.class.getDeclaredMethod("method4")
 		));
 		// NB: we use HashSet for comparison because order is not guaranteed when traversing class members, so final order neither
-		assertEquals(expectedResult, new HashSet<>(Iterables.collectToList(() -> testInstance, Function.identity())));
+		assertThat(new HashSet<>(Iterables.collectToList(() -> testInstance, Function.identity()))).isEqualTo(expectedResult);
 	}
 	
 	@Test
 	public void testNext_throwsNoSuchElementException() {
 		// with intermediary hasNext() invokation
 		InstanceMethodIterator testInstance = new InstanceMethodIterator(MethodsContainer.class, Object.class);
-		assertTrue(testInstance.hasNext());
+		assertThat(testInstance.hasNext()).isTrue();
 		testInstance.next();
-		assertTrue(testInstance.hasNext());
+		assertThat(testInstance.hasNext()).isTrue();
 		testInstance.next();
-		assertTrue(testInstance.hasNext());
+		assertThat(testInstance.hasNext()).isTrue();
 		testInstance.next();
-		assertTrue(testInstance.hasNext());
+		assertThat(testInstance.hasNext()).isTrue();
 		testInstance.next();
-		assertFalse(testInstance.hasNext());
-		assertThrows(NoSuchElementException.class, testInstance::next);
+		assertThat(testInstance.hasNext()).isFalse();
+		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(testInstance::next);
 		
 		// without hasNext() invokation
 		testInstance = new InstanceMethodIterator(MethodsContainer.class, Object.class);
@@ -54,16 +52,16 @@ public class InstanceMethodIteratorTest {
 		testInstance.next();
 		testInstance.next();
 		testInstance.next();
-		assertThrows(NoSuchElementException.class, testInstance::next);
+		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(testInstance::next);
 		
 		// with no more element right from the beginning
 		testInstance = new InstanceMethodIterator(Object.class, Object.class);
-		assertFalse(testInstance.hasNext());
-		assertThrows(NoSuchElementException.class, testInstance::next);
+		assertThat(testInstance.hasNext()).isFalse();
+		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(testInstance::next);
 		
 		// without hasNext() invokation
 		testInstance = new InstanceMethodIterator(Object.class, Object.class);
-		assertThrows(NoSuchElementException.class, testInstance::next);
+		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(testInstance::next);
 	}
 	
 	private static class MethodsContainer {

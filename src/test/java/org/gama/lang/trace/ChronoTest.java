@@ -2,7 +2,7 @@ package org.gama.lang.trace;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Guillaume Mary
@@ -11,16 +11,16 @@ class ChronoTest {
 	
 	@Test
 	void testFormat() {
-		assertEquals("1ms", Chrono.format(1));
-		assertEquals("1s", Chrono.format(Chrono.MILLIS_MAX));
-		assertEquals("1min", Chrono.format(Chrono.SEC_MAX));
-		assertEquals("1h", Chrono.format(Chrono.MIN_MAX));
-		assertEquals("1d", Chrono.format(Chrono.H_MAX));
+		assertThat(Chrono.format(1)).isEqualTo("1ms");
+		assertThat(Chrono.format(Chrono.MILLIS_MAX)).isEqualTo("1s");
+		assertThat(Chrono.format(Chrono.SEC_MAX)).isEqualTo("1min");
+		assertThat(Chrono.format(Chrono.MIN_MAX)).isEqualTo("1h");
+		assertThat(Chrono.format(Chrono.H_MAX)).isEqualTo("1d");
 		
 		// testing omission : minutes are ommitted because there aren't any
-		assertEquals("1h 1s", Chrono.format(Chrono.MIN_MAX + Chrono.MILLIS_MAX));
+		assertThat(Chrono.format(Chrono.MIN_MAX + Chrono.MILLIS_MAX)).isEqualTo("1h 1s");
 		
 		// corner cases
-		assertEquals("", Chrono.format(0));
+		assertThat(Chrono.format(0)).isEqualTo("");
 	}
 }

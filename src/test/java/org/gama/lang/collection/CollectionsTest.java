@@ -5,7 +5,7 @@ import java.util.List;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Guillaume Mary
@@ -23,7 +23,7 @@ public class CollectionsTest {
 	@MethodSource("testParcelData")
 	public void testParcel(List<Integer> integers, int blockSize, List<List<Integer>> expected) throws Exception {
 		List<List<Integer>> blocks = Collections.parcel(integers, blockSize);
-		assertEquals(expected, blocks);
+		assertThat(blocks).isEqualTo(expected);
 	}
 	
 }

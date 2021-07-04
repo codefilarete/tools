@@ -6,7 +6,7 @@ import java.util.TreeSet;
 import org.gama.lang.collection.Arrays;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Guillaume Mary
@@ -17,14 +17,14 @@ public class RandomizerTest {
 	public void testGetElementsByIndex_listInput() {
 		TreeSet<Integer> indexes = new TreeSet<>(Arrays.asList(0, 2, 8));
 		List<String> elementsByIndex = Randomizer.getElementsByIndex(Arrays.asList("a", "b", "c", "d", "e", "f", "g", "h", "i"), indexes);
-		assertEquals(Arrays.asList("a", "c", "i"), elementsByIndex);
+		assertThat(elementsByIndex).isEqualTo(Arrays.asList("a", "c", "i"));
 	}
 	
 	@Test
 	public void testGetElementsByIndex_setInput() {
 		TreeSet<Integer> indexes = new TreeSet<>(Arrays.asList(0, 2, 8));
 		List<String> elementsByIndex = Randomizer.getElementsByIndex(Arrays.asHashSet("a", "b", "c", "d", "e", "f", "g", "h", "i"), indexes);
-		assertEquals(Arrays.asList("a", "c", "i"), elementsByIndex);
+		assertThat(elementsByIndex).isEqualTo(Arrays.asList("a", "c", "i"));
 	}
 	
 }

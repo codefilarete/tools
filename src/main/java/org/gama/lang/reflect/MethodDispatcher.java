@@ -142,7 +142,7 @@ public class MethodDispatcher {
 	private void assertInterceptingMethodsAreFromInterfaces() {
 		interceptors.values().forEach(m -> {
 			if (!m.getMethod().getDeclaringClass().isInterface()) {
-				throw new IllegalArgumentException("Cannot intercept concrete method : " + Reflections.toString(m.getMethod()));
+				throw new UnsupportedOperationException("Cannot intercept concrete method : " + Reflections.toString(m.getMethod()));
 			}
 		});
 	}

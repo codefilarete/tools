@@ -8,7 +8,7 @@ import org.gama.lang.trace.ModifiableInt;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Guillaume Mary
@@ -25,29 +25,29 @@ class ValueFactoryMapTest {
 	@Test
 	void testGet_inputDoesntExist_createInstanceIsCalled() {
 		testInstance.get("a").increment();
-		assertEquals(1, testInstance.get("a").getValue());
+		assertThat(testInstance.get("a").getValue()).isEqualTo(1);
 		// a second call should not create a new instance
 		testInstance.get("a").increment();
-		assertEquals(2, testInstance.get("a").getValue());
+		assertThat(testInstance.get("a").getValue()).isEqualTo(2);
 	}
 	
 	@Test
 	void testGet_wrongInputType_nullIsReturned() {
-		assertNull(testInstance.get(new Object()));
+		assertThat(testInstance.get(new Object())).isNull();
 	}
 	
 	@Test
 	void testSize() {
-		assertEquals(0, testInstance.size());
+		assertThat(testInstance.size()).isEqualTo(0);
 		testInstance.get("a");
-		assertEquals(1, testInstance.size());
+		assertThat(testInstance.size()).isEqualTo(1);
 	}
 	
 	@Test
 	void testContains() {
-		assertFalse(testInstance.containsKey("a"));
+		assertThat(testInstance.containsKey("a")).isFalse();
 		// contains() should not add any instance to the Map
-		assertEquals(0, testInstance.size());
+		assertThat(testInstance.size()).isEqualTo(0);
 	}
 	
 	@Test
@@ -55,15 +55,15 @@ class ValueFactoryMapTest {
 		ModifiableInt modifiableInt = new ModifiableInt(42);
 		testInstance.put("a", modifiableInt);
 		// get() should not overwrite instance put by put()
-		assertEquals(42, testInstance.get("a").getValue());
+		assertThat(testInstance.get("a").getValue()).isEqualTo(42);
 	}
 	
 	@Test
 	void testPutAll() {
 		testInstance.putAll(Maps.asMap("a", new ModifiableInt(666)).add("b", new ModifiableInt(42)));
-		assertEquals(666, testInstance.get("a").getValue());
-		assertEquals(42, testInstance.get("b").getValue());
-		assertEquals(2, testInstance.size());
+		assertThat(testInstance.get("a").getValue()).isEqualTo(666);
+		assertThat(testInstance.get("b").getValue()).isEqualTo(42);
+		assertThat(testInstance.size()).isEqualTo(2);
 	}
 	
 	@Test
@@ -71,10 +71,10 @@ class ValueFactoryMapTest {
 		testInstance.put("a", new ModifiableInt(666));
 		testInstance.put("b", new ModifiableInt(42));
 		testInstance.remove("a");
-		assertEquals(1, testInstance.size());
-		assertTrue(testInstance.containsKey("b"));
+		assertThat(testInstance.size()).isEqualTo(1);
+		assertThat(testInstance.containsKey("b")).isTrue();
 		// if we ask again for "a" then we should have a reseted instance
-		assertEquals(0, testInstance.get("a").getValue());
+		assertThat(testInstance.get("a").getValue()).isEqualTo(0);
 	}
 	
 	@Test
@@ -82,39 +82,39 @@ class ValueFactoryMapTest {
 		testInstance.put("a", new ModifiableInt(666));
 		testInstance.put("b", new ModifiableInt(42));
 		testInstance.clear();
-		assertEquals(0, testInstance.size());
-		assertFalse(testInstance.containsKey("a"));
-		assertFalse(testInstance.containsKey("b"));
+		assertThat(testInstance.size()).isEqualTo(0);
+		assertThat(testInstance.containsKey("a")).isFalse();
+		assertThat(testInstance.containsKey("b")).isFalse();
 		// if we ask again for keys then we should have a reseted instance
-		assertEquals(0, testInstance.get("a").getValue());
-		assertEquals(0, testInstance.get("b").getValue());
+		assertThat(testInstance.get("a").getValue()).isEqualTo(0);
+		assertThat(testInstance.get("b").getValue()).isEqualTo(0);
 	}
 	
 	@Test
 	void testKeySet() {
 		testInstance.put("a", new ModifiableInt(666));
 		testInstance.put("b", new ModifiableInt(42));
-		assertEquals(Arrays.asSet("a", "b"), testInstance.keySet());
+		assertThat(testInstance.keySet()).isEqualTo(Arrays.asSet("a", "b"));
 	}
 	
 	@Test
 	void testValues() {
-		assertTrue(testInstance.values().isEmpty());
+		assertThat(testInstance.values().isEmpty()).isTrue();
 		ModifiableInt evil = new ModifiableInt(666);
 		ModifiableInt universeAnswer = new ModifiableInt(42);
 		testInstance.put("a", evil);
 		testInstance.put("b", universeAnswer);
 		// NB: we must wrap testInstance.value() into a Set because its implementation (HashMap.Values) doesn't implement equals(..) nor hashcode()
-		assertEquals(Arrays.asHashSet(evil, universeAnswer), new HashSet<>(testInstance.values()));
+		assertThat(new HashSet<>(testInstance.values())).isEqualTo(Arrays.asHashSet(evil, universeAnswer));
 	}
 	
 	@Test
 	void testEntrySet() {
-		assertTrue(testInstance.entrySet().isEmpty());
+		assertThat(testInstance.entrySet().isEmpty()).isTrue();
 		ModifiableInt evil = new ModifiableInt(666);
 		ModifiableInt universeAnswer = new ModifiableInt(42);
 		testInstance.put("a", evil);
 		testInstance.put("b", universeAnswer);
-		assertEquals(Arrays.asHashSet(new SimpleEntry<>("a", evil), new SimpleEntry<>("b", universeAnswer)), testInstance.entrySet());
+		assertThat(testInstance.entrySet()).isEqualTo(Arrays.asHashSet(new SimpleEntry<>("a", evil), new SimpleEntry<>("b", universeAnswer)));
 	}
 }

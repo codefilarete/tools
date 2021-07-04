@@ -8,10 +8,11 @@ import java.util.Map;
 
 import org.gama.lang.Reflections;
 import org.gama.lang.bean.MethodIterator;
-import org.gama.lang.test.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.opentest4j.AssertionFailedError;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Guillaume Mary
@@ -54,7 +55,7 @@ class MapWrapperTest {
 				if (method.getName().equals("keySet")) {
 					delegateResult = new HashSet<>();
 				}
-				Assertions.assertEquals(delegateResult, invokationResult);
+				assertThat(invokationResult).isEqualTo(delegateResult);
 				Mockito.clearInvocations(delegate);
 				methodCount++;
 			} catch (AssertionFailedError assertionFailedError) {
@@ -64,7 +65,7 @@ class MapWrapperTest {
 			}
 		}
 		// checking that iteration over methods really worked
-		org.junit.jupiter.api.Assertions.assertEquals(23, methodCount);
+		assertThat(methodCount).isEqualTo(23);
 	}
 	
 }

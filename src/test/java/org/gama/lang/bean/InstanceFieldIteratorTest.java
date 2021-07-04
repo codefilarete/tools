@@ -6,7 +6,7 @@ import java.util.List;
 import org.gama.lang.collection.Arrays;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Guillaume Mary
@@ -33,7 +33,7 @@ public class InstanceFieldIteratorTest {
 				getClass().getDeclaredField("field3"),
 				getClass().getDeclaredField("field4")
 		);
-		assertEquals(expectedResult, Arrays.asList(testInstance.getElements(getClass())));
+		assertThat(Arrays.asList(testInstance.getElements(getClass()))).isEqualTo(expectedResult);
 	}
 	
 }

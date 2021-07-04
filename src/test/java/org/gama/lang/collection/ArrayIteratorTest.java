@@ -4,10 +4,8 @@ import java.util.NoSuchElementException;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 /**
  * @author Guillaume Mary
@@ -17,21 +15,21 @@ class ArrayIteratorTest {
 	@Test
 	public void testNext() {
 		ArrayIterator<String> testInstance = new ArrayIterator<>("a", "b", "c");
-		assertEquals(Arrays.asList("a", "b", "c"), Iterables.copy(testInstance));
+		assertThat(Iterables.copy(testInstance)).isEqualTo(Arrays.asList("a", "b", "c"));
 	}
 	
 	@Test
 	public void testNext_throwsNoSuchElementException() {
 		// with intermediary hasNext() invokation
 		ArrayIterator<String> testInstance = new ArrayIterator<>("a");
-		assertTrue(testInstance.hasNext());
+		assertThat(testInstance.hasNext()).isTrue();
 		testInstance.next();
-		assertFalse(testInstance.hasNext());
-		assertThrows(NoSuchElementException.class, testInstance::next);
+		assertThat(testInstance.hasNext()).isFalse();
+		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(testInstance::next);
 		
 		// without hasNext() invokation
 		testInstance = new ArrayIterator<>("a");
 		testInstance.next();
-		assertThrows(NoSuchElementException.class, testInstance::next);
+		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(testInstance::next);
 	}
 }

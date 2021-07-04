@@ -9,9 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 /**
  * @author Guillaume Mary
@@ -29,31 +28,31 @@ public class ClassIteratorTest {
 	@MethodSource("testNextMethodsData")
 	public void testNext(Class clazz, List<Class> expectedClasses) {
 		ClassIterator testInstance = new ClassIterator(clazz);
-		assertEquals(expectedClasses, Iterables.copy(testInstance));
+		assertThat(Iterables.copy(testInstance)).isEqualTo(expectedClasses);
 	}
 	
 	@Test
 	public void testNext_stopClass() {
 		ClassIterator testInstance = new ClassIterator(Z.class, X.class);
-		assertEquals(Arrays.asList((Class) Z.class, Y.class), Iterables.copy(testInstance));
+		assertThat(Iterables.copy(testInstance)).isEqualTo(Arrays.asList((Class) Z.class, Y.class));
 	}
 	
 	@Test
 	public void testHasNext_false() {
 		ClassIterator testInstance = new ClassIterator(X.class, X.class);
-		assertFalse(testInstance.hasNext());
+		assertThat(testInstance.hasNext()).isFalse();
 	}
 	
 	@Test
 	public void testNext_throwsNoSuchElementException() {
 		// with intermediary hasNext() invokation
 		ClassIterator testInstance = new ClassIterator(Object.class);
-		assertFalse(testInstance.hasNext());
-		assertThrows(NoSuchElementException.class, testInstance::next);
+		assertThat(testInstance.hasNext()).isFalse();
+		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(testInstance::next);
 		
 		// without hasNext() invokation
 		testInstance = new ClassIterator(Object.class);
-		assertThrows(NoSuchElementException.class, testInstance::next);
+		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(testInstance::next);
 	}
 	
 	static class X { }

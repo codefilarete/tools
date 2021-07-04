@@ -7,8 +7,7 @@ import java.util.List;
 import org.gama.lang.Duo;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Guillaume Mary
@@ -23,14 +22,14 @@ public class ReverseListIteratorTest {
 		PairIterator<String, String> pairIterator = new PairIterator<>(iterator, expected.iterator());
 		while (pairIterator.hasNext()) {
 			Duo<String, String> next = pairIterator.next();
-			assertEquals(next.getLeft(), next.getRight());
+			assertThat(next.getRight()).isEqualTo(next.getLeft());
 		}
 	}
 	
 	@Test
 	public void testIteration_empty() {
 		Iterator<?> iterator = new ReverseListIterator<>(Arrays.asList());
-		assertFalse(iterator.hasNext());
+		assertThat(iterator.hasNext()).isFalse();
 	}
 	
 	@Test
@@ -39,7 +38,7 @@ public class ReverseListIteratorTest {
 		Iterator<String> iterator = new ReverseListIterator<>(toModify);
 		iterator.next();
 		iterator.remove();
-		assertEquals(Arrays.asList("a", "b"), toModify);
-		assertEquals("b", iterator.next());
+		assertThat(toModify).isEqualTo(Arrays.asList("a", "b"));
+		assertThat(iterator.next()).isEqualTo("b");
 	}
 }

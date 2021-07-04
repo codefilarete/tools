@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 /**
  * @author Guillaume Mary
@@ -31,33 +31,33 @@ public class IteratorIteratorTest {
 	@MethodSource("test_data")
 	public void test(Collection<Iterable<String>> input, List<String> expectedResult) {
 		IteratorIterator<String> testInstance = new IteratorIterator<>(input.iterator());
-		assertEquals(expectedResult, Iterables.copy(testInstance));
+		assertThat(Iterables.copy(testInstance)).isEqualTo(expectedResult);
 	}
 	
 	@Test
 	public void testContructor() {
 		IteratorIterator<String> testInstance = new IteratorIterator<>(Arrays.asList("a"), Arrays.asList("b", "c"), Arrays.asList("d"));
-		assertEquals(Arrays.asList("a", "b", "c", "d"), Iterables.copy(testInstance));
+		assertThat(Iterables.copy(testInstance)).isEqualTo(Arrays.asList("a", "b", "c", "d"));
 	}
 	
 	@Test
 	public void testNoSuchElementException() {
 		IteratorIterator<String> testInstance = new IteratorIterator<>(Arrays.asList());
-		assertThrows(NoSuchElementException.class, testInstance::next);
+		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(testInstance::next);
 	}
 	
 	@Test
 	public void testRemove() {
 		IteratorIterator<String> testInstance = new IteratorIterator<>(Arrays.asList("a"), Arrays.asList("b", "c"), Arrays.asList("d"));
-		assertEquals("a", testInstance.next());
+		assertThat(testInstance.next()).isEqualTo("a");
 		testInstance.remove();
-		assertEquals(Arrays.asList("b", "c", "d"), Iterables.copy(testInstance));
+		assertThat(Iterables.copy(testInstance)).isEqualTo(Arrays.asList("b", "c", "d"));
 		
 		testInstance = new IteratorIterator<>(Arrays.asList("a"), Arrays.asList("b", "c"), Arrays.asList("d"));
-		assertEquals("a", testInstance.next());
-		assertEquals("b", testInstance.next());
-		assertEquals("c", testInstance.next());
+		assertThat(testInstance.next()).isEqualTo("a");
+		assertThat(testInstance.next()).isEqualTo("b");
+		assertThat(testInstance.next()).isEqualTo("c");
 		testInstance.remove();
-		assertEquals(Arrays.asList("d"), Iterables.copy(testInstance));
+		assertThat(Iterables.copy(testInstance)).isEqualTo(Arrays.asList("d"));
 	}
 }

@@ -7,9 +7,8 @@ import org.gama.lang.function.Hanger;
 import org.gama.lang.trace.ModifiableInt;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author Guillaume Mary
@@ -17,44 +16,40 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class MethodDispatcherTest {
 	
 	@Test
-	public void testBuild_defaultCase() {
-		ModifiableInt hanger = new ModifiableInt();
+	void redirect_interface() {
+		IntegerHanger surrogate = new IntegerHanger();
 		Holder1 testInstance = new MethodDispatcher()
-//				.redirect(Supplier.class, () -> "Hello world !")
-				.redirect(Hanger.class, new IntegerHanger())
-//				.redirect(Hanger.class, (Hanger<Integer>) hanger::increment)
+				.redirect(Hanger.class, surrogate)
 				.fallbackOn(666)
 				.build(Holder1.class);
 		
-//		assertEquals("Hello world !", testInstance.get());
 		testInstance.set(42);
-//		assertEquals(42, hanger.getValue());
-//		assertEquals("Dispatcher to 666", testInstance.toString());
+		assertThat(surrogate.getValue()).isEqualTo(42);
+		assertThat(testInstance.toString()).isEqualTo("Dispatcher to 666");
 	}
 	
 	@Test
-	public void testBuild_noFallbackInstance_toStringReflectBuiltClass() {
+	void redirect_noFallbackInstance_toStringReflectBuiltClass() {
 		MethodDispatcher methodDispatcher = new MethodDispatcher()
 				.redirect(Supplier.class, () -> "Hello world !");
 		
 		methodDispatcher.fallbackOn(null);
 		Holder1 builtInstance = methodDispatcher.build(Holder1.class);
-		System.out.println(builtInstance.toString());
-		assertTrue(builtInstance.toString().contains(Holder1.class.getName()));
+		assertThat(builtInstance.toString()).contains(Holder1.class.getName());
 	}
 	
 	@Test
-	public void testBuild_noFallbackInstance_throwsException2() {
+	void redirect_noFallbackInstance_throwsException2() {
 		Holder3 testInstance = new MethodDispatcher()
 				.redirect(AutoCloseable.class, () -> { throw new SQLException(); })
 				.build(Holder3.class);
 		
-		assertThrows(SQLException.class, testInstance::close);
+		assertThatThrownBy(testInstance::close).isInstanceOf(SQLException.class);
 	}
 	
 	
 	@Test
-	public void testWhenInvokedMethodThrowsAnException_exceptionMustBeThrownWithoutWrapping() {
+	void redirect_whenInvokedMethodThrowsAnException_exceptionMustBeThrownWithoutWrapping() {
 		ModifiableInt hanger = new ModifiableInt();
 		Holder2 testInstance = new MethodDispatcher()
 				.redirect(Supplier.class, () -> "Hello world !")
@@ -62,53 +57,43 @@ public class MethodDispatcherTest {
 				.redirect(Hanger.class, (Hanger<Integer>) hanger::increment)
 				.build(Holder2.class);
 		
-		assertEquals("Hello world !", testInstance.get());
-		assertEquals("java.lang.String cannot be cast to java.lang.Integer",
-				assertThrows(ClassCastException.class, () ->
+		assertThat(testInstance.get()).isEqualTo("Hello world !");
+		assertThatThrownBy(() ->
 				// This can't be successfull because hanger instance expects an Integer so it will throw a ClassCastException
 				// This test checks that the exception is not wrapped in a UndeclaredThrowableException or InvocationTargetException
-				testInstance.set("sqds")).getMessage());
+				testInstance.set("sqds"))
+				.isInstanceOf(ClassCastException.class)
+				.hasMessage("java.lang.String cannot be cast to java.lang.Integer");
 	}
 	
 	@Test
-	public void testWhenFallbackInstanceDoesntSupportInvokedMethod_exceptionMustBeThrown() {
+	void redirect_whenFallbackInstanceDoesntSupportInvokedMethod_exceptionMustBeThrown() {
 		Holder2 testInstance = new MethodDispatcher()
 				.fallbackOn("toto")
 				.build(Holder2.class);
 		
 		// Object is not an instance of declaring class: expected java.util.function.Supplier but was java.lang.String
 		// because "toto" doesn't implement get()
-		assertTrue(assertThrows(IllegalArgumentException.class, testInstance::get).getMessage()
-				.contains("Wrong given instance"));
+		assertThatThrownBy(testInstance::get)
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessageContaining("Wrong given instance");
 	}
 	
 	@Test
-	public void testBuild_targetClassDoesntImplementRedirectingClasses_exceptionIsThrown() {
+	void redirect_targetClassDoesntImplementRedirectingClasses_exceptionIsThrown() {
 		MethodDispatcher methodDispatcher = new MethodDispatcher()
 				.redirect(Supplier.class, () -> "Hello world !");
 		
 		// Exception is thrown here, else we could do successfully
 		// Method get = Reflections.findMethod(Supplier.class, "get");
 		// assertEquals("Hello world !", get.invoke(testInstance));
-		assertTrue(assertThrows(IllegalArgumentException.class, () -> methodDispatcher.build(CharSequence.class)).getMessage()
-				.contains(" doesn't implement "));
+		assertThatThrownBy(() -> methodDispatcher.build(CharSequence.class))
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessageContaining(" doesn't implement ");
 	}
 	
 	@Test
-	public void testRedirect_returnTypesAreNotThoseOfInterface_exceptionIsThrown() {
-		DummyFluentInterface testInstance = new MethodDispatcher()
-				.redirect(SubclassAwareFluentInterface.class, new FluentInterfaceSupport())
-				.build(DummyFluentInterface.class);
-		
-		assertEquals("org.gama.lang.reflect.MethodDispatcherTest$FluentInterfaceSupport cannot be cast" +
-				" to org.gama.lang.reflect.MethodDispatcherTest$DummyFluentInterface",
-				assertThrows(ClassCastException.class,
-				// This won't work because FluentInterfaceSupport returns itself which doesn't match DummyFluentInterface : they are dissociated subclasses.
-				() -> testInstance.doSomething().doSomethingElse()).getMessage());
-	}
-	
-	@Test
-	public void testRedirect_returnTypesAreNotThoseOfInterfaceButReturnProxyIsAsked() {
+	void redirect_returnTypesAreNotThoseOfInterface_returnProxyIsAsked_works() {
 		DummyFluentInterface testInstance = new MethodDispatcher()
 				.redirect(SubclassAwareFluentInterface.class, new FluentInterfaceSupport(), true)
 				.build(DummyFluentInterface.class);
@@ -118,7 +103,20 @@ public class MethodDispatcherTest {
 	}
 	
 	@Test
-	public void testRedirect_proxyHasMultilpleInheritanceWithRefinedType() {
+	void redirect_returnTypesAreNotThoseOfInterface_returnProxyIsNotAsked_throwsException() {
+		DummyFluentInterface testInstance = new MethodDispatcher()
+				.redirect(SubclassAwareFluentInterface.class, new FluentInterfaceSupport())
+				.build(DummyFluentInterface.class);
+		
+		// This won't work because FluentInterfaceSupport returns itself which doesn't match DummyFluentInterface : they are dissociated subclasses.
+		assertThatThrownBy(() -> testInstance.doSomething().doSomethingElse())
+				.isInstanceOf(ClassCastException.class)
+				.hasMessage("org.gama.lang.reflect.MethodDispatcherTest$FluentInterfaceSupport cannot be cast"
+						+ " to org.gama.lang.reflect.MethodDispatcherTest$DummyFluentInterface");
+	}
+	
+	@Test
+	void redirect_proxyHasMultilpleInheritanceWithRefinedType() {
 		SubclassNotAwareFluentInterfaceSupport testInstance = new MethodDispatcher()
 				.redirect(SubSubclassNotAwareFluentInterface.class, new SubSubclassNotAwareFluentInterface() {
 					@Override
@@ -143,7 +141,7 @@ public class MethodDispatcherTest {
 	}
 	
 	@Test
-	public void testRedirect_proxyHasMultilpleInheritanceWithRefinedType2() {
+	void redirect_proxyHasMultilpleInheritanceWithRefinedType2() {
 		MultipleInheritanceTestSupport testInstance = new MethodDispatcher()
 				.redirect(SubclassNotAwareFluentInterface.class, new SubclassNotAwareFluentInterface() {
 					@Override
@@ -166,14 +164,15 @@ public class MethodDispatcherTest {
 	}
 	
 	@Test
-	public void test_returnTypesAreNotThoseOfInterfaceButReturnProxyIsAsked() {
+	void redirect_givenClassHasSomeMethodsOutOfInterfaceScope_throwsException() {
 		MethodDispatcher testInstance = new MethodDispatcher()
 				.redirect(String.class, "abc");
 		
-		assertTrue(assertThrows(IllegalArgumentException.class,
-				// This won't work because FluentInterfaceSupport returns itself which doesn't match DummyFluentInterface : they are dissociated subclasses.
-				() -> testInstance.build(CharSequence.class)).getMessage()
-				.contains("Cannot intercept concrete method"));
+		// Concerete methods can't be intercepted by Java proxy, so an exception is raised to say "this is not implementable"
+		// This could be enhance by throwing it right after redirect(..) call
+		assertThatThrownBy(() -> testInstance.build(CharSequence.class))
+				.isInstanceOf(UnsupportedOperationException.class)
+				.hasMessageContaining("Cannot intercept concrete method");
 	}
 	
 	private interface Holder1 extends Supplier<String>, Hanger<Integer> {
@@ -266,9 +265,17 @@ public class MethodDispatcherTest {
 	}
 	
 	private static class IntegerHanger implements Hanger<Integer> {
+		
+		private final ModifiableInt hanger = new ModifiableInt();
+		
+		
 		@Override
 		public void set(Integer value) {
-			
+			hanger.increment(value);
+		}
+		
+		public int getValue() {
+			return hanger.getValue();
 		}
 	}
 }

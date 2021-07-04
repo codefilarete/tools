@@ -9,12 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 /**
  * @author Guillaume Mary
@@ -40,32 +36,32 @@ public class InvocationHandlerSupportTest {
 	@MethodSource("methodReturningPrimitiveTypesProvider")
 	public void testInvokeMethod_methodReturnsPrimitiveType_defaultPrimitiveValueIsReturned(Method method, Object expectedValue) throws Throwable {
 		DefaultPrimitiveValueInvocationProvider testInstance = InvocationHandlerSupport.PRIMITIVE_INVOCATION_HANDLER;
-		assertEquals(expectedValue, testInstance.invoke(InvocationHandlerSupport.mock(AllPrimitiveTypesMethods.class), method, new Object[0]));
+		assertThat(testInstance.invoke(InvocationHandlerSupport.mock(AllPrimitiveTypesMethods.class), method, new Object[0])).isEqualTo(expectedValue);
 	}
 	
 	@Test
 	public void testInvoke() throws Throwable {
 		InvocationHandlerSupport testInstance = new InvocationHandlerSupport((proxy, method, args) -> "Hello");
 		// 42.get() => "Hello" !
-		assertEquals("Hello", testInstance.invoke(42, Reflections.findMethod(Supplier.class, "get"), new Object[0]));
+		assertThat(testInstance.invoke(42, Reflections.findMethod(Supplier.class, "get"), new Object[0])).isEqualTo("Hello");
 	}
 	
 	@Test
 	public void testMock() throws Throwable {
 		CharSequence mock = InvocationHandlerSupport.mock(CharSequence.class, Appendable.class);
-		assertEquals(0, mock.length());
-		assertNull(((Appendable) mock).append("coucou"));
+		assertThat(mock.length()).isEqualTo(0);
+		assertThat(((Appendable) mock).append("coucou")).isNull();
 	}
 	
 	@Test
 	public void testInvokeEquals() throws Throwable {
 		InvocationHandlerSupport testInstance = new InvocationHandlerSupport();
 		// 42 == 42 ?
-		assertTrue((boolean) testInstance.invoke(42, Reflections.findMethod(Object.class, "equals", Object.class), new Object[] { 42 }));
+		assertThat((boolean) testInstance.invoke(42, Reflections.findMethod(Object.class, "equals", Object.class), new Object[] { 42 })).isTrue();
 		// null == 42 ?
-		assertFalse((boolean) testInstance.invoke(null, Reflections.findMethod(Object.class, "equals", Object.class), new Object[] { 42 }));
+		assertThat((boolean) testInstance.invoke(null, Reflections.findMethod(Object.class, "equals", Object.class), new Object[] { 42 })).isFalse();
 		// 42 == null ?
-		assertFalse((boolean) testInstance.invoke(42, Reflections.findMethod(Object.class, "equals", Object.class), new Object[] { null }));
+		assertThat((boolean) testInstance.invoke(42, Reflections.findMethod(Object.class, "equals", Object.class), new Object[] { null })).isFalse();
 	}
 	
 	/** Mainly tested for non StackOverflowError */
@@ -73,28 +69,29 @@ public class InvocationHandlerSupportTest {
 	public void testInvokeEquals_onProxiedInstance() {
 		InvocationHandlerSupport testInstance = new InvocationHandlerSupport();
 		Object proxy = Proxy.newProxyInstance(getClass().getClassLoader(), new Class[] { CharSequence.class }, testInstance);
-		assertEquals(proxy, proxy);
-		assertNotEquals(proxy, new Object());
-		assertNotEquals(new Object(), proxy);
-		assertNotEquals(testInstance, proxy);
-		assertNotEquals(proxy, testInstance);
-		assertEquals(testInstance, testInstance);
-		assertNotEquals(testInstance, new Object());
-		assertNotEquals(new Object(), testInstance);
+		assertThat(proxy).isEqualTo(proxy);
+		assertThat(new Object()).isNotEqualTo(proxy);
+		assertThat(proxy).isNotEqualTo(new Object());
+		assertThat(proxy).isNotEqualTo(testInstance);
+		assertThat(testInstance).isNotEqualTo(proxy);
+		assertThat(testInstance).isEqualTo(testInstance);
+		assertThat(new Object()).isNotEqualTo(testInstance);
+		assertThat(testInstance).isNotEqualTo(new Object());
 	}
 	
 	@Test
 	public void testInvokeHashCode_returnsTargetHashCode() throws Throwable {
 		InvocationHandlerSupport testInstance = new InvocationHandlerSupport();
 		// 42.hasCode()
-		assertEquals(42, testInstance.invoke(42, Reflections.findMethod(Object.class, "hashCode"), new Object[0]));
+		assertThat(testInstance.invoke(42, Reflections.findMethod(Object.class, "hashCode"), new Object[0])).isEqualTo(42);
 	}
 	
 	@Test
 	public void testInvokeHashCode_onNullReference_throwsNPE() {
 		InvocationHandlerSupport testInstance = new InvocationHandlerSupport();
 		// null.hasCode()
-		assertThrows(NullPointerException.class, () -> testInstance.invoke(null, Reflections.findMethod(Integer.class, "hashCode"), new Object[0]));
+		assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> testInstance.invoke(null, Reflections.findMethod(Integer.class, 
+				"hashCode"), new Object[0]));
 	}
 	
 	/** Mainly tested for non StackOverflowError */
@@ -102,13 +99,13 @@ public class InvocationHandlerSupportTest {
 	public void testInvokeHashCode_onProxiedInstance() {
 		InvocationHandlerSupport testInstance = new InvocationHandlerSupport();
 		Object proxy = Proxy.newProxyInstance(getClass().getClassLoader(), new Class[] { CharSequence.class }, testInstance);
-		assertEquals(testInstance.hashCode(), proxy.hashCode());
+		assertThat(proxy.hashCode()).isEqualTo(testInstance.hashCode());
 	}
 	
 	@Test
 	public void testInvokeToString() {
 		InvocationHandlerSupport testInstance = new InvocationHandlerSupport();
-		assertTrue(testInstance.toString().contains(InvocationHandlerSupport.class.getSimpleName()));
+		assertThat(testInstance.toString().contains(InvocationHandlerSupport.class.getSimpleName())).isTrue();
 	}
 	
 	/** Mainly tested for non StackOverflowError */
@@ -116,7 +113,7 @@ public class InvocationHandlerSupportTest {
 	public void testInvokeToString_onProxiedInstance() {
 		InvocationHandlerSupport testInstance = new InvocationHandlerSupport();
 		Object proxy = Proxy.newProxyInstance(getClass().getClassLoader(), new Class[] { CharSequence.class }, testInstance);
-		assertEquals(testInstance.toString(), proxy.toString());
+		assertThat(proxy.toString()).isEqualTo(testInstance.toString());
 	}
 	
 	private interface AllPrimitiveTypesMethods {

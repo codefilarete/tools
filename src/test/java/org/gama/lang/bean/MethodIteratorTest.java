@@ -11,10 +11,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 /**
  * @author Guillaume Mary
@@ -37,31 +35,31 @@ public class MethodIteratorTest {
 	@MethodSource("testNextMethodsData")
 	public void testNextMethods(Class clazz, List<Method> expectedMethods) {
 		MethodIterator testInstance = new MethodIterator(clazz, Object.class);
-		assertEquals(expectedMethods, Iterables.collectToList(() -> testInstance, Function.identity()));
+		assertThat(Iterables.collectToList(() -> testInstance, Function.identity())).isEqualTo(expectedMethods);
 	}
 	
 	@Test
 	public void testNext_throwsNoSuchElementException() {
 		// with intermediary hasNext() invokation
 		MethodIterator testInstance = new MethodIterator(X.class, Object.class);
-		assertTrue(testInstance.hasNext());
+		assertThat(testInstance.hasNext()).isTrue();
 		testInstance.next();
-		assertFalse(testInstance.hasNext());
-		assertThrows(NoSuchElementException.class, testInstance::next);
+		assertThat(testInstance.hasNext()).isFalse();
+		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(testInstance::next);
 		
 		// without hasNext() invokation
 		testInstance = new MethodIterator(X.class, Object.class);
 		testInstance.next();
-		assertThrows(NoSuchElementException.class, testInstance::next);
+		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(testInstance::next);
 		
 		// with no more element right from the beginning
 		testInstance = new MethodIterator(Object.class, Object.class);
-		assertFalse(testInstance.hasNext());
-		assertThrows(NoSuchElementException.class, testInstance::next);
+		assertThat(testInstance.hasNext()).isFalse();
+		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(testInstance::next);
 		
 		// without hasNext() invokation
 		testInstance = new MethodIterator(Object.class, Object.class);
-		assertThrows(NoSuchElementException.class, testInstance::next);
+		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(testInstance::next);
 	}
 	
 	static class X {

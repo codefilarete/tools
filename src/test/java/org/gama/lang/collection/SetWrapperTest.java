@@ -6,10 +6,11 @@ import java.util.Set;
 
 import org.gama.lang.Reflections;
 import org.gama.lang.bean.MethodIterator;
-import org.gama.lang.test.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.opentest4j.AssertionFailedError;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Guillaume Mary
@@ -42,7 +43,7 @@ class SetWrapperTest {
 				}
 				invokationResult = method.invoke(testInstance, args);
 				Object delegateResult = method.invoke(Mockito.verify(delegate), args);
-				Assertions.assertEquals(delegateResult, invokationResult);
+				assertThat(invokationResult).isEqualTo(delegateResult);
 				Mockito.clearInvocations(delegate);
 				methodCount++;
 			} catch (AssertionFailedError assertionFailedError) {
@@ -52,6 +53,6 @@ class SetWrapperTest {
 			}
 		}
 		// checking that iteration over methods really worked
-		org.junit.jupiter.api.Assertions.assertEquals(14, methodCount);
+		assertThat(methodCount).isEqualTo(14);
 	}
 }

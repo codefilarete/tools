@@ -9,10 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 /**
  * @author Guillaume Mary
@@ -22,11 +20,11 @@ public class PairIteratorTest {
 	@Test
 	public void testHasNext() {
 		PairIterator<Integer, String> testInstance = new PairIterator<>(Arrays.asList(1,2,3), Arrays.asList("a", "b"));
-		assertTrue(testInstance.hasNext());
-		assertEquals(testInstance.next(), new Duo<>(1, "a"));
-		assertTrue(testInstance.hasNext());
-		assertEquals(testInstance.next(), new Duo<>(2, "b"));
-		assertFalse(testInstance.hasNext());
+		assertThat(testInstance.hasNext()).isTrue();
+		assertThat(new Duo<>(1, "a")).isEqualTo(testInstance.next());
+		assertThat(testInstance.hasNext()).isTrue();
+		assertThat(new Duo<>(2, "b")).isEqualTo(testInstance.next());
+		assertThat(testInstance.hasNext()).isFalse();
 	}
 	
 	public static Object[][] testNext_NoSuchElementExceptionData() {
@@ -43,7 +41,7 @@ public class PairIteratorTest {
 	@ParameterizedTest
 	@MethodSource("testNext_NoSuchElementExceptionData")
 	public void testNext_NoSuchElementException(PairIterator<Integer, String> testInstance) {
-		assertThrows(NoSuchElementException.class, testInstance::next);
+		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(testInstance::next);
 	}
 	
 	@Test
@@ -54,8 +52,8 @@ public class PairIteratorTest {
 		testInstance.hasNext();
 		testInstance.next();
 		testInstance.remove();
-		assertEquals(integers, Arrays.asList(2, 3));
-		assertEquals(strings, Arrays.asList("b"));
+		assertThat(Arrays.asList(2, 3)).isEqualTo(integers);
+		assertThat(Arrays.asList("b")).isEqualTo(strings);
 	}
 	
 	@Test
@@ -63,12 +61,12 @@ public class PairIteratorTest {
 		List<Integer> integers = Arrays.asList(1, 2, 3);
 		List<String> strings = Arrays.asList("a");
 		PairIterator<Integer, String> testInstance = new PairIterator<>(integers.iterator(), new PairIterator.InfiniteIterator<>(strings.iterator()));
-		assertTrue(testInstance.hasNext());
-		assertEquals(testInstance.next(), new Duo<>(1, "a"));
-		assertTrue(testInstance.hasNext());
-		assertEquals(testInstance.next(), new Duo<>(2, null));
-		assertTrue(testInstance.hasNext());
-		assertEquals(testInstance.next(), new Duo<>(3, null));
-		assertFalse(testInstance.hasNext());
+		assertThat(testInstance.hasNext()).isTrue();
+		assertThat(new Duo<>(1, "a")).isEqualTo(testInstance.next());
+		assertThat(testInstance.hasNext()).isTrue();
+		assertThat(new Duo<>(2, null)).isEqualTo(testInstance.next());
+		assertThat(testInstance.hasNext()).isTrue();
+		assertThat(new Duo<>(3, null)).isEqualTo(testInstance.next());
+		assertThat(testInstance.hasNext()).isFalse();
 	}
 }

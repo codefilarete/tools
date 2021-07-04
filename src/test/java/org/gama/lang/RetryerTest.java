@@ -2,8 +2,8 @@ package org.gama.lang;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 /**
  * @author Guillaume Mary
@@ -26,10 +26,10 @@ public class RetryerTest {
 				throw new RuntimeException("Never works !");
 			}, "test");
 		} catch (Throwable t) {
-			assertEquals("Action \"test\" has been executed 3 times every 5ms and always failed", t.getMessage());
-			assertEquals("Never works !", t.getCause().getMessage());
+			assertThat(t.getMessage()).isEqualTo("Action \"test\" has been executed 3 times every 5ms and always failed");
+			assertThat(t.getCause().getMessage()).isEqualTo("Never works !");
 		}
-		assertEquals(3, callTimes[0]);
+		assertThat(callTimes[0]).isEqualTo(3);
 	}
 	
 	@Test
@@ -53,7 +53,7 @@ public class RetryerTest {
 		} catch (Throwable t) {
 			fail("No exception should be thrown");
 		}
-		assertEquals(2, callTimes[0]);
+		assertThat(callTimes[0]).isEqualTo(2);
 	}
 	
 	@Test
@@ -74,7 +74,7 @@ public class RetryerTest {
 		} catch (Throwable t) {
 			fail("No exception should be thrown");
 		}
-		assertEquals(1, callTimes[0]);
+		assertThat(callTimes[0]).isEqualTo(1);
 	}
 	
 	@Test
@@ -97,9 +97,9 @@ public class RetryerTest {
 				}
 			}, "test");
 		} catch (Throwable t) {
-			assertEquals("Unepected error", t.getMessage());
+			assertThat(t.getMessage()).isEqualTo("Unepected error");
 		}
-		assertEquals(3, callTimes[0]);
+		assertThat(callTimes[0]).isEqualTo(3);
 	}
 	
 	@Test
@@ -116,7 +116,7 @@ public class RetryerTest {
 		} catch (Throwable t) {
 			fail("No exception should be thrown");
 		}
-		assertEquals(1, callTimes[0]);
-		assertEquals("OK", result);
+		assertThat(callTimes[0]).isEqualTo(1);
+		assertThat(result).isEqualTo("OK");
 	}
 }

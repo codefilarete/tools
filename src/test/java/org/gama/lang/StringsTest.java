@@ -2,7 +2,7 @@ package org.gama.lang;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 /**
@@ -12,65 +12,65 @@ public class StringsTest {
 	
 	@Test
 	public void testIsEmpty() {
-		assertFalse(Strings.isEmpty("a"));
-		assertTrue(Strings.isEmpty(""));
-		assertTrue(Strings.isEmpty(null));
+		assertThat(Strings.isEmpty("a")).isFalse();
+		assertThat(Strings.isEmpty("")).isTrue();
+		assertThat(Strings.isEmpty(null)).isTrue();
 	}
 	
 	@Test
 	public void testCapitalize() {
-		assertEquals("Bonjour", Strings.capitalize("bonjour"));
-		assertEquals("BONJOUR", Strings.capitalize("BONJOUR"));
-		assertEquals("", Strings.capitalize(""));
-		assertEquals(null, Strings.capitalize(null));
+		assertThat(Strings.capitalize("bonjour")).isEqualTo("Bonjour");
+		assertThat(Strings.capitalize("BONJOUR")).isEqualTo("BONJOUR");
+		assertThat(Strings.capitalize("")).isEqualTo("");
+		assertThat(Strings.capitalize(null)).isEqualTo(null);
 	}
 	
 	@Test
 	public void testHead() {
-		assertEquals("sn", Strings.head("snake", 2));
-		assertEquals("sna", Strings.head("snake", 3));
-		assertEquals("snake", Strings.head("snake", 42));
-		assertEquals(null, Strings.head(null, 2));
+		assertThat(Strings.head("snake", 2)).isEqualTo("sn");
+		assertThat(Strings.head("snake", 3)).isEqualTo("sna");
+		assertThat(Strings.head("snake", 42)).isEqualTo("snake");
+		assertThat(Strings.head(null, 2)).isEqualTo(null);
 	}
 	
 	@Test
 	public void testHead_stringBoundary() {
-		assertEquals("sn", Strings.head("snake", "a"));
-		assertEquals("sna", Strings.head("snake", "k"));
-		assertEquals("", Strings.head("snake", "w"));
-		assertEquals(null, Strings.head(null, "z"));
+		assertThat(Strings.head("snake", "a")).isEqualTo("sn");
+		assertThat(Strings.head("snake", "k")).isEqualTo("sna");
+		assertThat(Strings.head("snake", "w")).isEqualTo("");
+		assertThat(Strings.head(null, "z")).isEqualTo(null);
 	}
 	
 	@Test
 	public void testCutHead() {
-		assertEquals("ake", Strings.cutHead("snake", 2));
-		assertEquals("ke", Strings.cutHead("snake", 3));
-		assertEquals("", Strings.cutHead("snake", 42));
-		assertEquals(null, Strings.cutHead(null, 2));
+		assertThat(Strings.cutHead("snake", 2)).isEqualTo("ake");
+		assertThat(Strings.cutHead("snake", 3)).isEqualTo("ke");
+		assertThat(Strings.cutHead("snake", 42)).isEqualTo("");
+		assertThat(Strings.cutHead(null, 2)).isEqualTo(null);
 	}
 	
 	@Test
 	public void testTail() {
-		assertEquals("ke", Strings.tail("snake", 2));
-		assertEquals("ake", Strings.tail("snake", 3));
-		assertEquals("snake", Strings.tail("snake", 42));
-		assertEquals(null, Strings.tail(null, 2));
+		assertThat(Strings.tail("snake", 2)).isEqualTo("ke");
+		assertThat(Strings.tail("snake", 3)).isEqualTo("ake");
+		assertThat(Strings.tail("snake", 42)).isEqualTo("snake");
+		assertThat(Strings.tail(null, 2)).isEqualTo(null);
 	}
 	
 	@Test
 	public void testCutTail() {
-		assertEquals("sna", Strings.cutTail("snake", 2));
-		assertEquals("sn", Strings.cutTail("snake", 3));
-		assertEquals("", Strings.cutTail("snake", 42));
-		assertEquals(null, Strings.cutTail(null, 2));
+		assertThat(Strings.cutTail("snake", 2)).isEqualTo("sna");
+		assertThat(Strings.cutTail("snake", 3)).isEqualTo("sn");
+		assertThat(Strings.cutTail("snake", 42)).isEqualTo("");
+		assertThat(Strings.cutTail(null, 2)).isEqualTo(null);
 	}
 	
 	@Test
 	public void ellipsis() {
-		assertEquals("a too long...", Strings.ellipsis("a too long sentense", 10));
-		assertEquals("0123456789", Strings.ellipsis("0123456789", 10));
-		assertEquals("a word", Strings.ellipsis("a word", 10));
-		assertEquals(null, Strings.ellipsis(null, 10));
+		assertThat(Strings.ellipsis("a too long sentense", 10)).isEqualTo("a too long...");
+		assertThat(Strings.ellipsis("0123456789", 10)).isEqualTo("0123456789");
+		assertThat(Strings.ellipsis("a word", 10)).isEqualTo("a word");
+		assertThat(Strings.ellipsis(null, 10)).isEqualTo(null);
 	}
 	
 	@Test
@@ -79,22 +79,23 @@ public class StringsTest {
 		String s5 = "bbbbb";
 		String s = "c";
 		// we know if the optimization is good as we give pre-concatenated Strings different from each other
-		assertEquals("ccc", Strings.repeat(3, s).toString());
-		assertEquals("cccccccc", Strings.repeat(8, s).toString());
-		assertEquals("ccc", Strings.repeat(3, s, s10, s5).toString());
-		assertEquals("bbbbb", Strings.repeat(5, s, s10, s5).toString());
-		assertEquals("bbbbbccc", Strings.repeat(8, s, s10, s5).toString());
-		assertEquals("aaaaaaaaaacc", Strings.repeat(12, s, s10, s5).toString());
-		assertEquals("aaaaaaaaaabbbbbcc", Strings.repeat(17, s, s10, s5).toString());
-		assertEquals("aaaaaaaaaaaaaaaaaaaabbbbbcc", Strings.repeat(27, s, s10, s5).toString());
+		assertThat(Strings.repeat(3, s).toString()).isEqualTo("ccc");
+		assertThat(Strings.repeat(8, s).toString()).isEqualTo("cccccccc");
+		assertThat(Strings.repeat(3, s, s10, s5).toString()).isEqualTo("ccc");
+		assertThat(Strings.repeat(5, s, s10, s5).toString()).isEqualTo("bbbbb");
+		assertThat(Strings.repeat(8, s, s10, s5).toString()).isEqualTo("bbbbbccc");
+		assertThat(Strings.repeat(12, s, s10, s5).toString()).isEqualTo("aaaaaaaaaacc");
+		assertThat(Strings.repeat(17, s, s10, s5).toString()).isEqualTo("aaaaaaaaaabbbbbcc");
+		assertThat(Strings.repeat(27, s, s10, s5).toString()).isEqualTo("aaaaaaaaaaaaaaaaaaaabbbbbcc");
 		// inverting order of pre-concatenated Strings may work also but lessly optimized
-		assertEquals("bbbbbbbbbbbbbbbbbbbbbbbbbcc", Strings.repeat(27, s, s5, s10).toString());
+		assertThat(Strings.repeat(27, s, s5, s10).toString()).isEqualTo("bbbbbbbbbbbbbbbbbbbbbbbbbcc");
 	}
 	
 	@Test
 	void foorPrint() {
-		assertEquals("42", Strings.footPrint(new FootPrintCandidate().setValue1(42), FootPrintCandidate::getValue1));
-		assertEquals("42, a", Strings.footPrint(new FootPrintCandidate().setValue1(42).setValue2("a"), FootPrintCandidate::getValue1, FootPrintCandidate::getValue2));
+		assertThat(Strings.footPrint(new FootPrintCandidate().setValue1(42), FootPrintCandidate::getValue1)).isEqualTo("42");
+		assertThat(Strings.footPrint(new FootPrintCandidate().setValue1(42).setValue2("a"), FootPrintCandidate::getValue1,
+				FootPrintCandidate::getValue2)).isEqualTo("42, a");
 	}
 	
 	private class FootPrintCandidate {

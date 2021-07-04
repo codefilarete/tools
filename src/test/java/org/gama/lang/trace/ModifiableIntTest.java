@@ -2,7 +2,7 @@ package org.gama.lang.trace;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Guillaume Mary
@@ -14,13 +14,13 @@ public class ModifiableIntTest {
 		ModifiableInt testInstance = new ModifiableInt();
 		
 		testInstance.increment();
-		assertEquals(1, testInstance.getValue());
+		assertThat(testInstance.getValue()).isEqualTo(1);
 		
-		assertEquals(2, testInstance.increment());
+		assertThat(testInstance.increment()).isEqualTo(2);
 		
-		assertEquals(6, testInstance.increment(4));
+		assertThat(testInstance.increment(4)).isEqualTo(6);
 		
-		assertEquals(-6, testInstance.increment(-12));
+		assertThat(testInstance.increment(-12)).isEqualTo(-6);
 	}
 	
 	@Test
@@ -28,13 +28,13 @@ public class ModifiableIntTest {
 		ModifiableInt testInstance = new ModifiableInt();
 		
 		testInstance.decrement();
-		assertEquals(-1, testInstance.getValue());
+		assertThat(testInstance.getValue()).isEqualTo(-1);
 		
-		assertEquals(-2, testInstance.decrement());
+		assertThat(testInstance.decrement()).isEqualTo(-2);
 		
-		assertEquals(-6, testInstance.decrement(4));
+		assertThat(testInstance.decrement(4)).isEqualTo(-6);
 		
-		assertEquals(6, testInstance.decrement(-12));
+		assertThat(testInstance.decrement(-12)).isEqualTo(6);
 	}
 	
 	@Test
@@ -42,16 +42,16 @@ public class ModifiableIntTest {
 		ModifiableInt testInstance = new ModifiableInt();
 		
 		testInstance.reset(3);
-		assertEquals(3, testInstance.getValue());
+		assertThat(testInstance.getValue()).isEqualTo(3);
 	}
 	
 	@Test
 	public void testConstructor() {
 		ModifiableInt testInstance = new ModifiableInt(2);
 		
-		assertEquals(2, testInstance.getValue());
+		assertThat(testInstance.getValue()).isEqualTo(2);
 		
 		testInstance.increment();
-		assertEquals(3, testInstance.getValue());
+		assertThat(testInstance.getValue()).isEqualTo(3);
 	}
 }

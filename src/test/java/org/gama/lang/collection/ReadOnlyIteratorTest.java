@@ -2,7 +2,8 @@ package org.gama.lang.collection;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 /**
  * @author Guillaume Mary
@@ -12,16 +13,16 @@ public class ReadOnlyIteratorTest {
 	@Test
 	public void testRemove_throwsException() {
 		ReadOnlyIterator<String> testInstance = ReadOnlyIterator.wrap(Arrays.asList("a", "b"));
-		assertThrows(UnsupportedOperationException.class, testInstance::remove);
+		assertThatExceptionOfType(UnsupportedOperationException.class).isThrownBy(testInstance::remove);
 	}
 	
 	@Test
 	public void testIteration() {
 		ReadOnlyIterator<String> testInstance = ReadOnlyIterator.wrap(Arrays.asList("a", "b"));
-		assertTrue(testInstance.hasNext());
-		assertEquals("a", testInstance.next());
-		assertTrue(testInstance.hasNext());
-		assertEquals("b", testInstance.next());
+		assertThat(testInstance.hasNext()).isTrue();
+		assertThat(testInstance.next()).isEqualTo("a");
+		assertThat(testInstance.hasNext()).isTrue();
+		assertThat(testInstance.next()).isEqualTo("b");
 	}
 	
 }

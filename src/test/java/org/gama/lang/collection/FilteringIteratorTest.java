@@ -6,7 +6,7 @@ import java.util.Objects;
 import org.gama.lang.function.Predicates;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Guillaume Mary
@@ -17,26 +17,26 @@ class FilteringIteratorTest {
 	void filter() {
 		FilteringIterator<String> testInstance = new FilteringIterator<>(Arrays.asList("a", null, "b", "c", "b").iterator(), Predicates.not("b"::equals));
 		List<String> copy = Iterables.copy(testInstance);
-		assertEquals(Arrays.asList("a", null, "c"), copy);
+		assertThat(copy).isEqualTo(Arrays.asList("a", null, "c"));
 		
 		// and works with null
 		testInstance = new FilteringIterator<>(Arrays.asList("a", null, "b", "c", "b").iterator(), Objects::nonNull);
 		copy = Iterables.copy(testInstance);
-		assertEquals(Arrays.asList("a", "b", "c", "b"), copy);
+		assertThat(copy).isEqualTo(Arrays.asList("a", "b", "c", "b"));
 	}
 	
 	@Test
 	void filterWorksAtVeryFirstStep() {
 		FilteringIterator<String> testInstance = new FilteringIterator<>(Arrays.asList("a", null, "b", "c", "b").iterator(), Predicates.not("b"::equals));
 		testInstance.hasNext();
-		assertEquals("a", testInstance.next());
+		assertThat(testInstance.next()).isEqualTo("a");
 		
 		// and works with null
 		testInstance = new FilteringIterator<>(Arrays.asList("a", null, "b", "c", "b").iterator(), Objects::nonNull);
 		testInstance.hasNext();
-		assertEquals("a", testInstance.next());
+		assertThat(testInstance.next()).isEqualTo("a");
 		testInstance.hasNext();
-		assertEquals("b", testInstance.next());
+		assertThat(testInstance.next()).isEqualTo("b");
 	}
 	
 	@Test
@@ -49,6 +49,6 @@ class FilteringIteratorTest {
 		testInstance.remove();
 		List<String> copy = Iterables.copy(testInstance);
 		// "a" was consumed, and null was removed
-		assertEquals(Arrays.asList("c"), copy);
+		assertThat(copy).isEqualTo(Arrays.asList("c"));
 	}
 }

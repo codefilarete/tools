@@ -14,10 +14,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.gama.lang.reflect.MemberPrinter.FLATTEN_PACKAGE_PRINTER;
 import static org.gama.lang.reflect.MemberPrinter.FULL_PACKAGE_PRINTER;
 import static org.gama.lang.reflect.MemberPrinter.WELL_KNOWN_FLATTEN_PACKAGE_PRINTER;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Guillaume Mary
@@ -27,15 +27,15 @@ public class MemberPrinterTest {
 	@Test
 	public void toStringClass() throws ClassNotFoundException {
 		MemberPrinter testInstance = FLATTEN_PACKAGE_PRINTER;
-		assertEquals("j.l.String", testInstance.toString(String.class));
-		assertEquals("j.u.Collection", testInstance.toString(Collection.class));
-		assertEquals("o.g.l.ReflectionsTest", testInstance.toString(ReflectionsTest.class));
-		assertEquals("TopPackageLevelClass", testInstance.toString(Class.forName("TopPackageLevelClass")));
-		assertEquals("boolean", testInstance.toString(boolean.class));
-		assertEquals("boolean", testInstance.toString(Boolean.TYPE));
-		assertEquals("void", testInstance.toString(Void.TYPE));
-		assertEquals("j.l.Comparable[]", testInstance.toString(Comparable[].class));
-		assertEquals("j.u.Map$Entry", testInstance.toString(Map.Entry.class));
+		assertThat(testInstance.toString(String.class)).isEqualTo("j.l.String");
+		assertThat(testInstance.toString(Collection.class)).isEqualTo("j.u.Collection");
+		assertThat(testInstance.toString(ReflectionsTest.class)).isEqualTo("o.g.l.ReflectionsTest");
+		assertThat(testInstance.toString(Class.forName("TopPackageLevelClass"))).isEqualTo("TopPackageLevelClass");
+		assertThat(testInstance.toString(boolean.class)).isEqualTo("boolean");
+		assertThat(testInstance.toString(Boolean.TYPE)).isEqualTo("boolean");
+		assertThat(testInstance.toString(Void.TYPE)).isEqualTo("void");
+		assertThat(testInstance.toString(Comparable[].class)).isEqualTo("j.l.Comparable[]");
+		assertThat(testInstance.toString(Map.Entry.class)).isEqualTo("j.u.Map$Entry");
 	}
 	
 	private static Object[][] toStringConstructor() {
@@ -50,8 +50,8 @@ public class MemberPrinterTest {
 	@ParameterizedTest
 	@MethodSource
 	public void toStringConstructor(Constructor constructor, String expectedFlattenPkgePrint, String expectedFullPkgePrint) {
-		assertEquals(expectedFlattenPkgePrint, FLATTEN_PACKAGE_PRINTER.toString(constructor));
-		assertEquals(expectedFullPkgePrint, FULL_PACKAGE_PRINTER.toString(constructor));
+		assertThat(FLATTEN_PACKAGE_PRINTER.toString(constructor)).isEqualTo(expectedFlattenPkgePrint);
+		assertThat(FULL_PACKAGE_PRINTER.toString(constructor)).isEqualTo(expectedFullPkgePrint);
 	}
 	
 	private static Object[][] toStringMethod() {
@@ -66,36 +66,36 @@ public class MemberPrinterTest {
 	@ParameterizedTest
 	@MethodSource
 	public void toStringMethod(Method method, String expectedFlattenPkgePrint, String expectedFullPkgePrint) {
-		assertEquals(expectedFlattenPkgePrint, FLATTEN_PACKAGE_PRINTER.toString(method));
-		assertEquals(expectedFullPkgePrint, FULL_PACKAGE_PRINTER.toString(method));
+		assertThat(FLATTEN_PACKAGE_PRINTER.toString(method)).isEqualTo(expectedFlattenPkgePrint);
+		assertThat(FULL_PACKAGE_PRINTER.toString(method)).isEqualTo(expectedFullPkgePrint);
 	}
 	
 	@ParameterizedTest
 	@MethodSource({ "toStringConstructor", "toStringMethod" })
 	public void toStringExecutable(Executable executable, String expectedFlattenPkgePrint, String expectedFullPkgePrint) {
-		assertEquals(expectedFlattenPkgePrint, FLATTEN_PACKAGE_PRINTER.toString(executable));
-		assertEquals(expectedFullPkgePrint, FULL_PACKAGE_PRINTER.toString(executable));
+		assertThat(FLATTEN_PACKAGE_PRINTER.toString(executable)).isEqualTo(expectedFlattenPkgePrint);
+		assertThat(FULL_PACKAGE_PRINTER.toString(executable)).isEqualTo(expectedFullPkgePrint);
 	}
 	
 	@Test
 	public void toStringField() {
 		Field valueField = Reflections.getField(String.class, "value");
-		assertEquals("j.l.String.value", MemberPrinter.FLATTEN_PACKAGE_PRINTER.toString(valueField));
-		assertEquals("java.lang.String.value", FULL_PACKAGE_PRINTER.toString(valueField));
+		assertThat(MemberPrinter.FLATTEN_PACKAGE_PRINTER.toString(valueField)).isEqualTo("j.l.String.value");
+		assertThat(FULL_PACKAGE_PRINTER.toString(valueField)).isEqualTo("java.lang.String.value");
 		Field defaultsPropertiesField = Reflections.getField(Properties.class, "defaults");
-		assertEquals("j.u.Properties.defaults", FLATTEN_PACKAGE_PRINTER.toString(defaultsPropertiesField));
-		assertEquals("java.util.Properties.defaults", FULL_PACKAGE_PRINTER.toString(defaultsPropertiesField));
+		assertThat(FLATTEN_PACKAGE_PRINTER.toString(defaultsPropertiesField)).isEqualTo("j.u.Properties.defaults");
+		assertThat(FULL_PACKAGE_PRINTER.toString(defaultsPropertiesField)).isEqualTo("java.util.Properties.defaults");
 	}
 	
 	@Test
 	public void toStringClass_wellKnowPackage() throws ClassNotFoundException {
 		MemberPrinter testInstance = WELL_KNOWN_FLATTEN_PACKAGE_PRINTER;
-		assertEquals("String", testInstance.toString(String.class));
-		assertEquals("Collection", testInstance.toString(Collection.class));
-		assertEquals("o.g.l.ReflectionsTest", testInstance.toString(ReflectionsTest.class));
-		assertEquals("TopPackageLevelClass", testInstance.toString(Class.forName("TopPackageLevelClass")));
-		assertEquals("boolean", testInstance.toString(boolean.class));
-		assertEquals("boolean", testInstance.toString(Boolean.TYPE));
-		assertEquals("void", testInstance.toString(Void.TYPE));
+		assertThat(testInstance.toString(String.class)).isEqualTo("String");
+		assertThat(testInstance.toString(Collection.class)).isEqualTo("Collection");
+		assertThat(testInstance.toString(ReflectionsTest.class)).isEqualTo("o.g.l.ReflectionsTest");
+		assertThat(testInstance.toString(Class.forName("TopPackageLevelClass"))).isEqualTo("TopPackageLevelClass");
+		assertThat(testInstance.toString(boolean.class)).isEqualTo("boolean");
+		assertThat(testInstance.toString(Boolean.TYPE)).isEqualTo("boolean");
+		assertThat(testInstance.toString(Void.TYPE)).isEqualTo("void");
 	}
 }

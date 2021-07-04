@@ -10,7 +10,8 @@ import java.util.Date;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.data.Offset.offset;
 
 /**
  * @author Guillaume Mary
@@ -25,10 +26,10 @@ class DatesTest {
 		Clock clock = Clock.fixed(fixedInstant, zoneId);
 		LocalDateTime[] nowAtAtime = new LocalDateTime[1];
 		Dates.doWithClock(clock, () -> nowAtAtime[0] = Dates.now());
-		assertEquals(expectedInstant, nowAtAtime[0]);
+		assertThat(nowAtAtime[0]).isEqualTo(expectedInstant);
 		
 		Dates.doWithClock(clock, () -> nowAtAtime[0] = Dates.now().plusHours(1));
-		assertEquals(expectedInstant.plusHours(1), nowAtAtime[0]);
+		assertThat(nowAtAtime[0]).isEqualTo(expectedInstant.plusHours(1));
 	}
 	
 	@Test
@@ -39,9 +40,9 @@ class DatesTest {
 		Clock clock = Clock.fixed(fixedInstant, zoneId);
 		LocalDateTime[] nowAtAtime = new LocalDateTime[1];
 		Dates.doWithClock(clock, () -> nowAtAtime[0] = Dates.now());
-		assertEquals(expectedInstant, nowAtAtime[0]);
+		assertThat(nowAtAtime[0]).isEqualTo(expectedInstant);
 		
-		assertEquals((double) Dates.now().getNano(), (double) LocalDateTime.now().getNano(), 10_000_000);	// almost equal with 10ms gap
+		assertThat((double) LocalDateTime.now().getNano()).isCloseTo(Dates.now().getNano(), offset(10_000_000d));	// almost equal with 10ms gap
 		
 		try {
 			Dates.doWithClock(clock, () -> {
@@ -51,7 +52,7 @@ class DatesTest {
 			// nothing to do here : we only catch exception thrown by runnable given to doWithClock
 		}
 		
-		assertEquals((double) Dates.now().getNano(), (double) LocalDateTime.now().getNano(), 10_000_000);	// almost equal with 10ms gap
+		assertThat((double) LocalDateTime.now().getNano()).isCloseTo(Dates.now().getNano(), offset(10_000_000d));	// almost equal with 10ms gap
 	}
 	
 	@Test
@@ -59,24 +60,24 @@ class DatesTest {
 		LocalDateTime runtime = LocalDateTime.of(2018, Month.DECEMBER, 10, 15, 50);
 		LocalDateTime[] nowAtAtime = new LocalDateTime[1];
 		Dates.runAtTime(runtime, () -> nowAtAtime[0] = Dates.now());
-		assertEquals(runtime, nowAtAtime[0]);
+		assertThat(nowAtAtime[0]).isEqualTo(runtime);
 		
 		Dates.runAtTime(runtime, () -> nowAtAtime[0] = Dates.now().plusHours(1));
-		assertEquals(runtime.plusHours(1), nowAtAtime[0]);
+		assertThat(nowAtAtime[0]).isEqualTo(runtime.plusHours(1));
 	}
 	
 	@Test
 	void now() {
-		assertEquals((double) Dates.now().getNano(), (double) LocalDateTime.now().getNano(), 10_000_000);	// almost equal with 10ms gap 
+		assertThat((double) LocalDateTime.now().getNano()).isCloseTo(Dates.now().getNano(), offset(10_000_000d));	// almost equal with 10ms gap 
 	}
 	
 	@Test
 	void nowAsDate() {
-		assertEquals((double) Dates.nowAsDate().getTime(), (double) new Date().getTime(), 10_000_000);	// almost equal with 10ms gap 
+		assertThat((double) new Date().getTime()).isCloseTo((double) Dates.nowAsDate().getTime(), offset(10_000_000d));	// almost equal with 10ms gap 
 	}
 	
 	@Test
 	void today() {
-		assertEquals(Dates.today(), LocalDate.now()); 
+		assertThat(LocalDate.now()).isEqualTo(Dates.today()); 
 	}
 }

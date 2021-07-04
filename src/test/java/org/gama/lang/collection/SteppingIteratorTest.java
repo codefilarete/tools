@@ -5,7 +5,7 @@ import java.util.Iterator;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -78,23 +78,23 @@ public class SteppingIteratorTest {
 			}
 		};
 		testInstance.hasNext();
-		assertEquals(0, i[0]);
+		assertThat(i[0]).isEqualTo(0);
 		testInstance.next();
 		testInstance.hasNext();
-		assertEquals(0, i[0]);
+		assertThat(i[0]).isEqualTo(0);
 		testInstance.next();
 		testInstance.hasNext();
-		assertEquals(1, i[0]);
+		assertThat(i[0]).isEqualTo(1);
 		testInstance.next();
 		testInstance.hasNext();
-		assertEquals(1, i[0]);
+		assertThat(i[0]).isEqualTo(1);
 		testInstance.next();
 		testInstance.hasNext();
-		assertEquals(2, i[0]);
+		assertThat(i[0]).isEqualTo(2);
 		
 		when(iterator.hasNext()).thenReturn(false);
 		testInstance.next();
 		testInstance.hasNext();
-		assertEquals(3, i[0]);
+		assertThat(i[0]).isEqualTo(3);
 	}
 }

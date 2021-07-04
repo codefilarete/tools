@@ -10,10 +10,8 @@ import org.gama.lang.exception.Exceptions.ExceptionCauseIterator;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 /**
  * @author Guillaume Mary
@@ -30,26 +28,26 @@ class ExceptionsTest {
 					new RuntimeException("second cause")));
 			ExceptionCauseIterator testInstance = new ExceptionCauseIterator(root);
 			List<String> stackMessages = Iterables.collect(() -> testInstance, Throwable::getMessage, ArrayList::new);
-			assertEquals(Arrays.asList("root", "cause", "second cause"), stackMessages);
+			assertThat(stackMessages).isEqualTo(Arrays.asList("root", "cause", "second cause"));
 		}
 		
 		@Test
 		public void testNext_throwsNoSuchElementException() {
 			RuntimeException root = new RuntimeException("root", new RuntimeException("cause"));
 			ExceptionCauseIterator testInstance = new ExceptionCauseIterator(root);
-			assertTrue(testInstance.hasNext());
+			assertThat(testInstance.hasNext()).isTrue();
 			testInstance.next();
-			assertTrue(testInstance.hasNext());
+			assertThat(testInstance.hasNext()).isTrue();
 			testInstance.next();
-			assertFalse(testInstance.hasNext());
-			assertThrows(NoSuchElementException.class, testInstance::next);
+			assertThat(testInstance.hasNext()).isFalse();
+			assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(testInstance::next);
 		}
 		
 		@Test
 		public void testNext_throwsNoSuchElementException_onNullException() {
 			ExceptionCauseIterator testInstance = new ExceptionCauseIterator(null);
-			assertFalse(testInstance.hasNext());
-			assertThrows(NoSuchElementException.class, testInstance::next);
+			assertThat(testInstance.hasNext()).isFalse();
+			assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(testInstance::next);
 		}
 	}
 	
