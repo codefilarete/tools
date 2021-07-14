@@ -69,7 +69,7 @@ public class Functions {
 	 * Chains several {@link Function}s taking null-returned values into account by skipping chain hence preventing NullPointerException.
 	 * Calling {@link Function#andThen(Function)} on result is also null-proof, making all the chain null-proof.
 	 * <br>
-	 * Prefer {@link #chain(Function, Function)} if you want to keep the behavior of a default Java statement chaining : throw a {@link NullPointerException}.
+	 * Prefer {@link #chain(Function, Function)} if you want to keep the behavior of a default Java statement chaining : throws a {@link NullPointerException}.
 	 * <br>
 	 * The method name "link" can be discussed, but it finally looks shorter than a "chainBeingNullAware" (kind of) name method which is too long but clearer. 
 	 * 
@@ -83,6 +83,24 @@ public class Functions {
 	}
 	
 	/**
+	 * Chains several {@link Function}s taking null-returned values into account by skipping chain hence preventing NullPointerException.
+	 * Calling {@link Function#andThen(Function)} on result is also null-proof, making all the chain null-proof.
+	 * <br>
+	 * Prefer {@link #chain(Function, Function, Function)} if you want to keep the behavior of a default Java statement chaining : throws a {@link NullPointerException}.
+	 * <br>
+	 * The method name "link" can be discussed, but it finally looks shorter than a "chainBeingNullAware" (kind of) name method which is too long but clearer. 
+	 *
+	 * @param firstFunction the first function that will be applied in the chain
+	 * @param secondFunction the second function that will be applied in the chain
+	 * @param thirdFunction the third function that will be applied in the chain
+	 * @return a {@link Function} that chains the 3 given ones by avoiding NullPointerException
+	 * @see #chain(Function, Function)
+	 */
+	public static <K, A, B, V> Function<K, V> link(Function<K, A> firstFunction, Function<A, B> secondFunction, Function<B, V> thirdFunction) {
+		return chain(new NullProofFunction<>(firstFunction), new NullProofFunction<>(secondFunction), new NullProofFunction<>(thirdFunction));
+	}
+	
+	/**
 	 * Chains several {@link Function}s.
 	 * Prefer {@link #link(Function, Function)} if you want a "null proof" chain.
 	 * 
@@ -93,6 +111,19 @@ public class Functions {
 	 */
 	public static <K, A, V> Function<K, V> chain(Function<K, A> firstFunction, Function<A, V> secondFunction) {
 		return firstFunction.andThen(secondFunction);
+	}
+	
+	/**
+	 * Chains several {@link Function}s.
+	 * Prefer {@link #link(Function, Function, Function)} if you want a "null proof" chain.
+	 *
+	 * @param firstFunction the first function that will be applied in the chain
+	 * @param secondFunction the second function that will be applied in the chain
+	 * @return a {@link Function} that chains the 2 given ones by avoiding NullPointerException
+	 * @see #link(Function, Function)
+	 */
+	public static <K, A, B, V> Function<K, V> chain(Function<K, A> firstFunction, Function<A, B> secondFunction, Function<B, V> thirdFunction) {
+		return chain(firstFunction, secondFunction).andThen(thirdFunction);
 	}
 	
 	/**

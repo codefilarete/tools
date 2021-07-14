@@ -12,23 +12,23 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 /**
  * @author Guillaume Mary
  */
-public class FunctionsTest {
+class FunctionsTest {
 	
 	@Test
-	public void testToFunction_predicateArg() {
+	void toFunction_predicateArg() {
 		Function<Object, Boolean> predicateAsFunction = Functions.toFunction("hello"::equals);
 		assertThat(predicateAsFunction.apply("hello")).isTrue();
 		assertThat(predicateAsFunction.apply("coucou")).isFalse();
 	}
 	
 	@Test
-	public void testToFunction_methodArg() throws NoSuchMethodException {
+	void toFunction_methodArg() throws NoSuchMethodException {
 		Function<Object, Object> methodAsFunction = Functions.toFunction(Integer.class.getDeclaredMethod("toString"));
 		assertThat(methodAsFunction.apply(1)).isEqualTo("1");
 	}
 	
 	@Test
-	public void testToBiConsumer_methodArg() throws NoSuchMethodException {
+	void toBiConsumer_methodArg() throws NoSuchMethodException {
 		BiConsumer<Object, Object> methodAsBiConsumer = Functions.toBiConsumer(StringBuilder.class.getDeclaredMethod("append", int.class));
 		StringBuilder target = new StringBuilder();
 		methodAsBiConsumer.accept(target, 1);
@@ -36,7 +36,7 @@ public class FunctionsTest {
 	}
 	
 	@Test
-	public void testAsPredicate() {
+	void asPredicate() {
 		Predicate<StringBuilder> methodAsBiConsumer = Functions.asPredicate(StringBuilder::toString, "1"::equals);
 		StringBuilder target = new StringBuilder();
 		assertThat(methodAsBiConsumer.test(target)).isFalse();
@@ -45,7 +45,7 @@ public class FunctionsTest {
 	}
 	
 	@Test
-	public void testAsPredicate_givenMethod() {
+	void asPredicate_givenMethod() {
 		Predicate<StringBuilder> methodAsBiConsumer = Functions.asPredicate(StringBuilder::toString, "1"::equals);
 		StringBuilder target = new StringBuilder();
 		assertThat(methodAsBiConsumer.test(target)).isFalse();
@@ -54,8 +54,8 @@ public class FunctionsTest {
 	}
 	
 	@Test
-	public void testLink() {
-		// StringBuffer is transformed to a "2" String, then parsed to a 2 int
+	void link() {
+		// given StringBuffer is transformed to a "2" String, then parsed to a 2 int
 		assertThat((int) Functions.link(Object::toString, Integer::parseInt).apply(new StringBuffer("2"))).isEqualTo(2);
 		// test againt null
 		assertThat(Functions.link(Object::toString, Integer::parseInt).apply(null)).isNull();
@@ -69,7 +69,7 @@ public class FunctionsTest {
 	}
 	
 	@Test
-	public void testLink_andThen() {
+	void link_andThen() {
 		assertThat(Functions.link(Object::toString, Integer::parseInt).andThen(i -> String.valueOf(i + 1)).apply(new Object() {
 			@Override
 			public String toString() {
@@ -86,18 +86,18 @@ public class FunctionsTest {
 	}
 	
 	@Test
-	public void testChain() {
+	void chain() {
 		// StringBuffer is transformed to a "2" String, then parsed to a 2 int
 		assertThat((int) Functions.chain(Object::toString, Integer::parseInt).apply(new StringBuffer("2"))).isEqualTo(2);
 	}
 	
 	@Test
-	public void testChain_throwNPE1() {
+	void chain_throwNPE1() {
 		assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> Functions.chain(Object::toString, Object::toString).apply(null));
 	}
 	
 	@Test
-	public void testChain_throwNPE2() {
+	void chain_throwNPE2() {
 		assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> Functions.chain(Object::toString, Object::toString).apply(new Object() {
 			@Override
 			public String toString() {
@@ -107,7 +107,7 @@ public class FunctionsTest {
 	}
 	
 	@Test
-	public void testChain_andThen_throwNPE() {
+	void chain_andThen_throwNPE() {
 		assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> Functions.chain(Object::toString, Object::toString).andThen(String::valueOf).apply(null));
 	}
 	
