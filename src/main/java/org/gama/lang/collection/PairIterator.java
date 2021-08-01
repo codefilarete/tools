@@ -12,7 +12,7 @@ import org.gama.lang.Duo;
  * @param <V> type of second {@link Iterator}'s element
  * @author Guillaume Mary
  */
-public class PairIterator<K, V> implements Iterator<Duo<? extends K, ? extends V>> {
+public class PairIterator<K, V> implements Iterator<Duo<K, V>> {
 	
 	protected Iterator<? extends K> iterator1;
 	protected Iterator<? extends V> iterator2;

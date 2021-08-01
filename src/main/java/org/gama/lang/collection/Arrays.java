@@ -18,6 +18,7 @@ import java.util.function.Supplier;
 public class Arrays {
 	
 	private static final Integer[] EMPTY_INTEGER_ARRAY = {};
+	private static final int[] EMPTY_INT_ARRAY = {};
 	
 	@SafeVarargs
 	public static <T> List<T> asList(T... a) {
@@ -74,6 +75,21 @@ public class Arrays {
 			return EMPTY_INTEGER_ARRAY;
 		} else {
 			Integer[] result = new Integer[integers.length];
+			for (int i = 0; i < integers.length; i++) {
+				result[i] = integers[i];
+			}
+			return result;
+		}
+	}
+	
+	@Nullable
+	public static int[] toPrimitive(@Nullable Integer[] integers) {
+		if (integers == null) {
+			return null;
+		} else if (integers.length == 0) {
+			return EMPTY_INT_ARRAY;
+		} else {
+			int[] result = new int[integers.length];
 			for (int i = 0; i < integers.length; i++) {
 				result[i] = integers[i];
 			}
