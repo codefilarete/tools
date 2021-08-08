@@ -11,6 +11,10 @@ import java.util.LinkedHashSet;
  */
 public class KeepOrderSet<E> extends SetWrapper<E> {
 	
+	public KeepOrderSet() {
+		super(new LinkedHashSet<>());
+	}
+	
 	public KeepOrderSet(E ... e) {
 		this(Arrays.asList(e));
 	}

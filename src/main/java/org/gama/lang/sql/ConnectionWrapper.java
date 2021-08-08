@@ -304,26 +304,26 @@ public class ConnectionWrapper implements Connection {
 	}
 	
 	/**
-	 * Implementation that gives access to delegate {@link Connection} if given parameter if {@link Connection} class.
+	 * Returns delegate instance if it is type matches with given one, else asks for unwrapping itself.
 	 *
+	 * @param iface an interface that the result must implement
+	 * @return an object that implements given interface
 	 * @param <T> the type of the class modeled by this Class object
-	 * @param iface A Class defining an interface that the result must implement.
-	 * @return an object that implements the interface. May be a proxy for the actual implementing object.
-	 * @throws SQLException If no object found that implements the interface
+	 * @throws SQLException if no object found that implements the interface
 	 */
 	@Override
 	public <T> T unwrap(Class<T> iface) throws SQLException {
-		if (iface == Connection.class) {
+		if (iface.isInstance(this.surrogate)) {
 			return (T) this.surrogate;
-		} else if (isWrapperFor(iface)) {
-			// made for subclasses
-			return (T) this;
+		} else if (this.surrogate != null) {
+			return this.surrogate.unwrap(iface);
+		} else {
+			throw new SQLException(Reflections.toString(ConnectionWrapper.class) + " cannot be unwrapped as " + Reflections.toString(iface));
 		}
-		throw new SQLException(Reflections.toString(ConnectionWrapper.class) + " cannot be unwrapped as " + Reflections.toString(iface));
 	}
 	
 	@Override
 	public boolean isWrapperFor(Class<?> iface) throws SQLException {
-		return iface.isInstance(this);
+		return iface.isInstance(this.surrogate) || this.surrogate != null && this.surrogate.isWrapperFor(iface);
 	}
 }

@@ -65,7 +65,7 @@ public class StringAppender implements Serializable, CharSequence {
 		cat(ss);
 		this.appender = previous;
 		// finally inserting at index
-		this.appender.insert(index, target.toString());
+		this.appender.insert(index, target);
 		return this;
 	}
 	
