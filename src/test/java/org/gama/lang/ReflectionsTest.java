@@ -7,6 +7,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.AbstractMap;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.assertj.core.api.AbstractThrowableAssert;
@@ -436,6 +437,24 @@ public class ReflectionsTest {
 		assertThat(capturedMethod[0]).isEqualTo(CharSequence.class.getMethod("subSequence", int.class, int.class));
 		((Closeable) proxy).close();
 		assertThat(capturedMethod[0]).isEqualTo(Closeable.class.getMethod("close"));
+	}
+	
+	@Test
+	void isStatic_class() {
+		assertThat(Reflections.isStatic(InnerClass.class)).isFalse();
+		assertThat(Reflections.isStatic(InnerStaticClass.class)).isTrue();
+	}
+	
+	@Test
+	void isStatic_method() {
+		assertThat(Reflections.isStatic(Reflections.getMethod(Objects.class, "equals", Object.class, Object.class))).isTrue();
+		assertThat(Reflections.isStatic(Reflections.getMethod(Object.class, "equals", Object.class))).isFalse();
+	}
+	
+	@Test
+	void isStatic_field() {
+		assertThat(Reflections.isStatic(Reflections.getField(String.class, "CASE_INSENSITIVE_ORDER"))).isTrue();
+		assertThat(Reflections.isStatic(Reflections.getField(String.class, "value"))).isFalse();
 	}
 	
 	private static class ClosedClass {

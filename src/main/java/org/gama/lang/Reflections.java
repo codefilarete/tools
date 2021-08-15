@@ -168,6 +168,36 @@ public final class Reflections {
 		return clazz.isMemberClass() && !Modifier.isStatic(clazz.getModifiers());
 	}
 	
+	/**
+	 * Indicates if given class is static or not
+	 * 
+	 * @param clazz any non null {@link Class}
+	 * @return true if given {@link Class} is a static one, else false
+	 */
+	public static boolean isStatic(@Nonnull Class<?> clazz) {
+		return Modifier.isStatic(clazz.getModifiers());
+	}
+	
+	/**
+	 * Indicates if given method is static or not
+	 * 
+	 * @param method any non null {@link Method}
+	 * @return true if given {@link Method} is a static one, else false
+	 */
+	public static boolean isStatic(@Nonnull Method method) {
+		return Modifier.isStatic(method.getModifiers());
+	}
+	
+	/**
+	 * Indicates if given field is static or not
+	 *
+	 * @param field any non null {@link Field}
+	 * @return true if given {@link Field} is a static one, else false
+	 */
+	public static boolean isStatic(@Nonnull Field field) {
+		return Modifier.isStatic(field.getModifiers());
+	}
+	
 	public static Map<String, Field> mapFieldsOnName(Class clazz) {
 		return Iterables.map(() -> new FieldIterator(clazz), Field::getName);
 	}
