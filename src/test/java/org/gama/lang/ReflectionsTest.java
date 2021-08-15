@@ -94,8 +94,10 @@ public class ReflectionsTest {
 	
 	@ParameterizedTest
 	@MethodSource("testGetDefaultConstructor_throwingCases_data")
-	void getDefaultConstructor_throwingCases(Class clazz, String expectedMessage) {
-//		assertThat(assertThrows(UnsupportedOperationException.class, () -> Reflections.getDefaultConstructor(clazz)).getMessage()).isEqualTo(expectedMessage);
+	void getDefaultConstructor_throwingCases(Class<?> clazz, String expectedMessage) {
+		assertThatThrownBy(() -> Reflections.getDefaultConstructor(clazz))
+				.isInstanceOf(UnsupportedOperationException.class)
+				.hasMessage(expectedMessage);
 	}
 	
 	@Test
@@ -108,7 +110,9 @@ public class ReflectionsTest {
 	
 	@Test
 	void getConstructor_innerNonStaticClass_missingEnclosingClassAsParameter_throwsException() {
-//		assertThat(assertThrows(MemberNotFoundException.class, () -> Reflections.getConstructor(InnerClassWithPrivateConstructor.class)).getMessage()).isEqualTo("Non static inner classes require an enclosing class parameter as first argument");
+		assertThatThrownBy(() -> Reflections.getConstructor(InnerClassWithPrivateConstructor.class))
+				.isInstanceOf(MemberNotFoundException.class)
+				.hasMessage("Non static inner classes require an enclosing class parameter as first argument");
 	}
 	
 	public static Object[][] testGetFieldData() {
