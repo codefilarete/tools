@@ -46,7 +46,7 @@ public class MethodDispatcher {
 	/**
 	 * Redirects all interfazz methods to extensionSurrogate
 	 * @param interfazz an interface, must be extended by the one that will be given by {@link #build(Class)} (should be a super type of it) 
-	 * @param extensionSurrogate an instance implementing X so methods of X can be redirect to it
+	 * @param extensionSurrogate an instance implementing X so methods of X can be redirected to it
 	 * @param <X> a interface type
 	 * @return this
 	 */
@@ -55,12 +55,12 @@ public class MethodDispatcher {
 	}
 	
 	/**
-	 * Same as {@link #redirect(Class, Object)} but proxy will be return by all methods invocation : result of them will be ignored.
+	 * Same as {@link #redirect(Class, Object)} but proxy will be returned by all methods invocation : result of them will be ignored.
 	 * Usefull when return types of extensionSurrogate methods don't match those of {@link #build(Class)} (kind of rare case).
 	 * 
-	 * @param interfazz an interface, must be extended by the one that will be given by {@link #build(Class)} (should be a super type of it) 
-	 * @param extensionSurrogate an instance implementing X so methods of X can be redirect to it
-	 * @param <X> a interface type
+	 * @param interfazz an interface, must be extended by the one that will be given to {@link #build(Class)} (should be a super type of it) 
+	 * @param extensionSurrogate an instance implementing X so methods of X can be redirected to it
+	 * @param <X> an interface type
 	 * @return this
 	 */
 	public <X> MethodDispatcher redirect(Class<X> interfazz, X extensionSurrogate, boolean returnProxy) {
@@ -70,8 +70,30 @@ public class MethodDispatcher {
 		return this;
 	}
 	
+	/**
+	 * Same as {@link #redirect(Class, Object)} but given object will be returned by all methods invocation.
+	 * Usefull when creating a fluent API where given interfazz methods should be invoked once, then methods return type is not herself but another
+	 * one, the one that given returningMethodsTarget must implement (kind of rare case).
+	 * 
+	 * @param interfazz an interface, must be extended by the one that will be given to {@link #build(Class)} (should be a super type of it) 
+	 * @param extensionSurrogate an instance implementing X so methods of X can be redirected to it
+	 * @param returningMethodsTarget an instance that implements all interfazz' methods return types
+	 * @param <X> an interface type
+	 * @return this
+	 */
+	public <X> MethodDispatcher redirect(Class<X> interfazz, X extensionSurrogate, Object returningMethodsTarget) {
+		for (Method method : interfazz.getMethods()) {
+			addInterceptor(method, extensionSurrogate, returningMethodsTarget);
+		}
+		return this;
+	}
+	
 	protected  <X> void addInterceptor(Method method, X extensionSurrogate, boolean returnProxy) {
 		interceptors.put(giveSignature(method), new Interceptor(method, extensionSurrogate, returnProxy));
+	}
+	
+	protected  <X> void addInterceptor(Method method, X extensionSurrogate, Object returningMethodsTarget) {
+		interceptors.put(giveSignature(method), new Interceptor(method, extensionSurrogate, returningMethodsTarget));
 	}
 	
 	/**
@@ -90,8 +112,6 @@ public class MethodDispatcher {
 	public <X> X build(Class<X> interfazz) {
 		assertInterceptingMethodsAreFromInterfaces();
 		assertClassImplementsInterceptingInterface(interfazz);
-		// Fallback instance must not be null, else you'll get NullPointerException hard to debug
-		ensureFallbackInstanceIsNotNull(interfazz);
 		
 		// Which ClassLoader ? Thread, fallback, this ?
 		// we don't use the Thread one because it can live forever so it might lead to memory leak
@@ -105,22 +125,34 @@ public class MethodDispatcher {
 		InvocationHandler dispatcher = new InvocationHandlerSupport((input, method, args) -> {
 			// looking for method to be really invoked
 			Interceptor interceptor = interceptors.get(giveSignature(method));
-			Object targetInstance = fallback;
+			Object targetInstance;
 			boolean returnProxy = false;
+			Object returningMethodsTarget = null;
 			if (interceptor != null) {
 				// NB: the method finally invoked may not be the same as the one invoked
 				// in polymorphism and multiple inheritance cases
 				method = interceptor.getMethod();
 				targetInstance = interceptor.getMethodTarget();
 				returnProxy = interceptor.isReturnProxy();
+				returningMethodsTarget = interceptor.getReturningMethodsTarget();
+			} else {
+				if (fallback == null && !Reflections.isStatic(method)) {
+					throw new NullPointerException("No fallback instance was declared, therefore calling " + Reflections.toString(method)
+							+ " would throw NullPointerException: try to set one or redirect given method to a compatible instance");
+				}
+				targetInstance = fallback;
 			}
 			Object result = invoke(targetInstance, method, args);
+			
+			// Handling return cases
 			if (returnProxy) {
 				result = proxyHolder[0];
+			} else if (returningMethodsTarget != null) {
+				result = returningMethodsTarget;
 			}
 			return result;
 		}) {
-			/** We handle toString() to had some message indicating who we are to avoid "ghost" behavior and hard debug */
+			/** We handle toString() to have some message indicating who we are to avoid "ghost" behavior and hard debug */
 			@Override
 			public String toString() {
 				return "Dispatcher to " + fallback.toString();
@@ -145,13 +177,6 @@ public class MethodDispatcher {
 				throw new UnsupportedOperationException("Cannot intercept concrete method : " + Reflections.toString(m.getMethod()));
 			}
 		});
-	}
-	
-	private <X> void ensureFallbackInstanceIsNotNull(Class<X> interfazz) {
-		if (this.fallback == null) {
-			// we fallback equals(), hashCode(), toString(), etc on a more printable instance
-			this.fallback = new Fallback(interfazz);
-		}
 	}
 	
 	/**
@@ -191,34 +216,25 @@ public class MethodDispatcher {
 		}
 	}
 	
-	/**
-	 * Dedicated class to fallback objects so printed stack trace are more understandable
-	 * Only override the {@link #toString()}
-	 */
-	private static class Fallback {
-		
-		private final Class interfazz;
-		
-		public Fallback(Class interfazz) {
-			this.interfazz = interfazz;
-		}
-		
-		@Override
-		public String toString() {
-			return interfazz.getName() + "@" + Integer.toHexString(hashCode());
-		}
-	}
-	
 	protected static class Interceptor {
 		
 		private final Method method;
 		private final Object methodTarget;
 		private final boolean returnProxy;
+		private final Object returningMethodsTarget;
 		
 		public Interceptor(Method method, Object methodTarget, boolean returnProxy) {
 			this.method = method;
 			this.methodTarget = methodTarget;
 			this.returnProxy = returnProxy;
+			this.returningMethodsTarget = null;
+		}
+		
+		public Interceptor(Method method, Object methodTarget, Object returningMethodsTarget) {
+			this.method = method;
+			this.methodTarget = methodTarget;
+			this.returnProxy = false;
+			this.returningMethodsTarget = returningMethodsTarget;
 		}
 		
 		public Method getMethod() {
@@ -231,6 +247,10 @@ public class MethodDispatcher {
 		
 		public boolean isReturnProxy() {
 			return returnProxy;
+		}
+		
+		public Object getReturningMethodsTarget() {
+			return returningMethodsTarget;
 		}
 	}
 }

@@ -1,9 +1,11 @@
 package org.gama.lang.reflect;
 
-import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
 
 import org.gama.lang.function.Hanger;
+import org.gama.lang.function.Hanger.Holder;
 import org.gama.lang.trace.ModifiableInt;
 import org.junit.jupiter.api.Test;
 
@@ -13,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 /**
  * @author Guillaume Mary
  */
-public class MethodDispatcherTest {
+class MethodDispatcherTest {
 	
 	@Test
 	void redirect_interface() {
@@ -29,24 +31,47 @@ public class MethodDispatcherTest {
 	}
 	
 	@Test
-	void redirect_noFallbackInstance_toStringReflectBuiltClass() {
-		MethodDispatcher methodDispatcher = new MethodDispatcher()
-				.redirect(Supplier.class, () -> "Hello world !");
+	void redirect_interfaceToObject_allMethodResultAreRedirectedToObject() {
+		List<String> resultHolder = new ArrayList<>();
 		
-		methodDispatcher.fallbackOn(null);
-		Holder1 builtInstance = methodDispatcher.build(Holder1.class);
-		assertThat(builtInstance.toString()).contains(Holder1.class.getName());
+		EntryPoint surrogate1 = new EntryPoint() {
+			@Override
+			public NextStep doSomething() {
+				resultHolder.add("something done");
+				return null;
+			}
+			
+			@Override
+			public NextStep doSomethingElse() {
+				resultHolder.add("something else done");
+				return null;
+			}
+		};
+		NextStep surrogate2 = new NextStep() {
+			@Override
+			public void doStepThing() {
+				resultHolder.add("step thing done");
+			}
+		};
+		EntryPoint testInstance = new MethodDispatcher()
+				.redirect(EntryPoint.class, surrogate1, surrogate2)
+				.build(EntryPoint.class);
+		
+		testInstance.doSomething().doStepThing();
+		assertThat(resultHolder).containsExactly("something done", "step thing done");
 	}
 	
 	@Test
-	void redirect_noFallbackInstance_throwsException2() {
-		Holder3 testInstance = new MethodDispatcher()
-				.redirect(AutoCloseable.class, () -> { throw new SQLException(); })
-				.build(Holder3.class);
-		
-		assertThatThrownBy(testInstance::close).isInstanceOf(SQLException.class);
+	void build_noFallbackInstance_callingUnredirectedMethodThrowsException() {
+		Holder2 testInstance = new MethodDispatcher()
+				.redirect(Hanger.class, new Holder<>())
+				.build(Holder2.class);
+
+		assertThatThrownBy(testInstance::get)
+				.isInstanceOf(NullPointerException.class)
+				.hasMessage("No fallback instance was declared, therefore calling j.u.f.Supplier.get() would throw NullPointerException:" 
+						+ " try to set one or redirect given method to a compatible instance");
 	}
-	
 	
 	@Test
 	void redirect_whenInvokedMethodThrowsAnException_exceptionMustBeThrownWithoutWrapping() {
@@ -277,5 +302,17 @@ public class MethodDispatcherTest {
 		public int getValue() {
 			return hanger.getValue();
 		}
+	}
+	
+	private interface EntryPoint {
+		
+		NextStep doSomething();
+		
+		NextStep doSomethingElse();
+	}
+	
+	private interface NextStep {
+		
+		void doStepThing();
 	}
 }
