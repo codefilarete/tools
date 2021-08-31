@@ -168,15 +168,15 @@ public class Nullable<T> implements Supplier<T> {
 	}
 	
 	/**
-	 * Gives the current value or throws the given {@link Exception} in case of missing value.
+	 * Gives the current value or throws the given {@link Throwable} in case of missing value.
 	 * Shortcut for {@link #elseThrow(Throwable)}.get()
 	 *
-	 * @param throwable the {@link Exception} to be thrown
-	 * @param <E> the {@link Exception} type
+	 * @param throwable the provider of {@link Throwable} to be thrown
+	 * @param <E> the {@link Throwable} type
 	 * @return this (if value is present)
 	 * @throws E the given throwable
 	 */
-	public <E extends Throwable> T getOrThrow(E throwable) throws E {
+	public <E extends Throwable> T getOrThrow(Supplier<E> throwable) throws E {
 		return elseThrow(throwable).get();
 	}
 	

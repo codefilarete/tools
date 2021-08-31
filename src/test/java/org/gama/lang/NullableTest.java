@@ -22,13 +22,13 @@ class NullableTest {
 	private static final Supplier<String> STRING_SUPPLIER = () -> "hello";
 	
 	@Test
-	void testEmpty() {
+	void empty() {
 		assertThat(Nullable.empty().isPresent()).isEqualTo(false);
 		assertThat(Nullable.empty().get()).isEqualTo(null);
 	}
 	
 	@Test
-	void testConstructors_object() {
+	void constructors_object() {
 		String nullObject = null;
 		assertThat(Nullable.nullable(nullObject).getOr("hello")).isEqualTo("hello");
 		Function<String, String> appendingWorldFunction = o -> o + " world";
@@ -46,7 +46,7 @@ class NullableTest {
 	}
 	
 	@Test
-	void testConstructors_supplier() {
+	void constructors_supplier() {
 		assertThat(Nullable.nullable(NULL_SUPPLIER).getOr("hello")).isEqualTo("hello");
 		Function<String, String> appendingWorldFunction = o -> o + " world";
 		Function<String, String> shallNotCallFunction = o -> {
@@ -63,20 +63,20 @@ class NullableTest {
 	}
 	
 	@Test
-	void testIsPresent() {
+	void isPresent() {
 		assertThat(Nullable.nullable(new Object()).isPresent()).isTrue();
 		assertThat(Nullable.nullable((Object) null).isPresent()).isFalse();
 	}
 	
 	@Test
-	void testGetOr_object() {
+	void getOr_object() {
 		Object value = new Object();
 		assertThat(Nullable.nullable(value).getOr("hello")).isEqualTo(value);
 		assertThat(Nullable.nullable((String) null).getOr("hello")).isEqualTo("hello");
 	}
 	
 	@Test
-	void testGetOr_supplier() {
+	void getOr_supplier() {
 		Object value = new Object();
 		Supplier<Object> dummyFunction = () -> value;
 		assertThat(Nullable.nullable(value).getOr(dummyFunction)).isEqualTo(value);
@@ -84,14 +84,14 @@ class NullableTest {
 	}
 	
 	@Test
-	void testElseSet_object() {
+	void elseSet_object() {
 		Object value = new Object();
 		assertThat(Nullable.nullable(value).elseSet("hello").get()).isEqualTo(value);
 		assertThat(Nullable.nullable((String) null).elseSet("hello").get()).isEqualTo("hello");
 	}
 	
 	@Test
-	void testElseSet_supplier() {
+	void elseSet_supplier() {
 		Object value = new Object();
 		assertThat(Nullable.nullable(value).elseSet(() -> "hello").get()).isEqualTo(value);
 		assertThat(Nullable.nullable((String) null).elseSet(() -> "hello").get()).isEqualTo("hello");
@@ -99,7 +99,7 @@ class NullableTest {
 	
 	
 	@Test
-	void testMap() {
+	void map() {
 		// simple case
 		assertThat(Nullable.nullable("Hello").map(o -> o + " World").get()).isEqualTo("Hello World");
 		// with null value
@@ -110,7 +110,7 @@ class NullableTest {
 	}
 	
 	@Test
-	void testTest() {
+	void test() {
 		// simple case
 		assertThat(Nullable.nullable("Hello").test(o -> o.equals("Hello")).get()).isTrue();
 		// with null value
@@ -121,7 +121,7 @@ class NullableTest {
 	}
 	
 	@Test
-	void testFilter() {
+	void filter() {
 		// simple case
 		assertThat(Nullable.nullable("Hello").filter(o -> o.contains("ll")).get()).isEqualTo("Hello");
 		// with null value
@@ -132,7 +132,7 @@ class NullableTest {
 	}
 	
 	@Test
-	void testInvoke() {
+	void invoke() {
 		String value = "hello";
 		ModifiableInt isCalled = new ModifiableInt();
 		Consumer<String> dummyFunction = s -> isCalled.increment();
@@ -145,7 +145,7 @@ class NullableTest {
 	}
 	
 	@Test
-	void testMapThrower() {
+	void mapThrower() {
 		assertThatExceptionOfType(IOException.class).isThrownBy(() -> Nullable.nullable(new ByteArrayOutputStream()).mapThrower(b -> {
 			b.write(0);
 			throw new IOException();
@@ -154,7 +154,7 @@ class NullableTest {
 	
 	
 	@Test
-	void testInvokeThrower() {
+	void invokeThrower() {
 		assertThatExceptionOfType(IOException.class).isThrownBy(() -> Nullable.nullable(new ByteArrayOutputStream()).invokeThrower(b -> {
 			b.write(0);
 			throw new IOException();
@@ -162,31 +162,31 @@ class NullableTest {
 	}
 	
 	@Test
-	void testElseThrow() throws IOException {
+	void elseThrow() throws IOException {
 		Object value = new Object();
 		assertThat(Nullable.nullable(value).elseThrow(new IOException()).get()).isEqualTo(value);
 	}
 	
 	@Test
-	void testElseThrow_nullValue_exceptionIsThrown() {
+	void elseThrow_nullValue_exceptionIsThrown() {
 		assertThatExceptionOfType(IOException.class).isThrownBy(() -> Nullable.nullable((Object) null).elseThrow(new IOException()));
 	}
 	
 	@Test
-	void testElseThrow_supplier() throws IOException {
+	void elseThrow_supplier() throws IOException {
 		Object value = new Object();
 		assertThat(Nullable.nullable(value).<IOException>elseThrow(IOException::new).get()).isEqualTo(value);
 	}
 	
 	@Test
-	void testGetElseThrow() throws IOException {
+	void getElseThrow() throws IOException {
 		Object value = new Object();
-		assertThat(Nullable.nullable(value).getOrThrow(new IOException())).isEqualTo(value);
+		assertThat(Nullable.nullable(value).getOrThrow(IOException::new)).isEqualTo(value);
 	}
 	
 	@Test
-	void testGetElseThrow_nullValue_exceptionIsThrown() {
-		assertThatExceptionOfType(IOException.class).isThrownBy(() -> Nullable.nullable((Object) null).getOrThrow(new IOException()));
+	void getElseThrow_nullValue_exceptionIsThrown() {
+		assertThatExceptionOfType(IOException.class).isThrownBy(() -> Nullable.nullable((Object) null).getOrThrow(IOException::new));
 	}
 	
 }

@@ -592,7 +592,7 @@ public final class Reflections {
 	 * @throws IllegalArgumentException if given argument is not a primitive type
 	 */
 	public static Class giveWrapperClass(Class<?> clazz) {
-		return nullable(findWrapperClass(clazz)).getOrThrow(new IllegalArgumentException("Given type is not a primitive one : " + toString(clazz)));
+		return nullable(findWrapperClass(clazz)).getOrThrow(() -> new IllegalArgumentException("Given type is not a primitive one : " + toString(clazz)));
 	}
 	
 	/**
