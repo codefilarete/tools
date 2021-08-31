@@ -267,7 +267,9 @@ public final class Iterables {
 	 * @param <V> vaules type
 	 * @return a new (Hash)Map
 	 */
-	public static <T, K, V> Map<K, V> map(Iterable<T> iterable, Function<T, K> keyMapper, Function<T, V> valueMapper) {
+	public static <T, K, V> Map<K, V> map(Iterable<T> iterable,
+										  Function<? super T, ? extends K> keyMapper,
+										  Function<? super T, ? extends V> valueMapper) {
 		return map(iterable, keyMapper, valueMapper, HashMap::new);
 	}
 	
@@ -281,9 +283,13 @@ public final class Iterables {
 	 * @param <T> iterated objets type
 	 * @param <K> keys type
 	 * @param <V> vaules type
-	 * @return a new (Hash)Map
+	 * @param <M> returned {@link Map} type
+	 * @return a new {@link Map} of type M filled with key and values from given parameters
 	 */
-	public static <T, K, V, M extends Map<K, V>> M map(Iterable<T> iterable, Function<T, K> keyMapper, Function<T, V> valueMapper, Supplier<M> target) {
+	public static <T, K, V, M extends Map<K, V>> M map(Iterable<T> iterable,
+													   Function<? super T, ? extends K> keyMapper,
+													   Function<? super T, ? extends V> valueMapper,
+													   Supplier<M> target) {
 		M result = target.get();
 		for (T t : iterable) {
 			result.put(keyMapper.apply(t), valueMapper.apply(t));
@@ -300,8 +306,23 @@ public final class Iterables {
 	 * @param <K> keys type
 	 * @return a new (Hash)Map
 	 */
-	public static <T, K> Map<K, T> map(Iterable<T> iterable, Function<T, K> keyMapper) {
+	public static <T, K> Map<K, T> map(Iterable<T> iterable, Function<? super T, ? extends K> keyMapper) {
 		return map(iterable, keyMapper, Function.identity());
+	}
+	
+	/**
+	 * Maps an {@link Iterable} on a key took as a {@link Function} of its beans. The value is also a function took on them.
+	 *
+	 * @param iterable the iterable to map
+	 * @param keyMapper the key provider
+	 * @param target the map to be filled
+	 * @param <T> iterated objets type
+	 * @param <K> keys type
+	 * @param <M> returned {@link Map} type
+	 * @return a new {@link Map} of type M filled with key and values from given parameters
+	 */
+	public static <T, K, M extends Map<K, T>> M map(Iterable<T> iterable, Function<? super T, ? extends K> keyMapper, Supplier<M> target) {
+		return map(iterable, keyMapper, Function.identity(), target);
 	}
 	
 	/**

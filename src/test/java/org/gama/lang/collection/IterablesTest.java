@@ -32,10 +32,10 @@ import static org.gama.lang.collection.Iterables.last;
 /**
  * @author Guillaume Mary
  */
-public class IterablesTest {
+class IterablesTest {
 	
 	@Test
-	public void first_iterable() {
+	void first_iterable() {
 		Iterable<String> strings = asList("a", "b");
 		assertThat(first(strings)).isEqualTo("a");
 		strings = asList("a");
@@ -46,7 +46,7 @@ public class IterablesTest {
 	}
 	
 	@Test
-	public void first_iterator() {
+	void first_iterator() {
 		Iterator<String> strings = asList("a", "b").iterator();
 		assertThat(first(strings)).isEqualTo("a");
 		strings = asList("a").iterator();
@@ -57,7 +57,7 @@ public class IterablesTest {
 	}
 	
 	@Test
-	public void first_list() {
+	void first_list() {
 		List<String> strings = asList("a", "b");
 		assertThat(first(strings)).isEqualTo("a");
 		strings = asList("a");
@@ -68,7 +68,7 @@ public class IterablesTest {
 	}
 	
 	@Test
-	public void first_array() {
+	void first_array() {
 		String[] strings = new String[] { "a", "b" };
 		assertThat(first(strings)).isEqualTo("a");
 		strings = new String[] { "a" };
@@ -79,7 +79,7 @@ public class IterablesTest {
 	}
 	
 	@Test
-	public void first_map() {
+	void first_map() {
 		Map<String, Integer> aMap = new LinkedHashMap<>();
 		aMap.put("d", 25);
 		aMap.put("a", 14);
@@ -90,7 +90,7 @@ public class IterablesTest {
 	}
 	
 	@Test
-	public void firstValue_map() {
+	void firstValue_map() {
 		Map<String, Integer> aMap = new LinkedHashMap<>();
 		aMap.put("d", 25);
 		aMap.put("a", 14);
@@ -101,7 +101,7 @@ public class IterablesTest {
 	}
 	
 	@Test
-	public void last_list() {
+	void last_list() {
 		List<String> strings = asList("a", "b");
 		assertThat(last(strings)).isEqualTo("b");
 		strings = asList("a");
@@ -112,7 +112,7 @@ public class IterablesTest {
 	}
 	
 	@Test
-	public void last_iterable() {
+	void last_iterable() {
 		Set<String> strings = asSet("a", "b");
 		assertThat(last(strings)).isEqualTo("b");
 		strings = asSet("a");
@@ -123,7 +123,7 @@ public class IterablesTest {
 	}
 	
 	@Test
-	public void head() {
+	void head() {
 		List<String> strings = asList("a", "b", "c", "d");
 		assertThat(Iterables.head(strings, "c")).isEqualTo(Arrays.asList("a", "b"));
 		assertThat(Iterables.head(strings, "z")).isEqualTo(Arrays.asList("a", "b", "c", "d"));
@@ -134,7 +134,7 @@ public class IterablesTest {
 	}
 	
 	@Test
-	public void copy_iterable() {
+	void copy_iterable() {
 		// test with content
 		Set<String> aSet = Arrays.asSet("d", "a");
 		assertThat(copy(aSet)).isEqualTo(asList("d", "a"));
@@ -145,7 +145,7 @@ public class IterablesTest {
 	}
 	
 	@Test
-	public void copy_iterator() {
+	void copy_iterator() {
 		// test with content
 		ArrayIterator<String> iterator = new ArrayIterator<>("d", "a");
 		assertThat(copy(iterator, new ArrayList<>())).isEqualTo(asList("d", "a"));
@@ -157,7 +157,7 @@ public class IterablesTest {
 	}
 	
 	@Test
-	public void copy_iterable_collector() {
+	void copy_iterable_collector() {
 		// test with content
 		Iterable<String> iterable = asIterable(new ArrayIterator<>("d", "a"));
 		assertThat(copy(iterable, new ArrayList<>())).isEqualTo(asList("d", "a"));
@@ -180,7 +180,7 @@ public class IterablesTest {
 	}
 	
 	@Test
-	public void intersect() {
+	void intersect() {
 		assertThat(Iterables.intersect(asList(1, 2, 3, 4, 5), asList(2, 3, 6))).isEqualTo(asHashSet(2, 3));
 		assertThat(Iterables.intersect(asList(2, 3, 6), asList(1, 2, 3, 4, 5))).isEqualTo(asHashSet(2, 3));
 		assertThat(Iterables.intersect(asList(1, 2, 3, 4, 5), emptyList())).isEqualTo(emptySet());
@@ -191,7 +191,7 @@ public class IterablesTest {
 	}
 	
 	@Test
-	public void intersect_withComparator() {
+	void intersect_withComparator() {
 		// let's take a non comparable class : StringBuilder (which is simple to compare in fact)
 		StringBuilder a = new StringBuilder().append("a");
 		StringBuilder a$ = new StringBuilder().append("a");
@@ -215,7 +215,7 @@ public class IterablesTest {
 	}
 	
 	@Test
-	public void minus() {
+	void minus() {
 		assertThat(Iterables.minus(asList(1, 2, 3, 4, 5), asList(2, 3, 6))).isEqualTo(asHashSet(1, 4, 5));
 		assertThat(Iterables.minus(asList(2, 3, 6), asList(1, 2, 3, 4, 5))).isEqualTo(asHashSet(6));
 		assertThat(Iterables.minus(asList(1, 2, 3, 4, 5), emptyList())).isEqualTo(asHashSet(1, 2, 3, 4, 5));
@@ -226,7 +226,7 @@ public class IterablesTest {
 	}
 	
 	@Test
-	public void isEmpty() {
+	void isEmpty() {
 		assertThat(Iterables.isEmpty(Arrays.asList(1, 4, 5))).isFalse();
 		assertThat(Iterables.isEmpty(Arrays.asList())).isTrue();
 		assertThat(Iterables.isEmpty(null)).isTrue();
@@ -255,7 +255,7 @@ public class IterablesTest {
 	}
 	
 	@Test
-	public void equals() {
+	void equals() {
 		assertThat(Iterables.equals(asList(1, 2, 3, 4, 5), asList(2, 3, 6), Object::equals)).isFalse();
 		assertThat(Iterables.equals(asList(1, 2, 3, 4, 5), emptyList(), Object::equals)).isFalse();
 		assertThat(Iterables.equals(emptyList(), asList(1, 2, 3, 4, 5), Object::equals)).isFalse();
@@ -270,7 +270,7 @@ public class IterablesTest {
 	}
 	
 	@Test
-	public void collect() {
+	void collect() {
 		List<Integer> aList = asList(1, 2, 1);
 		assertThat(collectToList(aList, Object::toString)).isEqualTo(asList("1", "2", "1"));
 		
@@ -278,7 +278,7 @@ public class IterablesTest {
 	}
 	
 	@Test
-	public void collect_mappedWithFilter() {
+	void collect_mappedWithFilter() {
 		List<Integer> aList = asList(1, 2, 1);
 		assertThat((Set<String>) Iterables.collect(aList, i1 -> i1.equals(1), Object::toString, HashSet::new)).isEqualTo(asHashSet("1"));
 		assertThat((Set<String>) Iterables.collect(aList, i -> i.equals(2), Object::toString, HashSet::new)).isEqualTo(asHashSet("2"));
@@ -286,7 +286,7 @@ public class IterablesTest {
 	}
 	
 	@Test
-	public void collect_mappedWith2Filters() {
+	void collect_mappedWith2Filters() {
 		List<Integer> aList = asList(1, 2, 1);
 		assertThat((Set<String>) Iterables.collect(aList, i -> i.equals(1), Object::toString, "1"::equals, HashSet::new)).isEqualTo(asHashSet("1"));
 		assertThat((Set<String>) Iterables.collect(aList, i -> i.equals(2), Object::toString, "2"::equals, HashSet::new)).isEqualTo(asHashSet("2"));
@@ -296,7 +296,7 @@ public class IterablesTest {
 	}
 	
 	@Test
-	public void find() {
+	void find() {
 		List<String> strings = asList("a", "b");
 		String result = Iterables.find(strings, o -> o.equalsIgnoreCase("B"));
 		assertThat(result).isEqualTo("b");
@@ -306,7 +306,7 @@ public class IterablesTest {
 	}
 	
 	@Test
-	public void find_mapped() {
+	void find_mapped() {
 		List<String> strings = asList("a", "b");
 		Duo<String, String> result = Iterables.find(strings, String::toUpperCase, o -> o.equals("B"));
 		assertThat(result.getLeft()).isEqualTo("b");
@@ -316,7 +316,7 @@ public class IterablesTest {
 		assertThat(result).isNull();
 	}
 	
-	public static Object[][] consume() {
+	static Object[][] consume() {
 		return new Object[][] {
 				{ asList("a", "b"), "a", asSet(0) },
 				{ asList("a", "b"), "b", asSet(1) },
@@ -329,7 +329,7 @@ public class IterablesTest {
 	
 	@ParameterizedTest
 	@MethodSource
-	public void consume(List<String> input, String lookupElement, Set<Integer> expected) {
+	void consume(List<String> input, String lookupElement, Set<Integer> expected) {
 		Set<Integer> collectedIndexes = new HashSet<>();
 		Iterables.consume(input, lookupElement::equals, (s, i) -> collectedIndexes.add(i));
 		assertThat(collectedIndexes).isEqualTo(expected);
@@ -337,42 +337,42 @@ public class IterablesTest {
 	
 	@ParameterizedTest
 	@MethodSource("consume")
-	public void Consume_stream(List<String> input, String lookupElement, Set<Integer> expected) {
+	void Consume_stream(List<String> input, String lookupElement, Set<Integer> expected) {
 		Set<Integer> collectedIndexes = new HashSet<>();
 		Iterables.consume(input.stream(), lookupElement::equals, (s, i) -> collectedIndexes.add(i));
 		assertThat(collectedIndexes).isEqualTo(expected);
 	}
 	
 	@Test
-	public void contains() {
+	void contains() {
 		List<String> strings = asList("a", "b");
 		assertThat(Iterables.contains(strings.iterator(), s -> s.equalsIgnoreCase("B"))).isTrue();
 		assertThat(Iterables.contains(strings.iterator(), s -> s.equalsIgnoreCase("C"))).isFalse();
 	}
 	
 	@Test
-	public void contains_mapped() {
+	void contains_mapped() {
 		List<String> strings = asList("a", "b");
 		assertThat(Iterables.contains(strings.iterator(), String::toUpperCase, s -> s.equals("B"))).isTrue();
 		assertThat(Iterables.contains(strings.iterator(), String::toUpperCase, s -> s.equals("C"))).isFalse();
 	}
 	
 	@Test
-	public void contains_iterable() {
+	void contains_iterable() {
 		List<String> strings = asList("a", "b");
 		assertThat(Iterables.contains(strings, s -> s.equalsIgnoreCase("B"))).isTrue();
 		assertThat(Iterables.contains(strings, s -> s.equalsIgnoreCase("C"))).isFalse();
 	}
 	
 	@Test
-	public void contains_iterable_mapped() {
+	void contains_iterable_mapped() {
 		List<String> strings = asList("a", "b");
 		assertThat(Iterables.contains(strings, String::toUpperCase, s -> s.equals("B"))).isTrue();
 		assertThat(Iterables.contains(strings, String::toUpperCase, s -> s.equals("C"))).isFalse();
 	}
 	
 	@Test
-	public void pair() {
+	void pair() {
 		List<String> strings = asList("a", "b");
 		List<Integer> integers = asList(1, 2);
 		assertThat(Iterables.pair(strings, integers)).isEqualTo(Maps.asMap("a", 1).add("b", 2));
@@ -385,7 +385,7 @@ public class IterablesTest {
 	}
 	
 	@Test
-	public void iterate() {
+	void iterate() {
 		List<String> strings = asList("a", "b");
 		List<Object> result = new ArrayList<>();
 		Iterables.iterate(strings, (i, s) -> { result.add(i); result.add(s); });
@@ -393,13 +393,19 @@ public class IterablesTest {
 	}
 	
 	@Test
-	public void filter() {
+	void filter() {
 		List<String> strings = Arrays.asList("a", "ab", "b");
 		assertThat(Iterables.filter(strings, s -> s.startsWith("a"))).isEqualTo(Arrays.asList("a", "ab"));
 	}
 	
 	@Test
-	public void reverseListIterator() {
+	void reverseListIterator() {
 		assertThat(Iterables.copy(Iterables.reverseIterator(Arrays.asList("a", "d", "z", "k")))).isEqualTo(Arrays.asList("k", "z", "d", "a"));
+	}
+	
+	@Test
+	void map() {
+		List<Duo<String, Integer>> input = asList(new Duo<>("a", 1), new Duo<>("b", 2));
+		assertThat(Iterables.map(input, Duo::getLeft, Duo::getRight)).isEqualTo(Maps.asMap("a", 1).add("b", 2));
 	}
 }
