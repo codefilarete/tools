@@ -8,14 +8,14 @@ import static org.assertj.core.api.Assertions.fail;
 /**
  * @author Guillaume Mary
  */
-public class RetryerTest {
+class RetryerTest {
 	
 	@Test
-	public void testExecute_neverWorks() throws Throwable {
+	void execute_neverWorks() {
 		Retryer testInstance = new Retryer(3, 5) {
 			@Override
-			protected boolean shouldRetry(Throwable t) {
-				return true;
+			protected boolean shouldRetry(Result result) {
+				return result instanceof Failure;
 			}
 		};
 		
@@ -33,11 +33,11 @@ public class RetryerTest {
 	}
 	
 	@Test
-	public void testExecute_worksLastAttempt() throws Throwable {
+	void execute_worksLastAttempt() {
 		Retryer testInstance = new Retryer(3, 5) {
 			@Override
-			protected boolean shouldRetry(Throwable t) {
-				return true;
+			protected boolean shouldRetry(Result result) {
+				return result instanceof Failure;
 			}
 		};
 		
@@ -57,11 +57,11 @@ public class RetryerTest {
 	}
 	
 	@Test
-	public void testExecute_worksFirstAttempt() throws Throwable {
+	void execute_worksFirstAttempt() {
 		Retryer testInstance = new Retryer(3, 5) {
 			@Override
-			protected boolean shouldRetry(Throwable t) {
-				return true;
+			protected boolean shouldRetry(Result result) {
+				return result instanceof Failure;
 			}
 		};
 		
@@ -78,11 +78,16 @@ public class RetryerTest {
 	}
 	
 	@Test
-	public void testExecute_throwUnexpected() throws Throwable {
+	void execute_throwUnexpected() {
 		Retryer testInstance = new Retryer(3, 5) {
+			
 			@Override
-			protected boolean shouldRetry(Throwable t) {
-				return t.getMessage().equals("retry");
+			protected boolean shouldRetry(Result result) {
+				if (result instanceof Failure) {
+					return ((Failure<?>) result).getError().getMessage().equals("retry");
+				} else {
+					return false;
+				}
 			}
 		};
 		
@@ -103,7 +108,7 @@ public class RetryerTest {
 	}
 	
 	@Test
-	public void testExecute_noRetryAsked() throws Throwable {
+	void execute_noRetryAsked() {
 		Retryer testInstance = Retryer.NO_RETRY;
 		
 		final int[] callTimes = new int[1];
