@@ -13,6 +13,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
+import org.assertj.core.api.Condition;
 import org.gama.lang.Reflections;
 import org.gama.lang.bean.ClassIterator;
 import org.gama.lang.bean.InterfaceIterator;
@@ -85,9 +86,9 @@ class ReadOnlyListTest {
 		// List.class must be added because it is not included by inheritance iterator
 		listClassInheritance.add(0, List.class);
 		MethodIterator methodInHierarchyIterator = new MethodIterator(listClassInheritance.iterator());
-		FilteringIterator<Method> nonMutingMethodsIterator = new FilteringIterator<>(methodInHierarchyIterator,
+		FilteringIterator<Method> nonMutatingMethodsIterator = new FilteringIterator<>(methodInHierarchyIterator,
 				m -> !MUTATING_METHODS.contains(m) && !EQUALS_HASHCODE_METHODS.contains(m) && !DEFAULT_METHODS.contains(m));
-		Iterable<Method> methods = () -> nonMutingMethodsIterator;
+		Iterable<Method> methods = () -> nonMutatingMethodsIterator;
 		int methodCount = 0;
 		for (Method method : methods) {
 			Object invokationResult;
@@ -111,7 +112,7 @@ class ReadOnlyListTest {
 						Mockito.verify(delegate).listIterator(eq(0));
 						break;
 					case "spliterator":
-						Mockito.verifyNoMoreInteractions(delegate);
+						Mockito.verify(delegate).spliterator();
 						break;
 					case "listIterator":
 						Mockito.verify(delegate).listIterator(eq(0));
@@ -140,6 +141,10 @@ class ReadOnlyListTest {
 	void readOnlyMethodsThrowException() {
 		List delegate = Mockito.mock(List.class);
 		
+		Condition<Throwable> hasUnsupportedOperationExceptionInTrace = new Condition<>(
+				thrownException -> Exceptions.findExceptionInCauses(thrownException, UnsupportedOperationException.class) != null,
+				"exception stack contains " + UnsupportedOperationException.class.getSimpleName());
+		
 		ReadOnlyList testInstance = new ReadOnlyList(delegate);
 		for (Method method : MUTATING_METHODS) {
 			// we create default arguments otherwise we get IllegalArgumentException from the JVM at invoke() time
@@ -159,7 +164,7 @@ class ReadOnlyListTest {
 				} catch (ReflectiveOperationException | IllegalArgumentException e) {
 					throw new RuntimeException("Error executing " + Reflections.toString(method), e);
 				}
-			}).satisfies(thrownException -> Exceptions.findExceptionInCauses(thrownException, UnsupportedOperationException.class));
+			}).satisfies(hasUnsupportedOperationExceptionInTrace);
 		}
 	}
 	
@@ -168,17 +173,15 @@ class ReadOnlyListTest {
 		List list = Mockito.mock(List.class);
 		ListIterator delegate = Mockito.mock(ListIterator.class);
 		Mockito.when(list.listIterator(eq(0))).thenReturn(delegate);
-//		new ReadOnlyList(list).new ReadOnlyListIterator(0) 
-//		List testInstance = Mockito.mock(new ReadOnlyList(Mockito.mock(List.class)).listIterator());
 		
 		ListIterator testInstance = new ReadOnlyList<>(list).listIterator();
 		List<Class> listClassInheritance = Iterables.copy(new InterfaceIterator(new ClassIterator(ListIterator.class, null)));
 		// ListIterator.class must be added because it is not included by inheritance iterator
 		listClassInheritance.add(0, ListIterator.class);
 		MethodIterator methodInHierarchyIterator = new MethodIterator(listClassInheritance.iterator());
-		FilteringIterator<Method> nonMutingMethodsIterator = new FilteringIterator<>(methodInHierarchyIterator,
+		FilteringIterator<Method> nonMutatingMethodsIterator = new FilteringIterator<>(methodInHierarchyIterator,
 				m -> !ITERATOR_MUTATING_METHODS.contains(m) && !EQUALS_HASHCODE_METHODS.contains(m) && !DEFAULT_METHODS.contains(m));
-		Iterable<Method> methods = () -> nonMutingMethodsIterator;
+		Iterable<Method> methods = () -> nonMutatingMethodsIterator;
 		int methodCount = 0;
 		for (Method method : methods) {
 			Object invokationResult;
@@ -198,10 +201,6 @@ class ReadOnlyListTest {
 				
 				// hacking some checks because some methods don't redirect to themselves
 				Object delegateResult = method.invoke(Mockito.verify(delegate), args);
-				// small hack because Mockito is not consistent with itself : mock() returns an empty instances whereas verify() returns null
-				if (method.equals(List.class.getMethod("subList", int.class, int.class))) {
-					delegateResult = new ReadOnlyList();
-				}
 				assertThat(invokationResult).isEqualTo(delegateResult);
 				Mockito.clearInvocations(delegate);
 				methodCount++;
@@ -216,6 +215,10 @@ class ReadOnlyListTest {
 	@Test
 	void listIteratorReadOnlyMethodsThrowException() {
 		List delegate = Mockito.mock(List.class);
+		
+		Condition<Throwable> hasUnsupportedOperationExceptionInTrace = new Condition<>(
+				thrownException -> Exceptions.findExceptionInCauses(thrownException, UnsupportedOperationException.class) != null,
+				"exception stack contains " + UnsupportedOperationException.class.getSimpleName());
 		
 		ListIterator testInstance = new ReadOnlyList(delegate).listIterator();
 		for (Method method : ITERATOR_MUTATING_METHODS) {
@@ -236,7 +239,7 @@ class ReadOnlyListTest {
 				} catch (ReflectiveOperationException | IllegalArgumentException e) {
 					throw new RuntimeException("Error executing " + Reflections.toString(method), e);
 				}
-			}).satisfies(thrownException -> Exceptions.findExceptionInCauses(thrownException, UnsupportedOperationException.class));
+			}).satisfies(hasUnsupportedOperationExceptionInTrace);
 		}
 	}
 	

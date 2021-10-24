@@ -1,6 +1,7 @@
 package org.gama.lang.collection;
 
 import java.util.Iterator;
+import java.util.function.Consumer;
 
 /**
  * A marking class for {@link Iterator} which elements cannot be removed.
@@ -55,6 +56,11 @@ public abstract class ReadOnlyIterator<E> implements Iterator<E> {
 		@Override
 		public C next() {
 			return surrogate.next();
+		}
+		
+		@Override
+		public void forEachRemaining(Consumer<? super C> action) {
+			surrogate.forEachRemaining(action);
 		}
 	}
 }

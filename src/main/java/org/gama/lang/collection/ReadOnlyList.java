@@ -15,9 +15,7 @@ import java.util.function.UnaryOperator;
  * @param <E> element type
  * @author Guillaume Mary
  */
-public class ReadOnlyList<E> implements List<E> {
-	
-	private final List<? extends E> list;
+public class ReadOnlyList<E> extends ReadOnlyCollection<E, List<E>> implements List<E> {
 	
 	public ReadOnlyList() {
 		this(new ArrayList<>());
@@ -28,12 +26,12 @@ public class ReadOnlyList<E> implements List<E> {
 	}
 	
 	public ReadOnlyList(List<? extends E> list) {
-		this.list = list;
+		super((List<E>) list);
 	}
 	
 	@Override
 	public E get(int index) {
-		return list.get(index);
+		return delegate.get(index);
 	}
 	
 	@Override
@@ -53,71 +51,21 @@ public class ReadOnlyList<E> implements List<E> {
 	
 	@Override
 	public List<E> subList(int fromIndex, int toIndex) {
-		return new ReadOnlyList<>(list.subList(fromIndex, toIndex));
-	}
-	
-	@Override
-	public boolean contains(Object o) {
-		return list.contains(o);
-	}
-	
-	@Override
-	public boolean containsAll(Collection<?> c) {
-		return list.containsAll(c);
-	}
-	
-	@Override
-	public boolean isEmpty() {
-		return list.isEmpty();
-	}
-	
-	@Override
-	public int size() {
-		return list.size();
-	}
-	
-	@Override
-	public Object[] toArray() {
-		return list.toArray();
-	}
-	
-	@Override
-	public <T> T[] toArray(T[] a) {
-		return list.toArray(a);
+		return new ReadOnlyList<>(delegate.subList(fromIndex, toIndex));
 	}
 	
 	@Override
 	public int indexOf(Object o) {
-		return list.indexOf(o);
+		return delegate.indexOf(o);
 	}
 	
 	@Override
 	public int lastIndexOf(Object o) {
-		return list.lastIndexOf(o);
-	}
-	
-	@Override
-	public boolean equals(Object o) {
-		return o == this || list.equals(o);
-	}
-	
-	@Override
-	public int hashCode() {
-		return list.hashCode();
-	}
-	
-	@Override
-	public String toString() {
-		return list.toString();
+		return delegate.lastIndexOf(o);
 	}
 	
 	@Override
 	public final E set(int index, E element) {
-		throw new UnsupportedOperationException();
-	}
-	
-	@Override
-	public final boolean add(E element) {
 		throw new UnsupportedOperationException();
 	}
 	
@@ -127,32 +75,12 @@ public class ReadOnlyList<E> implements List<E> {
 	}
 	
 	@Override
-	public final boolean remove(Object element) {
-		throw new UnsupportedOperationException();
-	}
-	
-	@Override
 	public final E remove(int index) {
 		throw new UnsupportedOperationException();
 	}
 	
 	@Override
-	public final boolean addAll(Collection<? extends E> c) {
-		throw new UnsupportedOperationException();
-	}
-	
-	@Override
 	public final boolean addAll(int index, Collection<? extends E> c) {
-		throw new UnsupportedOperationException();
-	}
-	
-	@Override
-	public final boolean removeAll(Collection<?> c) {
-		throw new UnsupportedOperationException();
-	}
-	
-	@Override
-	public final boolean retainAll(Collection<?> c) {
 		throw new UnsupportedOperationException();
 	}
 	
@@ -166,17 +94,12 @@ public class ReadOnlyList<E> implements List<E> {
 		throw new UnsupportedOperationException();
 	}
 	
-	@Override
-	public final void clear() {
-		throw new UnsupportedOperationException();
-	}
-	
 	class ReadOnlyListIterator extends ReadOnlyIterator<E> implements ListIterator<E> {
 		
 		private final ListIterator<? extends E> delegateIterator;
 		
 		ReadOnlyListIterator(int index) {
-			delegateIterator = list.listIterator(index);
+			delegateIterator = delegate.listIterator(index);
 		}
 		
 		@Override
