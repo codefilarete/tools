@@ -13,35 +13,43 @@ import java.util.Iterator;
 public abstract class SteppingIterator<E> implements Iterator<E> {
 	
 	private final Iterator<? extends E> delegate;
-	private long stepCounter = 0;
-	private final long step;
+	private long stepCount = 0;
+	private final long stepSize;
 	
-	public SteppingIterator(Iterable<? extends E> delegate, long step) {
-		this(delegate.iterator(), step);
+	public SteppingIterator(Iterable<? extends E> delegate, long stepSize) {
+		this(delegate.iterator(), stepSize);
 	}
 	
-	public SteppingIterator(Iterator<? extends E> delegate, long step) {
+	public SteppingIterator(Iterator<? extends E> delegate, long stepSize) {
 		this.delegate = delegate;
-		this.step = step;
+		this.stepSize = stepSize;
 	}
 	
 	@Override
 	public boolean hasNext() {
 		boolean hasNext = delegate.hasNext();
 		if (	// step reached
-				stepCounter == step
+				stepCount == stepSize
 				// or has remainings (end reached and not started)
-				|| (!hasNext && stepCounter != 0)) {
+				|| (!hasNext && stepCount != 0)) {
 			onStep();
-			stepCounter = 0;
+			stepCount = 0;
 		}
 		return hasNext;
 	}
 	
 	@Override
 	public E next() {
-		stepCounter++;
+		stepCount++;
 		return delegate.next();
+	}
+	
+	public long getStepSize() {
+		return stepSize;
+	}
+	
+	public long getStepCount() {
+		return stepCount;
 	}
 	
 	protected abstract void onStep();
