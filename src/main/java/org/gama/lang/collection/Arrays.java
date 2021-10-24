@@ -19,6 +19,7 @@ public class Arrays {
 	
 	private static final Integer[] EMPTY_INTEGER_ARRAY = {};
 	private static final int[] EMPTY_INT_ARRAY = {};
+	private static final long[] EMPTY_LONG_ARRAY = {};
 	
 	@SafeVarargs
 	public static <T> List<T> asList(T... a) {
@@ -82,6 +83,12 @@ public class Arrays {
 		}
 	}
 	
+	/**
+	 * Unboxes given {@link Integer}s
+	 * 
+	 * @param integers array to be transformed as a primitive one
+	 * @return an array containing equivalent values of given array, null if input was null
+	 */
 	@Nullable
 	public static int[] toPrimitive(@Nullable Integer[] integers) {
 		if (integers == null) {
@@ -92,6 +99,27 @@ public class Arrays {
 			int[] result = new int[integers.length];
 			for (int i = 0; i < integers.length; i++) {
 				result[i] = integers[i];
+			}
+			return result;
+		}
+	}
+	
+	/**
+	 * Unboxes given {@link Long}s
+	 *
+	 * @param longs array to be transformed as a primitive one
+	 * @return an array containing equivalent values of given array, null if input was null
+	 */
+	@Nullable
+	public static long[] toPrimitive(@Nullable Long[] longs) {
+		if (longs == null) {
+			return null;
+		} else if (longs.length == 0) {
+			return EMPTY_LONG_ARRAY;
+		} else {
+			long[] result = new long[longs.length];
+			for (int i = 0; i < longs.length; i++) {
+				result[i] = longs[i];
 			}
 			return result;
 		}

@@ -95,8 +95,18 @@ public class ArraysTest {
 	}
 	
 	@Test
-	public void testFromPrimitive() {
+	public void fromPrimitive() {
 		assertThat(Arrays.fromPrimitive(new int[] { 1, 2, 3, 4 })).isEqualTo(new Integer[] { 1, 2, 3, 4 });
+	}
+	
+	@Test
+	public void toPrimitive() {
+		assertThat(Arrays.toPrimitive(new Integer[] { 1, 2, 3, 4 })).isEqualTo(new int[] { 1, 2, 3, 4 });
+	}
+	
+	@Test
+	public void toPrimitive_long() {
+		assertThat(Arrays.toPrimitive(new Long[] { 1L, 2L, 3L, 4L })).isEqualTo(new long[] { 1, 2, 3, 4 });
 	}
 	
 	@Test
