@@ -40,7 +40,7 @@ public interface Serie<I> {
 		}
 	}
 	
-	/** Every {@link #next(Object)} returns a new {@link Date} */
+	/** Every {@link #next(Object)} returns a new {@link LocalDateTime} */
 	class NowSerie implements Serie<LocalDateTime> {
 		
 		@Override
