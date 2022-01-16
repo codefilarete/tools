@@ -46,7 +46,7 @@ public class PairIterator<K, V> implements Iterator<Duo<K, V>> {
 	 * {@link Iterator} which continues while one of the surrogate {@link Iterator} still has elements. So it stops when both {@link Iterator}s are
 	 * drained.
 	 * Gives the pair as a {@link Duo}.
-	 * Missing values are overridable throught {@link #getMissingKey()} and {@link #getMissingValue()}.
+	 * Missing values are overridable through {@link #getMissingKey()} and {@link #getMissingValue()}.
 	 *
 	 * @param <K> type of first {@link Iterator}'s element
 	 * @param <V> type of second {@link Iterator}'s element

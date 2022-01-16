@@ -11,7 +11,7 @@ import org.gama.lang.VisibleForTesting;
 
 /**
  * Class aimed at mesuring time between 2 events.
- * Basic implementation and use case : start it (done at instanciation time), then printing throught {@link #toString()}.
+ * Basic implementation and use case : start it (done at instanciation time), then printing through {@link #toString()}.
  * One can reset it with {@link #start()}.
  * 
  * @author Guillaume Mary
