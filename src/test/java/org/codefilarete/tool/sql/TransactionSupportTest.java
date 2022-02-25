@@ -3,6 +3,7 @@ package org.codefilarete.tool.sql;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import org.codefilarete.tool.function.ThrowingConsumer;
 import org.codefilarete.tool.trace.ModifiableBoolean;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -13,16 +14,17 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Guillaume Mary
  */
-public class TransactionSupportTest {
+class TransactionSupportTest {
 	
 	@Test
-	public void testCommitStateReversion_true() throws SQLException {
+	void commitStateReversion_true() throws SQLException {
 		ModifiableBoolean commitState = new ModifiableBoolean(true);
 		
 		TransactionSupport testInstance = new TransactionSupport(new ConnectionWrapper() {
@@ -47,7 +49,7 @@ public class TransactionSupportTest {
 	}
 	
 	@Test
-	public void testCommitStateReversion_false() throws SQLException {
+	void commitStateReversion_false() throws SQLException {
 		ModifiableBoolean commitState = new ModifiableBoolean(false);
 		
 		TransactionSupport testInstance = new TransactionSupport(new ConnectionWrapper() {
@@ -72,31 +74,26 @@ public class TransactionSupportTest {
 	}
 	
 	@Test
-	public void testBegin_connectionAutoCommitIsSetToFalse() throws SQLException {
-		Connection mock = mock(Connection.class);
-		TransactionSupport testInstance = new TransactionSupport(mock);
-		testInstance.begin();
-		
-		verify(mock).setAutoCommit(eq(false));
-	}
-	
-	@Test
-	public void testEnd_connectionAutoCommitIsCalled() throws SQLException {
+	void end_connectionAutoCommitIsCalledIfNecessary() throws SQLException {
 		Connection connectionMock = mock(Connection.class);
 		TransactionSupport testInstance = new TransactionSupport(connectionMock);
 		testInstance.begin();
 		
-		verify(connectionMock).setAutoCommit(anyBoolean());
+		verify(connectionMock, times(0)).setAutoCommit(anyBoolean());
+		
+		when(connectionMock.getAutoCommit()).thenReturn(true);
+		testInstance.begin();
+		verify(connectionMock).setAutoCommit(eq(false));
 	}
 	
 	@Test
-	public void testRunAtomically_normalCase() throws SQLException {
+	void runAtomically_consumer_normalCase() throws SQLException {
 		Connection connectionMock = mock(Connection.class);
 		TransactionSupport testInstance = new TransactionSupport(connectionMock);
 		TransactionSupport spy = Mockito.spy(testInstance);
 		
 		Object[] consumerState = new Object[1];
-		spy.runAtomically(c -> consumerState[0] = c);
+		spy.runAtomically(c -> { consumerState[0] = c; });
 		
 		verify(spy).commit();
 		verify(connectionMock).commit();
@@ -106,12 +103,44 @@ public class TransactionSupportTest {
 	}
 	
 	@Test
-	public void testRunAtomically_rollbackOnException() throws SQLException {
+	void runAtomically_consumer_rollbackOnException() throws SQLException {
 		Connection connectionMock = mock(Connection.class);
 		TransactionSupport testInstance = new TransactionSupport(connectionMock);
 		TransactionSupport spy = Mockito.spy(testInstance);
 		
-		assertThatThrownBy(() -> spy.runAtomically(c -> {
+		assertThatThrownBy(() -> spy.runAtomically((ThrowingConsumer<Connection, SQLException>) c -> {
+			throw new SQLException();
+		})).isNotNull();
+		
+		verify(spy, never()).commit();
+		verify(connectionMock, never()).commit();
+		verify(spy).begin();
+		verify(spy).rollback();
+		verify(spy).end();
+	}
+	
+	@Test
+	void runAtomically_function_normalCase() throws SQLException {
+		Connection connectionMock = mock(Connection.class);
+		TransactionSupport testInstance = new TransactionSupport(connectionMock);
+		TransactionSupport spy = Mockito.spy(testInstance);
+		
+		Connection consumerState = spy.runAtomically((Connection c) -> c);
+		
+		verify(spy).commit();
+		verify(connectionMock).commit();
+		verify(spy).begin();
+		assertThat(consumerState).isSameAs(connectionMock);
+		verify(spy).end();
+	}
+	
+	@Test
+	void runAtomically_function_rollbackOnException() throws SQLException {
+		Connection connectionMock = mock(Connection.class);
+		TransactionSupport testInstance = new TransactionSupport(connectionMock);
+		TransactionSupport spy = Mockito.spy(testInstance);
+		
+		assertThatThrownBy(() -> spy.runAtomically((Connection c) -> {
 			throw new SQLException();
 		})).isNotNull();
 		
