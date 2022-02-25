@@ -18,11 +18,28 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
  */
 class ExceptionsTest {
 	
+	@Test
+	void findExceptionInCauses_string() {
+		NullPointerException cause = new NullPointerException("This exception contains toto in its message");
+		NullPointerException foundException = Exceptions.findExceptionInCauses(new RuntimeException(cause), NullPointerException.class,
+																			   // testing ignore case sensitivity
+																			   "THIS exception contains TOTO in its message");
+		assertThat(foundException).isSameAs(cause);
+	}
+	
+	@Test
+	void findExceptionInCauses_predicate() {
+		NullPointerException cause = new NullPointerException("This exception contains toto in its message");
+		NullPointerException foundException = Exceptions.findExceptionInCauses(new RuntimeException(cause), NullPointerException.class,
+																	 m -> m.contains("toto"));
+		assertThat(foundException).isSameAs(cause);
+	}
+	
 	@Nested
 	class ExceptionCauseIteratorTest {
 		
 		@Test
-		public void testNext() {
+		void next() {
 			RuntimeException root = new RuntimeException("root", 
 					new RuntimeException("cause", 
 					new RuntimeException("second cause")));
@@ -32,7 +49,7 @@ class ExceptionsTest {
 		}
 		
 		@Test
-		public void testNext_throwsNoSuchElementException() {
+		void next_throwsNoSuchElementException() {
 			RuntimeException root = new RuntimeException("root", new RuntimeException("cause"));
 			ExceptionCauseIterator testInstance = new ExceptionCauseIterator(root);
 			assertThat(testInstance.hasNext()).isTrue();
@@ -44,7 +61,7 @@ class ExceptionsTest {
 		}
 		
 		@Test
-		public void testNext_throwsNoSuchElementException_onNullException() {
+		void next_throwsNoSuchElementException_onNullException() {
 			ExceptionCauseIterator testInstance = new ExceptionCauseIterator(null);
 			assertThat(testInstance.hasNext()).isFalse();
 			assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(testInstance::next);

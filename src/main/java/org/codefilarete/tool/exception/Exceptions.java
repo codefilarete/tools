@@ -1,6 +1,7 @@
 package org.codefilarete.tool.exception;
 
 import java.util.NoSuchElementException;
+import java.util.function.Predicate;
 
 import org.codefilarete.tool.collection.Iterables;
 import org.codefilarete.tool.collection.ReadOnlyIterator;
@@ -34,6 +35,10 @@ public interface Exceptions {
 	
 	static <T> T findExceptionInCauses(Throwable t, Class<T> throwableClass, String message) {
 		return (T) findExceptionInCauses(t, new ClassAndMessageExceptionFilter<>(throwableClass, message));
+	}
+	
+	static <T> T findExceptionInCauses(Throwable t, Class<T> throwableClass, Predicate<String> messageAccepter) {
+		return (T) findExceptionInCauses(t, new ClassAndMessageExceptionFilter<>(throwableClass, messageAccepter));
 	}
 	
 	/**
@@ -96,16 +101,21 @@ public interface Exceptions {
 	
 	class ClassAndMessageExceptionFilter<T> extends ClassExceptionFilter<T> {
 		
-		private final String targetMessage;
+		private final Predicate<String> messageAccepter;
 		
 		public ClassAndMessageExceptionFilter(Class<T> c, String message) {
 			super(c);
-			this.targetMessage = message;
+			this.messageAccepter = message::equalsIgnoreCase;
+		}
+		
+		public ClassAndMessageExceptionFilter(Class<T> c, Predicate<String> messageAccepter) {
+			super(c);
+			this.messageAccepter = messageAccepter;
 		}
 		
 		@Override
 		public boolean accept(Throwable t) {
-			return super.accept(t) && targetMessage.equalsIgnoreCase(t.getMessage());
+			return super.accept(t) && this.messageAccepter.test(t.getMessage());
 		}
 	}
 	
