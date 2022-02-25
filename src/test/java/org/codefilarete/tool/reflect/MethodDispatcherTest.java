@@ -136,8 +136,8 @@ class MethodDispatcherTest {
 		// This won't work because FluentInterfaceSupport returns itself which doesn't match DummyFluentInterface : they are dissociated subclasses.
 		assertThatThrownBy(() -> testInstance.doSomething().doSomethingElse())
 				.isInstanceOf(ClassCastException.class)
-				.hasMessage("MethodDispatcherTest$FluentInterfaceSupport cannot be cast"
-						+ " to MethodDispatcherTest$DummyFluentInterface");
+				.hasMessage("org.codefilarete.tool.reflect.MethodDispatcherTest$FluentInterfaceSupport cannot be cast"
+						+ " to org.codefilarete.tool.reflect.MethodDispatcherTest$DummyFluentInterface");
 	}
 	
 	@Test

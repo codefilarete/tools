@@ -84,7 +84,7 @@ public class ReflectionsTest {
 	
 	public static Object[][] testGetDefaultConstructor_throwingCases_data() {
 		return new Object[][] {
-				{ InnerClass.class, "Class o.g.l.ReflectionsTest$InnerClass has no default constructor because it is an inner non static class" +
+				{ InnerClass.class, "Class o.c.t.ReflectionsTest$InnerClass has no default constructor because it is an inner non static class" +
 						" (needs an instance of the encosing class to be constructed)" },
 				{ int.class, "Class int has no default constructor because it is a primitive type" },
 				{ int[].class, "Class int[] has no default constructor because it is an array" },
@@ -292,7 +292,7 @@ public class ReflectionsTest {
 		assertThatThrownBy(() -> Reflections.newInstance(AbstractClass.class))
 				.isInstanceOf(InvokationRuntimeException.class)
 				.extracting(thrownException -> Exceptions.findExceptionInCauses(thrownException, InvokationRuntimeException.class), THROWABLE)
-				.hasMessage("Class o.g.l.ReflectionsTest$AbstractClass can't be instanciated because it is abstract");
+				.hasMessage("Class o.c.t.ReflectionsTest$AbstractClass can't be instanciated because it is abstract");
 	}
 	
 	@Test
@@ -303,7 +303,7 @@ public class ReflectionsTest {
 		
 		exceptionAsserter
 				.extracting(thrownException -> Exceptions.findExceptionInCauses(thrownException, InvokationRuntimeException.class), THROWABLE)
-				.hasMessage("Class o.g.l.ReflectionsTest$ThrowingConstructorClass can't be instanciated");
+				.hasMessage("Class o.c.t.ReflectionsTest$ThrowingConstructorClass can't be instanciated");
 		
 		exceptionAsserter
 				.extracting(thrownException -> Exceptions.findExceptionInCauses(thrownException, NullPointerException.class), THROWABLE)
@@ -324,7 +324,7 @@ public class ReflectionsTest {
 		
 		exceptionAsserter
 				.extracting(thrownException -> Exceptions.findExceptionInCauses(thrownException, InvokationRuntimeException.class), THROWABLE)
-				.hasMessage("Class o.g.l.ReflectionsTest$ThrowingConstructorClass can't be instanciated");
+				.hasMessage("Class o.c.t.ReflectionsTest$ThrowingConstructorClass can't be instanciated");
 		
 		exceptionAsserter
 				.extracting(thrownException -> Exceptions.findExceptionInCauses(thrownException, NullPointerException.class), THROWABLE)
@@ -375,7 +375,7 @@ public class ReflectionsTest {
 		Method fixBMethod = Toto.class.getDeclaredMethod("fixB", String.class);
 		assertThatThrownBy(() -> Reflections.propertyName(fixBMethod))
 				.isInstanceOf(MemberNotFoundException.class)
-				.hasMessage("Field wrapper o.g.l.ReflectionsTest$Toto.fixB(j.l.String) doesn't fit encapsulation naming convention");
+				.hasMessage("Field wrapper o.c.t.ReflectionsTest$Toto.fixB(j.l.String) doesn't fit encapsulation naming convention");
 	}
 	
 	@Test

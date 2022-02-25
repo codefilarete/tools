@@ -29,7 +29,7 @@ public class MemberPrinterTest {
 		MemberPrinter testInstance = FLATTEN_PACKAGE_PRINTER;
 		assertThat(testInstance.toString(String.class)).isEqualTo("j.l.String");
 		assertThat(testInstance.toString(Collection.class)).isEqualTo("j.u.Collection");
-		assertThat(testInstance.toString(ReflectionsTest.class)).isEqualTo("o.g.l.ReflectionsTest");
+		assertThat(testInstance.toString(ReflectionsTest.class)).isEqualTo("o.c.t.ReflectionsTest");
 		assertThat(testInstance.toString(Class.forName("TopPackageLevelClass"))).isEqualTo("TopPackageLevelClass");
 		assertThat(testInstance.toString(boolean.class)).isEqualTo("boolean");
 		assertThat(testInstance.toString(Boolean.TYPE)).isEqualTo("boolean");
@@ -92,7 +92,7 @@ public class MemberPrinterTest {
 		MemberPrinter testInstance = WELL_KNOWN_FLATTEN_PACKAGE_PRINTER;
 		assertThat(testInstance.toString(String.class)).isEqualTo("String");
 		assertThat(testInstance.toString(Collection.class)).isEqualTo("Collection");
-		assertThat(testInstance.toString(ReflectionsTest.class)).isEqualTo("o.g.l.ReflectionsTest");
+		assertThat(testInstance.toString(ReflectionsTest.class)).isEqualTo("o.c.t.ReflectionsTest");
 		assertThat(testInstance.toString(Class.forName("TopPackageLevelClass"))).isEqualTo("TopPackageLevelClass");
 		assertThat(testInstance.toString(boolean.class)).isEqualTo("boolean");
 		assertThat(testInstance.toString(Boolean.TYPE)).isEqualTo("boolean");
