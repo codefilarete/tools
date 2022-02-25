@@ -7,7 +7,7 @@ import org.codefilarete.tool.function.ThrowingConsumer;
 import org.codefilarete.tool.function.ThrowingFunction;
 
 /**
- * Class aimed at easing creating, commiting and rolbacking q SQL Transaction
+ * Class aimed at easing to create, commit and rollback a SQL Transaction
  * 
  * @author Guillaume Mary
  */
