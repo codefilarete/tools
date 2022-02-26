@@ -10,6 +10,7 @@ import org.codefilarete.tool.trace.ModifiableInt;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
@@ -27,7 +28,7 @@ class MethodDispatcherTest {
 		
 		testInstance.set(42);
 		assertThat(surrogate.getValue()).isEqualTo(42);
-		assertThat(testInstance.toString()).isEqualTo("Dispatcher to 666");
+		assertThat(testInstance).hasToString("Dispatcher to 666");
 	}
 	
 	@Test
@@ -124,7 +125,7 @@ class MethodDispatcherTest {
 				.build(DummyFluentInterface.class);
 		
 		// This will work because we ask to return the proxy after FluentInterfaceSupport invocations
-		testInstance.doSomething().doSomethingElse();
+		assertThatCode(() -> testInstance.doSomething().doSomethingElse()).doesNotThrowAnyException();
 	}
 	
 	@Test
@@ -162,7 +163,7 @@ class MethodDispatcherTest {
 				.build(SubclassNotAwareFluentInterfaceSupport.class);
 		
 		// This will work because we ask to return the proxy after FluentInterfaceSupport invocations
-		testInstance.doSomething().doSomethingElse().doEvenMore();
+		assertThatCode(() -> testInstance.doSomething().doSomethingElse().doEvenMore()).doesNotThrowAnyException();
 	}
 	
 	@Test
@@ -185,7 +186,7 @@ class MethodDispatcherTest {
 				.build(MultipleInheritanceTestSupport.class);
 		
 		// This will work because we ask to return the proxy after FluentInterfaceSupport invocations
-		testInstance.doSomething().simpleContractMethod();
+		assertThatCode(() -> testInstance.doSomething().simpleContractMethod()).doesNotThrowAnyException();
 	}
 	
 	@Test
