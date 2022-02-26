@@ -1,5 +1,7 @@
 package org.codefilarete.tool.collection;
 
+import java.util.NoSuchElementException;
+
 /**
  * @author Guillaume Mary
  */
@@ -21,6 +23,10 @@ public class ReverseArrayIterator<E> extends ReadOnlyIterator<E> {
 	
 	@Override
 	public E next() {
+		if (!hasNext()) {
+			// this is necessary to be compliant with Iterator#next(..) contract
+			throw new NoSuchElementException();
+		}
 		return iterable[--currentIndex];
 	}
 }

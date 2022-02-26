@@ -2,6 +2,7 @@ package org.codefilarete.tool.collection;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * @author Guillaume Mary
@@ -23,6 +24,10 @@ public class ReverseListIterator<E> implements Iterator<E> {
 	
 	@Override
 	public E next() {
+		if (!hasNext()) {
+			// this is necessary to be compliant with Iterator#next(..) contract
+			throw new NoSuchElementException();
+		}
 		return iterable.get(--currentIndex);
 	}
 	

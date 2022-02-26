@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.codefilarete.tool.Duo;
+import org.codefilarete.tool.collection.PairIterator.EmptyIterator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -118,8 +119,9 @@ class IterablesTest {
 		strings = asSet("a");
 		assertThat(last(strings)).isEqualTo("a");
 		// test against null
-		assertThat((Object) last(emptyList())).isNull();
-		assertThat((Object) last(null)).isNull();
+		assertThat(last((Iterable) () -> new EmptyIterator<>())).isNull();
+		assertThat(last((Iterable) null)).isNull();
+		assertThat(last((Iterable) null, null)).isNull();
 	}
 	
 	@Test
@@ -138,8 +140,9 @@ class IterablesTest {
 		// test with content
 		Set<String> aSet = Arrays.asSet("d", "a");
 		assertThat(copy(aSet)).isEqualTo(asList("d", "a"));
-		// test that copy is not the same instance than the original
-		assertThat(copy(aSet)).isNotSameAs(aSet);
+		// test that copy is not the same instance as the original
+		HashSet<String> result = new HashSet<>();
+		assertThat(copy(aSet, result)).isSameAs(result);
 		// test on corner case: empty content
 		assertThat(copy(asList())).isEqualTo(asList());
 	}
@@ -296,6 +299,24 @@ class IterablesTest {
 	}
 	
 	@Test
+	void filter_iterable() {
+		List<String> iterable = asList("a", "ab", "b");
+		Iterable<String> result = Iterables.filter(iterable, s -> s.startsWith("a"));
+		assertThat(Iterables.copy(result)).isEqualTo(Arrays.asList("a", "ab"));
+		// original object is left untouched
+		assertThat(iterable).isEqualTo(asList("a", "ab", "b"));
+	}
+	
+	@Test
+	void filter_iterator() {
+		List<String> iterable = asList("a", "ab", "b");
+		Iterator<String> result = Iterables.filter(iterable.iterator(), s -> s.startsWith("a"));
+		assertThat(Iterables.copy(result)).isEqualTo(Arrays.asList("a", "ab"));
+		// original object is left untouched
+		assertThat(iterable).isEqualTo(asList("a", "ab", "b"));
+	}
+	
+	@Test
 	void find() {
 		List<String> strings = asList("a", "b");
 		String result = Iterables.find(strings, o -> o.equalsIgnoreCase("B"));
@@ -390,12 +411,6 @@ class IterablesTest {
 		List<Object> result = new ArrayList<>();
 		Iterables.iterate(strings, (i, s) -> { result.add(i); result.add(s); });
 		assertThat(result).isEqualTo(Arrays.asList(0, "a", 1, "b"));
-	}
-	
-	@Test
-	void filter() {
-		List<String> strings = Arrays.asList("a", "ab", "b");
-		assertThat(Iterables.filter(strings, s -> s.startsWith("a"))).isEqualTo(Arrays.asList("a", "ab"));
 	}
 	
 	@Test

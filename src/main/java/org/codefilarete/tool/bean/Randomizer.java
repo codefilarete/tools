@@ -173,7 +173,7 @@ public class Randomizer {
 	}
 	
 	/**
-	 * Generator that will draw double linearly reparted
+	 * Generator that will draw double linearly distributed
 	 *
 	 * @see Random#nextDouble()
 	 */
@@ -181,7 +181,8 @@ public class Randomizer {
 		private final Random random;
 		
 		public LinearRandomGenerator() {
-			this(new Random());
+			// we use SecureRandom instead of Random to avoid some security issue
+			this(new SecureRandom());
 		}
 		
 		public LinearRandomGenerator(Random random) {
@@ -195,24 +196,14 @@ public class Randomizer {
 	}
 	
 	/**
-	 * Same as {@link LinearRandomGenerator} but with pseudo-random number generator (PRNG)
-	 * @see SecureRandom
-	 * @see "https://blog.frankel.ch/managing-randomness-java/" 
-	 */
-	public static class SecureLinearRandomGenerator extends LinearRandomGenerator {
-		
-		public SecureLinearRandomGenerator() {
-			super(new SecureRandom());
-		}
-	}
-	
-	/**
-	 * Generator that will draw double according to the Gaussion law
+	 * Generator that will draw double according to the Gaussian law
 	 *
 	 * @see Random#nextGaussian()
 	 */
 	public static class GaussianRandomGenerator implements IRandomGenerator {
-		private final Random random = new Random();
+		
+		// we use SecureRandom instead of Random to avoid some security issue
+		private final Random random = new SecureRandom();
 		
 		@Override
 		public double randomDouble() {

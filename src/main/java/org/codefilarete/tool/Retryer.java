@@ -2,12 +2,12 @@ package org.codefilarete.tool;
 
 import javax.annotation.Nullable;
 
-import org.codefilarete.tool.exception.Exceptions;
 import org.codefilarete.tool.function.ThrowingExecutable;
 
 /**
  * Basic implementation of a retryer processor.
- * 
+ * User has to override {@link #shouldRetry(Result)} method to decide whether a retry must happen or not.
+ * If max attempts have been reached then a {@link RetryException} will be thrown.
  * 
  * @author Guillaume Mary
  */
@@ -18,6 +18,12 @@ public abstract class Retryer {
 	private final int maxRetries;
 	private final long retryDelay;
 	
+	/**
+	 * Constructor with necessary parameters.
+	 * 
+	 * @param maxRetries maximum attempts before action is not retried
+	 * @param retryDelay delay between each attempt, in millisecond
+	 */
 	public Retryer(int maxRetries, long retryDelay) {
 		this.maxRetries = maxRetries;
 		this.retryDelay = retryDelay;
@@ -37,14 +43,6 @@ public abstract class Retryer {
 	 * @return true if a retry must be triggered
 	 */
 	protected abstract boolean shouldRetry(Result result);
-	
-	private void waitRetryDelay() {
-		try {
-			Thread.sleep(retryDelay);
-		} catch (InterruptedException ie) {
-			throw Exceptions.asRuntimeException(ie);
-		}
-	}
 	
 	public static class RetryException extends Exception {
 		
@@ -66,6 +64,7 @@ public abstract class Retryer {
 			this.description = description;
 		}
 		
+		@SuppressWarnings("java:S1181" /* Throwable caught voluntarily to let caller handle what he wants */)
 		public R execute() throws E, RetryException {
 			try {
 				tryCount++;
@@ -90,6 +89,14 @@ public abstract class Retryer {
 				return execute();
 			} else {
 				throw new RetryException(description, tryCount, retryDelay, t);
+			}
+		}
+		
+		private void waitRetryDelay() {
+			try {
+				Thread.sleep(retryDelay);
+			} catch (InterruptedException ie) {
+				Thread.currentThread().interrupt();
 			}
 		}
 	}

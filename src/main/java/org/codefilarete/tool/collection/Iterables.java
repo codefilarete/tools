@@ -13,6 +13,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.function.BiConsumer;
@@ -132,7 +133,7 @@ public final class Iterables {
 	}
 	
 	/**
-	 * Returns the first entry of a {@link Map}, meaningfull on a {@link SortedMap} or a {@link LinkedHashMap}
+	 * Returns the first entry of a {@link Map}, only makes sense on a {@link SortedMap} or a {@link LinkedHashMap}
 	 * 
 	 * @param iterable a Map : Sorted or Linked (else it has no purpose)
 	 * @return the first {@link Entry} of the Map, or null if argument is empty or null
@@ -143,7 +144,7 @@ public final class Iterables {
 	}
 	
 	/**
-	 * Returns the first entry of a {@link Map}, meaningfull on a {@link SortedMap} or a {@link LinkedHashMap}
+	 * Returns the first entry of a {@link Map}, only makes sense on a {@link SortedMap} or a {@link LinkedHashMap}
 	 *
 	 * @param iterable a Map : Sorted or Linked (else it has no purpose)
 	 * @return the first {@link Entry} of the Map, or the given default {@link Entry} if argument is empty or null
@@ -157,7 +158,7 @@ public final class Iterables {
 	}
 	
 	/**
-	 * Returns the first value of a {@link Map}, meaningfull on a {@link SortedMap} or a {@link LinkedHashMap}
+	 * Returns the first value of a {@link Map}, only makes sense on a {@link SortedMap} or a {@link LinkedHashMap}
 	 *
 	 * @param iterable a Map : Sorted or Linked (else it has no purpose)
 	 * @return the first value of the Map, null if argument is null
@@ -168,7 +169,7 @@ public final class Iterables {
 	}
 	
 	/**
-	 * Returns the first value of a {@link Map}, meaningfull on a {@link SortedMap} or a {@link LinkedHashMap}
+	 * Returns the first value of a {@link Map}, only makes sense on a {@link SortedMap} or a {@link LinkedHashMap}
 	 *
 	 * @param iterable a Map : Sorted or Linked (else it has no purpose)
 	 * @return the first value of the Map, or the given default value if argument is empty or null
@@ -208,7 +209,7 @@ public final class Iterables {
 		if (iterable == null || iterable.isEmpty()) {
 			return defaultValue;
 		} else {
-			return iterable.get(iterable.size()-1);
+			return iterable.get(iterable.size() - 1);
 		}
 	}
 	
@@ -222,18 +223,23 @@ public final class Iterables {
 	
 	/**
 	 * @param iterable a nullable {@link Iterable}
+	 * @param defaultValue value to be return if iterable is empty
 	 * @return the last element of the argument or the given default value if argument is empty or null
 	 */
-	public static <E> E last(@Nullable Iterable<E> iterable, E defaultValue) {
-		Iterator<E> iterator = iterable.iterator();
-		E result = null;
-		if (!iterator.hasNext()) {
-			result = defaultValue;
+	public static <E> E last(@Nullable Iterable<E> iterable, @Nullable E defaultValue) {
+		if (iterable == null) {
+			return defaultValue;
+		} else {
+			Iterator<E> iterator = iterable.iterator();
+			E result = null;
+			if (!iterator.hasNext()) {
+				result = defaultValue;
+			}
+			while (iterator.hasNext()) {
+				result = iterator.next();
+			}
+			return result;
 		}
-		while(iterator.hasNext()) {
-			result = iterator.next();
-		}
-		return result;
 	}
 	
 	/**
@@ -264,7 +270,7 @@ public final class Iterables {
 	 * @param valueMapper the value provider
 	 * @param <T> iterated objets type
 	 * @param <K> keys type
-	 * @param <V> vaules type
+	 * @param <V> values type
 	 * @return a new (Hash)Map
 	 */
 	public static <T, K, V> Map<K, V> map(Iterable<T> iterable,
@@ -282,7 +288,7 @@ public final class Iterables {
 	 * @param target the map to be filled
 	 * @param <T> iterated objets type
 	 * @param <K> keys type
-	 * @param <V> vaules type
+	 * @param <V> values type
 	 * @param <M> returned {@link Map} type
 	 * @return a new {@link Map} of type M filled with key and values from given parameters
 	 */
@@ -577,7 +583,7 @@ public final class Iterables {
 	 * If the {@link Iterator} comes from a {@link Collection}, then prefer usage of {@link Collection#stream()}
 	 * 
 	 * @param iterator an {@link Iterator}, not null
-	 * @return a {@link Stream} than will iterate over the {@link Iterator} passed as arguemnt
+	 * @return a {@link Stream} than will iterate over the {@link Iterator} passed as argument
 	 */
 	public static <E> Stream<E> stream(Iterator<E> iterator) {
 		return stream(() -> iterator);
@@ -588,7 +594,7 @@ public final class Iterables {
 	 * If the {@link Iterable} is a {@link Collection}, then prefer usage of {@link Collection#stream()}
 	 * 
 	 * @param iterable an {@link Iterable}, not null
-	 * @return a {@link Stream} than will iterate over the {@link Iterable} passed as arguemnt
+	 * @return a {@link Stream} than will iterate over the {@link Iterable} passed as argument
 	 */
 	public static <E> Stream<E> stream(Iterable<? extends E> iterable) {
 		// StreamSupport knows how to convert an Iterable to a stream
@@ -629,15 +635,7 @@ public final class Iterables {
 	 * @return given iterable without elements that doesn't match the given predicate
 	 */
 	public static <E> Iterable<E> filter(@Nonnull Iterable<E> iterable, @Nonnull Predicate<E> includer) {
-		Iterator<E> iterator = iterable.iterator();
-		while (iterator.hasNext()) {
-			E e = iterator.next();
-			if (!includer.test(e)) {
-				iterator.remove();
-			}
-			
-		}
-		return iterable;
+		return () -> filter(iterable.iterator(), includer);
 	}
 	
 	/**
@@ -653,7 +651,7 @@ public final class Iterables {
 			
 			private boolean hasNext = true;
 			private E currentItem = null;
-			private Iterator<E> surrogate = iterator;
+			private final Iterator<E> surrogate = iterator;
 			
 			private void lookAhead() {
 				while (hasNext = surrogate.hasNext()) {
@@ -679,6 +677,10 @@ public final class Iterables {
 			
 			@Override
 			public E next() {
+				if (!hasNext) {
+					// this is necessary to be compliant with Iterator#next(..) contract
+					throw new NoSuchElementException();
+				}
 				return currentItem;
 			}
 			
@@ -709,7 +711,7 @@ public final class Iterables {
 	 * @param <I> input type
 	 * @return null if no element matches the predicate
 	 */
-	@SuppressWarnings("squid:AssignmentInSubExpressionCheck")	// simple algorithm, doesn't require to extract assignment from if
+	@SuppressWarnings("squid:AssignmentInSubExpressionCheck" /* simple algorithm, doesn't require to extract the assignment from if */)
 	public static <I> I find(Iterator<I> iterator, Predicate<I> predicate) {
 		I result = null;
 		boolean found = false;
@@ -746,7 +748,7 @@ public final class Iterables {
 	 * @param <O> output type
 	 * @return null if no mapped values matches the predicate
 	 */
-	@SuppressWarnings("squid:AssignmentInSubExpressionCheck")	// simple algorithm, doesn't require to extract assignment from if
+	@SuppressWarnings("squid:AssignmentInSubExpressionCheck" /* simple algorithm, doesn't require to extract the assignment from if */)
 	public static <I, O> Duo<I, O> find(Iterator<I> iterator, Function<I, O> mapper, Predicate<O> predicate) {
 		Duo<I, O> result = null;
 		boolean found = false;
