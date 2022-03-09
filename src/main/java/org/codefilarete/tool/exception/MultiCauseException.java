@@ -10,7 +10,7 @@ import org.codefilarete.tool.StringAppender;
  */
 public class MultiCauseException extends RuntimeException {
 	
-	private List<Throwable> causes = new ArrayList<>();
+	private final List<Throwable> causes = new ArrayList<>();
 	
 	@Override
 	public synchronized Throwable initCause(Throwable cause) {
@@ -43,6 +43,6 @@ public class MultiCauseException extends RuntimeException {
 			message.cat(cause.getMessage(), ", ");
 		}
 		message.cutTail(2);
-		return "Multi cause exception : " + message.toString();
+		return "Multi cause exception : " + message;
 	}
 }

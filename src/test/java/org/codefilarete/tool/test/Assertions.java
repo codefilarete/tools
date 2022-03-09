@@ -444,7 +444,7 @@ public class Assertions {
 	}
 	
 	private static class IterableTester<A, B> {
-		private BiPredicate<A, B> biPredicate;
+		private final BiPredicate<A, B> biPredicate;
 		
 		public IterableTester(BiPredicate<A, B> biPredicate) {
 			this.biPredicate = biPredicate;

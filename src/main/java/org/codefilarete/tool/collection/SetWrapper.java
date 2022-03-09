@@ -16,7 +16,7 @@ import java.util.stream.Stream;
  */
 public class SetWrapper<E> implements Set<E> {
 	
-	private Set<E> surrogate;
+	private final Set<E> surrogate;
 	
 	public SetWrapper(Set<E> surrogate) {
 		this.surrogate = surrogate;

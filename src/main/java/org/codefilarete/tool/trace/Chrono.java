@@ -34,8 +34,8 @@ public class Chrono {
 		SECOND(MILLIS_MAX, "s"),
 		MILLIS(1, "ms");
 		
-		private int millisCount;
-		private String timeUnit;
+		private final int millisCount;
+		private final String timeUnit;
 		
 		TimeConstant(int millisCount, String timeUnit) {
 			this.millisCount = millisCount;

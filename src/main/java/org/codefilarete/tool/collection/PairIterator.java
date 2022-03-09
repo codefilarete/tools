@@ -100,7 +100,7 @@ public class PairIterator<K, V> implements Iterator<Duo<K, V>> {
 	 */
 	public static class InfiniteIterator<E> implements Iterator<E> {
 		
-		private Iterator<E> delegate;
+		private final Iterator<E> delegate;
 		
 		public InfiniteIterator(Iterator<E> delegate) {
 			this.delegate = delegate;
