@@ -15,6 +15,15 @@
 		<url>https://www.codefilarete.org</url>
 	</organization>
 	
+	<developers>
+		<developer>
+			<name>Guillaume Mary</name>
+			<email>codefilarete@gmail.com</email>
+			<organization>Codefilarete</organization>
+			<organizationUrl>https://www.codefilarete.org</organizationUrl>
+		</developer>
+	</developers>
+	
 	<licenses>
 		<license>
 			<name>MIT License</name>
@@ -180,6 +189,17 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>nexus-staging-maven-plugin</artifactId>
+				<version>1.6.7</version>
+				<extensions>true</extensions>
+				<configuration>
+					<serverId>ossrh</serverId>
+					<nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+					<autoReleaseAfterClose>true</autoReleaseAfterClose>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
