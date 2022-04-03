@@ -10,8 +10,8 @@ import org.codefilarete.tool.Duo;
 import org.codefilarete.tool.VisibleForTesting;
 
 /**
- * Class aimed at mesuring time between 2 events.
- * Basic implementation and use case : start it (done at instanciation time), then printing through {@link #toString()}.
+ * Class aimed at measuring time between 2 events.
+ * Basic implementation and use case : start it (done at instantiation time), then printing through {@link #toString()}.
  * One can reset it with {@link #start()}.
  * 
  * @author Guillaume Mary
@@ -51,8 +51,8 @@ public class Chrono {
 		/**
 		 * Gives constants (in decreasing order) necessary to format given milliseconds.
 		 * 
-		 * @param millis any (non null) millisecond
-		 * @return a set of {@link TimeConstant} in decreasing order (from biggest unit to smallest)
+		 * @param millis any (non-null) millisecond
+		 * @return a set of {@link TimeConstant} in decreasing order (from the biggest unit to smallest)
 		 */
 		private static Set<TimeConstant> getTimeConstantsToUse(@Nonnegative long millis) {
 			Set<TimeConstant> constantsToUse;
@@ -75,10 +75,13 @@ public class Chrono {
 	/**
 	 * Formats an instant such as "1:02min 24s 103ms" (each value is optional)
 	 * 
-	 * @param millis any (non null) millisecond
+	 * @param millis any (non-null) millisecond
 	 * @return a printable representation of {@code millis} 
 	 */
 	public static String format(long millis) {
+		if (millis == 0) {	// corner case not handled by algorithm below
+			return "0ms";
+		}
 		StringAppender result = new StringAppender();
 		Set<TimeConstant> constantsToUse = TimeConstant.getTimeConstantsToUse(millis);
 		for (TimeConstant timeConstant : constantsToUse) {
@@ -99,7 +102,7 @@ public class Chrono {
 	/**
 	 * Gives current instant
 	 * 
-	 * @return current time in milliscond (see {@link System#currentTimeMillis()}
+	 * @return current time in millisecond (see {@link System#currentTimeMillis()}
 	 */
 	public static long now() {
 		return System.currentTimeMillis();
@@ -107,7 +110,7 @@ public class Chrono {
 
 	private long startTime;
 	
-	/** Creates new Chrono */
+	/** Creates a new instance that starts immediately */
 	public Chrono () {
 		start();
 	}
