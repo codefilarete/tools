@@ -56,20 +56,21 @@ public abstract class Strings {
 	}
 	
 	/**
-	 * Concatenate count (positive) times parameter s.
+	 * Concatenates count (positive) times parameter s.
 	 * Optional Strings in prebuildStrings are used to speed concatenation for large count numbers if you already have
 	 * large snippets of s pre-concatenated. For instance, you want 3456 times "a" and you already got constants with
 	 * a*500, a*100, a*10, then this method will only cat 6*a*500, 4*a*100, 5*a*10 and 6*a. Instead of 3456 times "a".
 	 *
 	 * @param result destination of the concatenation
-	 * @param count expected repeatition of s
-	 * @param s the String to be concatenated
-	 * @param prebuiltStrings optional pre-concatenated "s" strings, <b>in descent size order</b>.
-	 * @return s repeated count times
+	 * @param count expected repetition of s
+	 * @param s the {@link CharSequence} to be concatenated to result
+	 * @param prebuiltStrings optional pre-concatenated "s" strings, <strong>in descent size order</strong>.
+	 * @return result with s repeated count times appended
 	 */
-	public static StringBuilder repeat(StringBuilder result, int count, CharSequence s, String... prebuiltStrings) {
+	public static StringBuilder repeat(StringBuilder result, int count, CharSequence s, CharSequence... prebuiltStrings) {
+		result.ensureCapacity(result.length() + count * s.length());	// to avoid extra allocation cycles
 		int snippetCount, remainer = count;
-		for (String snippet : prebuiltStrings) {
+		for (CharSequence snippet : prebuiltStrings) {
 			int snippetLength = snippet.length();
 			snippetCount = remainer / snippetLength;
 			for (int i = 0; i < snippetCount; i++) {
