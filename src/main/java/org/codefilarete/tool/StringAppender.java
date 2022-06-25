@@ -10,7 +10,7 @@ import java.util.Iterator;
  */
 public class StringAppender implements Serializable, CharSequence {
 	
-	private StringBuilder appender;
+	protected StringBuilder appender;
 	
 	public StringAppender() {
 		appender = new StringBuilder();
