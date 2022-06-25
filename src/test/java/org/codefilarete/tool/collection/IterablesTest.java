@@ -188,14 +188,14 @@ class IterablesTest {
 		assertThat(Iterables.intersect(asList(2, 3, 6), asList(1, 2, 3, 4, 5))).isEqualTo(asHashSet(2, 3));
 		assertThat(Iterables.intersect(asList(1, 2, 3, 4, 5), emptyList())).isEqualTo(emptySet());
 		assertThat(Iterables.intersect(emptyList(), asList(1, 2, 3, 4, 5))).isEqualTo(emptySet());
-		// test with striclty same instance
+		// test with strictly same instance
 		List<Integer> c1 = asList(1, 2, 3, 4, 5);
 		assertThat(Iterables.intersect(c1, c1)).isEqualTo(asHashSet(1, 2, 3, 4, 5));
 	}
 	
 	@Test
 	void intersect_withComparator() {
-		// let's take a non comparable class : StringBuilder (which is simple to compare in fact)
+		// let's take a non-Comparable class : StringBuilder (which is simple to compare in fact)
 		StringBuilder a = new StringBuilder().append("a");
 		StringBuilder a$ = new StringBuilder().append("a");
 		StringBuilder b = new StringBuilder().append("b");
@@ -212,7 +212,7 @@ class IterablesTest {
 		assertThat(Iterables.intersect(asList(c, b, c), asList(b$, a$, b$, c$), stringBuilderComparator)).isEqualTo(asHashSet(b, c));
 		assertThat(Iterables.intersect(asList(b, c), emptyList(), stringBuilderComparator)).isEqualTo(emptySet());
 		assertThat(Iterables.intersect(emptyList(), asList(c, a, d), stringBuilderComparator)).isEqualTo(emptySet());
-		// test with striclty same instance
+		// test with strictly same instance
 		List<StringBuilder> c1 = asList(b, c);
 		assertThat(Iterables.intersect(c1, c1)).isEqualTo(asHashSet(b, c));
 	}

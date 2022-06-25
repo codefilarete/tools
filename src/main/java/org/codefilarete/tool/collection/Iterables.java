@@ -454,14 +454,15 @@ public final class Iterables {
 	
 	/**
 	 * Gives the intersection between two {@link Collection}s.
-	 * Implementation has no particular optimization, it is based on a {@link HashSet}.
+	 * Implementation has no particular optimization, it is based on a {@link HashSet}, hence comparison is based on
+	 * {@link Object#equals(Object)}).
 	 * 
 	 * @param c1 a {@link Collection}, not null
 	 * @param c2 a {@link Collection}, not null
 	 * @param <E> type of elements
 	 * @return the intersection between two {@link Collection}s
 	 */
-	public static <E> Set<E> intersect(Collection<E> c1, Collection<E> c2) {
+	public static <E> Set<E> intersect(Collection<? extends E> c1, Collection<? extends E> c2) {
 		Set<E> copy = new HashSet<>(c1);
 		copy.retainAll(c2);
 		return copy; 
@@ -476,7 +477,7 @@ public final class Iterables {
 	 * @param <E> type of elements
 	 * @return the intersection between two {@link Collection}s according to the given {@link Comparator}
 	 */
-	public static <E> Set<E> intersect(Collection<E> c1, Collection<E> c2, Comparator<E> comparator) {
+	public static <E> Set<E> intersect(Collection<? extends E> c1, Collection<? extends E> c2, Comparator<? super E> comparator) {
 		Set<E> copy = new HashSet<>(c1);
 		copy.retainAll(Arrays.asTreeSet(comparator, c2));
 		return copy; 
