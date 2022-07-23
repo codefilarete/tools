@@ -85,7 +85,7 @@ public class ReflectionsTest {
 	public static Object[][] testGetDefaultConstructor_throwingCases_data() {
 		return new Object[][] {
 				{ InnerClass.class, "Class o.c.t.ReflectionsTest$InnerClass has no default constructor because it is an inner non static class" +
-						" (needs an instance of the encosing class to be constructed)" },
+						" (needs an instance of the enclosing class to be constructed)" },
 				{ int.class, "Class int has no default constructor because it is a primitive type" },
 				{ int[].class, "Class int[] has no default constructor because it is an array" },
 				{ CharSequence.class, "Class j.l.CharSequence has no default constructor because it is an interface" },
@@ -292,7 +292,7 @@ public class ReflectionsTest {
 		assertThatThrownBy(() -> Reflections.newInstance(AbstractClass.class))
 				.isInstanceOf(InvokationRuntimeException.class)
 				.extracting(thrownException -> Exceptions.findExceptionInCauses(thrownException, InvokationRuntimeException.class), THROWABLE)
-				.hasMessage("Class o.c.t.ReflectionsTest$AbstractClass can't be instanciated because it is abstract");
+				.hasMessage("Class o.c.t.ReflectionsTest$AbstractClass can't be instantiated because it is abstract");
 	}
 	
 	@Test
@@ -303,7 +303,7 @@ public class ReflectionsTest {
 		
 		exceptionAsserter
 				.extracting(thrownException -> Exceptions.findExceptionInCauses(thrownException, InvokationRuntimeException.class), THROWABLE)
-				.hasMessage("Class o.c.t.ReflectionsTest$ThrowingConstructorClass can't be instanciated");
+				.hasMessage("Class o.c.t.ReflectionsTest$ThrowingConstructorClass can't be instantiated");
 		
 		exceptionAsserter
 				.extracting(thrownException -> Exceptions.findExceptionInCauses(thrownException, NullPointerException.class), THROWABLE)
@@ -324,7 +324,7 @@ public class ReflectionsTest {
 		
 		exceptionAsserter
 				.extracting(thrownException -> Exceptions.findExceptionInCauses(thrownException, InvokationRuntimeException.class), THROWABLE)
-				.hasMessage("Class o.c.t.ReflectionsTest$ThrowingConstructorClass can't be instanciated");
+				.hasMessage("Class o.c.t.ReflectionsTest$ThrowingConstructorClass can't be instantiated");
 		
 		exceptionAsserter
 				.extracting(thrownException -> Exceptions.findExceptionInCauses(thrownException, NullPointerException.class), THROWABLE)

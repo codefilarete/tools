@@ -9,7 +9,7 @@ import org.codefilarete.tool.collection.Arrays;
 import org.codefilarete.tool.collection.Iterables;
 
 /**
- * InvocationHandler that does nothing. Usefull to create no-operation proxy (for mocking services) or intercept a
+ * InvocationHandler that does nothing. Useful to create no-operation proxy (for mocking services) or intercept a
  * particular method.
  *
  * @author Guillaume Mary
@@ -53,8 +53,8 @@ public class InvocationHandlerSupport implements InvocationHandler {
 	 * @param proxy the target on which method must be called
 	 * @param method the method to invoke
 	 * @param args the method arguments
-	 * @return result of method invokation on handler given at construction time, except for equals / hashCode / toString which are handled specifically
-	 * @throws Throwable in case of invokation error
+	 * @return result of method invocation on handler given at construction time, except for equals / hashCode / toString which are handled specifically
+	 * @throws Throwable in case of invocation error
 	 */
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {

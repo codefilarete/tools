@@ -22,7 +22,7 @@ public class InstanceMethodIterator extends MethodIterator {
 	}
 	
 	/**
-	 * Overriden to keep non-static methods only
+	 * Overridden to keep non-static methods only
 	 *
 	 * @param clazz the class for which methods must be given
 	 * @return non-static methods of the class only

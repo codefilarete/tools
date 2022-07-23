@@ -28,7 +28,7 @@ class SetWrapperTest {
 			if (Arrays.asHashSet("equals", "hashCode").contains(method.getName())) {
 				continue;
 			}
-			Object invokationResult;
+			Object invocationResult;
 			try {
 				// we create default arguments otherwise we get IllegalArgumentException from the JVM at invoke() time
 				Object[] args = new Object[method.getParameterCount()];
@@ -41,9 +41,9 @@ class SetWrapperTest {
 						args[i] = Reflections.PRIMITIVE_DEFAULT_VALUES.getOrDefault(arg, null /* default value for any non-primitive Object */);
 					}
 				}
-				invokationResult = method.invoke(testInstance, args);
+				invocationResult = method.invoke(testInstance, args);
 				Object delegateResult = method.invoke(Mockito.verify(delegate), args);
-				assertThat(invokationResult).isEqualTo(delegateResult);
+				assertThat(invocationResult).isEqualTo(delegateResult);
 				Mockito.clearInvocations(delegate);
 				methodCount++;
 			} catch (AssertionFailedError assertionFailedError) {

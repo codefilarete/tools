@@ -91,7 +91,7 @@ class ReadOnlyListTest {
 		Iterable<Method> methods = () -> nonMutatingMethodsIterator;
 		int methodCount = 0;
 		for (Method method : methods) {
-			Object invokationResult;
+			Object invocationResult;
 			try {
 				// we create default arguments otherwise we get IllegalArgumentException from the JVM at invoke() time
 				Object[] args = new Object[method.getParameterCount()];
@@ -104,7 +104,7 @@ class ReadOnlyListTest {
 						args[i] = Reflections.PRIMITIVE_DEFAULT_VALUES.getOrDefault(arg, null /* default value for any non-primitive Object */);
 					}
 				}
-				invokationResult = method.invoke(testInstance, args);
+				invocationResult = method.invoke(testInstance, args);
 				
 				// hacking some checks because some methods don't redirect to themselves
 				switch (method.getName()) {
@@ -116,7 +116,7 @@ class ReadOnlyListTest {
 						break;
 					case "listIterator":
 						Mockito.verify(delegate).listIterator(eq(0));
-						assertThat(invokationResult instanceof ReadOnlyIterator).isTrue();
+						assertThat(invocationResult instanceof ReadOnlyIterator).isTrue();
 						break;
 					default:
 						Object delegateResult = method.invoke(Mockito.verify(delegate), args);
@@ -124,7 +124,7 @@ class ReadOnlyListTest {
 						if (method.equals(List.class.getMethod("subList", int.class, int.class))) {
 							delegateResult = new ReadOnlyList();
 						}
-						assertThat(invokationResult).isEqualTo(delegateResult);
+						assertThat(invocationResult).isEqualTo(delegateResult);
 						break;
 				}
 				Mockito.clearInvocations(delegate);
@@ -184,7 +184,7 @@ class ReadOnlyListTest {
 		Iterable<Method> methods = () -> nonMutatingMethodsIterator;
 		int methodCount = 0;
 		for (Method method : methods) {
-			Object invokationResult;
+			Object invocationResult;
 			try {
 				// we create default arguments otherwise we get IllegalArgumentException from the JVM at invoke() time
 				Object[] args = new Object[method.getParameterCount()];
@@ -197,11 +197,11 @@ class ReadOnlyListTest {
 						args[i] = Reflections.PRIMITIVE_DEFAULT_VALUES.getOrDefault(arg, null /* default value for any non-primitive Object */);
 					}
 				}
-				invokationResult = method.invoke(testInstance, args);
+				invocationResult = method.invoke(testInstance, args);
 				
 				// hacking some checks because some methods don't redirect to themselves
 				Object delegateResult = method.invoke(Mockito.verify(delegate), args);
-				assertThat(invokationResult).isEqualTo(delegateResult);
+				assertThat(invocationResult).isEqualTo(delegateResult);
 				Mockito.clearInvocations(delegate);
 				methodCount++;
 			} catch (ReflectiveOperationException | IllegalArgumentException e) {

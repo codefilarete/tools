@@ -33,7 +33,7 @@ public class InstanceMethodIteratorTest {
 	
 	@Test
 	public void testNext_throwsNoSuchElementException() {
-		// with intermediary hasNext() invokation
+		// with intermediary hasNext() invocation
 		InstanceMethodIterator testInstance = new InstanceMethodIterator(MethodsContainer.class, Object.class);
 		assertThat(testInstance.hasNext()).isTrue();
 		testInstance.next();
@@ -46,7 +46,7 @@ public class InstanceMethodIteratorTest {
 		assertThat(testInstance.hasNext()).isFalse();
 		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(testInstance::next);
 		
-		// without hasNext() invokation
+		// without hasNext() invocation
 		testInstance = new InstanceMethodIterator(MethodsContainer.class, Object.class);
 		testInstance.next();
 		testInstance.next();
@@ -59,7 +59,7 @@ public class InstanceMethodIteratorTest {
 		assertThat(testInstance.hasNext()).isFalse();
 		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(testInstance::next);
 		
-		// without hasNext() invokation
+		// without hasNext() invocation
 		testInstance = new InstanceMethodIterator(Object.class, Object.class);
 		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(testInstance::next);
 	}

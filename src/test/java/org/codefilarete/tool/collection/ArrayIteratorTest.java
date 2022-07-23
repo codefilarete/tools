@@ -20,14 +20,14 @@ class ArrayIteratorTest {
 	
 	@Test
 	public void testNext_throwsNoSuchElementException() {
-		// with intermediary hasNext() invokation
+		// with intermediary hasNext() invocation
 		ArrayIterator<String> testInstance = new ArrayIterator<>("a");
 		assertThat(testInstance.hasNext()).isTrue();
 		testInstance.next();
 		assertThat(testInstance.hasNext()).isFalse();
 		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(testInstance::next);
 		
-		// without hasNext() invokation
+		// without hasNext() invocation
 		testInstance = new ArrayIterator<>("a");
 		testInstance.next();
 		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(testInstance::next);

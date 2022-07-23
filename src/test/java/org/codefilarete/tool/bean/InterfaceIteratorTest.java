@@ -53,14 +53,14 @@ public class InterfaceIteratorTest {
 	
 	@Test
 	public void testNext_throwsNoSuchElementException() {
-		// with intermediary hasNext() invokation
+		// with intermediary hasNext() invocation
 		InterfaceIterator testInstance = new InterfaceIterator(RuntimeException.class);
 		assertThat(testInstance.hasNext()).isTrue();
 		testInstance.next();
 		assertThat(testInstance.hasNext()).isFalse();
 		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(testInstance::next);
 		
-		// without hasNext() invokation
+		// without hasNext() invocation
 		testInstance = new InterfaceIterator(RuntimeException.class);
 		testInstance.next();
 		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(testInstance::next);
@@ -70,7 +70,7 @@ public class InterfaceIteratorTest {
 		assertThat(testInstance.hasNext()).isFalse();
 		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(testInstance::next);
 		
-		// without hasNext() invokation
+		// without hasNext() invocation
 		testInstance = new InterfaceIterator(Object.class);
 		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(testInstance::next);
 	}

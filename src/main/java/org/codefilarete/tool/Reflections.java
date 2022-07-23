@@ -55,8 +55,8 @@ public final class Reflections {
 			onJavaBeanPropertyWrapperNameGeneric(method.getName(), method, s -> true, s -> true, s -> true, s -> false);
 	
 	/**
-	 * Default values of primtive types
-	 * Note that it contains Object-equivalent types because in some circumstences auto-boxing happens and you won't find your type in the Map.
+	 * Default values of primitive types
+	 * Note that it contains Object-equivalent types because in some circumstances auto-boxing happens and you won't find your type in the Map.
 	 */
 	public static final Map<Class, Object> PRIMITIVE_DEFAULT_VALUES = Collections.unmodifiableMap(Maps
 			.forHashMap(Class.class, Object.class)
@@ -121,7 +121,7 @@ public final class Reflections {
 			if (missingDefaultConstructorReason.isPresent()) {
 				switch (missingDefaultConstructorReason.get()) {
 					case INNER_CLASS:
-						reason = " because it is an inner non static class (needs an instance of the encosing class to be constructed)";
+						reason = " because it is an inner non static class (needs an instance of the enclosing class to be constructed)";
 						break;
 					case INTERFACE:
 						reason = " because it is an interface";
@@ -144,7 +144,7 @@ public final class Reflections {
 		}
 	}
 	
-	private static Optional<MissingDefaultConstructorReason> giveMissingDefaultConstructorReason(Class clazz) {
+	private static Optional<MissingDefaultConstructorReason> giveMissingDefaultConstructorReason(Class<?> clazz) {
 		Optional<MissingDefaultConstructorReason> result = Optional.empty();
 		if (isInnerClass(clazz)) {
 			result = Optional.of(MissingDefaultConstructorReason.INNER_CLASS);
@@ -160,7 +160,7 @@ public final class Reflections {
 	
 	/**
 	 * @param clazz a class, not null
-	 * @return true is the given class is a non static inner class
+	 * @return true is the given class is a non-static inner class
 	 */
 	public static boolean isInnerClass(@Nonnull Class<?> clazz) {
 		return clazz.isMemberClass() && !Modifier.isStatic(clazz.getModifiers());
@@ -196,7 +196,7 @@ public final class Reflections {
 		return Modifier.isStatic(field.getModifiers());
 	}
 	
-	public static Map<String, Field> mapFieldsOnName(Class clazz) {
+	public static Map<String, Field> mapFieldsOnName(Class<?> clazz) {
 		return Iterables.map(() -> new FieldIterator(clazz), Field::getName);
 	}
 	
@@ -206,10 +206,10 @@ public final class Reflections {
 	 * @param clazz the class of the field
 	 * @param name the name of the field
 	 * @return the found field, null possible
-	 * @throws MemberNotFoundException in case of non existing field
+	 * @throws MemberNotFoundException in case of non-existing field
 	 */
 	@Nullable
-	public static Field findField(Class clazz, String name) {
+	public static Field findField(Class<?> clazz, String name) {
 		return Iterables.stream(new FieldIterator(clazz)).filter(field -> field.getName().equals(name)).findAny().orElse(null);
 	}
 	
@@ -221,7 +221,7 @@ public final class Reflections {
 	 * @param name the name of the method
 	 * @return the found method, never null
 	 */
-	public static Field getField(Class clazz, String name) {
+	public static Field getField(Class<?> clazz, String name) {
 		Field field = findField(clazz, name);
 		if (field == null) {
 			throw new MemberNotFoundException("Field " + name + " on " + toString(clazz) + " was not found");
@@ -238,7 +238,7 @@ public final class Reflections {
 	 * @return the found method, null possible
 	 */
 	@Nullable
-	public static Method findMethod(Class clazz, String name, Class... argTypes) {
+	public static Method findMethod(Class<?> clazz, String name, Class<?>... argTypes) {
 		return Iterables.stream(new MethodIterator(clazz, null))
 				.filter(method -> method.getName().equals(name) && java.util.Arrays.equals(method.getParameterTypes(), argTypes))
 				.findAny().orElse(null);
@@ -252,9 +252,9 @@ public final class Reflections {
 	 * @param name the name of the method
 	 * @param argTypes the argument types of the method
 	 * @return the found method, never null
-	 * @throws MemberNotFoundException in case of non existing method
+	 * @throws MemberNotFoundException in case of non-existing method
 	 */
-	public static Method getMethod(Class clazz, String name, Class... argTypes) {
+	public static Method getMethod(Class<?> clazz, String name, Class<?>... argTypes) {
 		Method method = findMethod(clazz, name, argTypes);
 		if (method == null) {
 			throw new MemberNotFoundException("Method " + name + "(" + new StringAppender().ccat(argTypes, ", ").toString()
@@ -271,7 +271,7 @@ public final class Reflections {
 	 * @return the found method, null possible
 	 */
 	@Nullable
-	public static Constructor findConstructor(Class clazz, Class... argTypes) {
+	public static <C> Constructor<C> findConstructor(Class<C> clazz, Class<?>... argTypes) {
 		try {
 			return getConstructor(clazz, argTypes);
 		} catch (MemberNotFoundException e) {
@@ -286,9 +286,9 @@ public final class Reflections {
 	 * @param clazz the class of the method
 	 * @param argTypes the argument types of the method
 	 * @return the found method, never null
-	 * @throws MemberNotFoundException in case of non existing constructor
+	 * @throws MemberNotFoundException in case of non-existing constructor
 	 */
-	public static Constructor getConstructor(Class clazz, Class... argTypes) {
+	public static <C> Constructor<C> getConstructor(Class<C> clazz, Class<?>... argTypes) {
 		try {
 			return clazz.getDeclaredConstructor(argTypes);
 		} catch (NoSuchMethodException e) {
@@ -304,9 +304,9 @@ public final class Reflections {
 	}
 	
 	/**
-	 * Instanciates a class from its default contructor
+	 * Instantiates a class from its default constructor
 	 * 
-	 * @param clazz the target intance class
+	 * @param clazz the target instance class
 	 * @param <E> the target instance type
 	 * @return a new instance of type E, never null
 	 */
@@ -314,12 +314,12 @@ public final class Reflections {
 		try {
 			return newInstance(getDefaultConstructor(clazz));
 		} catch (UnsupportedOperationException e) {
-			throw new InvokationRuntimeException("Class " + toString(clazz) + " can't be instanciated", e);
+			throw new InvokationRuntimeException("Class " + toString(clazz) + " can't be instantiated", e);
 		}
 	}
 	
 	/**
-	 * Instanciates a class from given contructor and parameters
+	 * Instantiates a class from given constructor and parameters
 	 *
 	 * @param constructor the constructor to use
 	 * @param args arguments to use with given constructor
@@ -333,9 +333,9 @@ public final class Reflections {
 			return constructor.newInstance(args);
 		} catch (ReflectiveOperationException e) {
 			if (e instanceof InstantiationException && Modifier.isAbstract(constructor.getDeclaringClass().getModifiers()) ) {
-				throw new InvokationRuntimeException("Class " + toString(constructor.getDeclaringClass()) + " can't be instanciated because it is abstract", e);
+				throw new InvokationRuntimeException("Class " + toString(constructor.getDeclaringClass()) + " can't be instantiated because it is abstract", e);
 			} else {
-				throw new InvokationRuntimeException("Class " + toString(constructor.getDeclaringClass()) + " can't be instanciated", e);
+				throw new InvokationRuntimeException("Class " + toString(constructor.getDeclaringClass()) + " can't be instantiated", e);
 			}
 		}
 	}
@@ -347,7 +347,7 @@ public final class Reflections {
 	 * @param method the method to be invoked
 	 * @param target the instance on which the method will be invoked
 	 * @param args methods arguments
-	 * @return method invokation result
+	 * @return method invocation result
 	 */
 	public static Object invoke(Method method, Object target, Object ... args) {
 		try {
@@ -515,7 +515,7 @@ public final class Reflections {
 		return MEMBER_PRINTER.get().toString(field);
 	}
 	
-	public static String toString(Constructor constructor) {
+	public static String toString(Constructor<?> constructor) {
 		return MEMBER_PRINTER.get().toString(constructor);
 	}
 	
@@ -527,7 +527,7 @@ public final class Reflections {
 		return MEMBER_PRINTER.get().toString(executable);
 	}
 	
-	public static String toString(Class clazz) {
+	public static String toString(Class<?> clazz) {
 		return MEMBER_PRINTER.get().toString(clazz);
 	}
 	
@@ -624,7 +624,7 @@ public final class Reflections {
 	
 	/**
 	 * Equivalent of {@link Class#isAssignableFrom(Class)} extended to primitive type, because {@link Class#isAssignableFrom(Class)} was created at
-	 * a time where autoboxing wasn't existing. See https://bugs.java.com/bugdatabase/view_bug.do?bug_id=6456930
+	 * a time when autoboxing wasn't existing. See <a href="https://bugs.java.com/bugdatabase/view_bug.do?bug_id=6456930">Class.cast does not work for primitive types</a>
 	 * @param aClass any class
 	 * @param otherClass any class
 	 * @return true if aClass variable accepts an otherClass variable

@@ -173,10 +173,10 @@ public abstract class Strings {
 	 * with comma (", ").
 	 * Result of method references are printed by {@link StringBuilder#append(Object)} contract.
 	 * 
-	 * @param object any object (non null)
+	 * @param object any object (not null)
 	 * @param printableProperties functions that give a properties to be concatenated
 	 * @param <O> object type
-	 * @return the concatenation of the results of functions invokation on the given object
+	 * @return the concatenation of the results of functions invocation on the given object
 	 */
 	@SafeVarargs
 	public static <O> String footPrint(O object, Function<O, ?> ... printableProperties) {

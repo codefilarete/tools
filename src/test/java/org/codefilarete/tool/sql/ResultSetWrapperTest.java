@@ -31,7 +31,7 @@ class ResultSetWrapperTest {
 		Iterable<Method> methods = () -> methodIterator;
 		int methodCount = 0;
 		for (Method method : methods) {
-			Object invokationResult;
+			Object invocationResult;
 			try {
 				// we create default arguments otherwise we get IllegalArgumentException from the JVM at invoke() time
 				Object[] args = new Object[method.getParameterCount()];
@@ -44,9 +44,9 @@ class ResultSetWrapperTest {
 						args[i] = Reflections.PRIMITIVE_DEFAULT_VALUES.getOrDefault(arg, null /* default value for any non-primitive Object */);
 					}
 				}
-				invokationResult = method.invoke(testInstance, args);
+				invocationResult = method.invoke(testInstance, args);
 				Object delegateResult = method.invoke(Mockito.verify(delegate), args);
-				assertThat(invokationResult).isEqualTo(delegateResult);
+				assertThat(invocationResult).isEqualTo(delegateResult);
 				Mockito.clearInvocations(delegate);
 				methodCount++;
 			} catch (ReflectiveOperationException | IllegalArgumentException e) {

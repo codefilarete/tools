@@ -217,7 +217,7 @@ public class Nullable<T> implements Supplier<T> {
 	
 	/**
 	 * Will throw supplied {@link Throwable} if current value is null.
-	 * Tips to avoid invokation conflict with {@link #elseThrow(Throwable)} : one should specify generics before method call sush as:
+	 * Tips to avoid invocation conflict with {@link #elseThrow(Throwable)} : one should specify generics before method call sush as:
 	 * <code>
 	 *     Nullable.empty().&lt;IOException&gt;elseThrow(IOException::new);
 	 * </code>

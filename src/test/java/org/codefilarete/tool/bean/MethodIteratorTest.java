@@ -40,14 +40,14 @@ public class MethodIteratorTest {
 	
 	@Test
 	public void testNext_throwsNoSuchElementException() {
-		// with intermediary hasNext() invokation
+		// with intermediary hasNext() invocation
 		MethodIterator testInstance = new MethodIterator(X.class, Object.class);
 		assertThat(testInstance.hasNext()).isTrue();
 		testInstance.next();
 		assertThat(testInstance.hasNext()).isFalse();
 		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(testInstance::next);
 		
-		// without hasNext() invokation
+		// without hasNext() invocation
 		testInstance = new MethodIterator(X.class, Object.class);
 		testInstance.next();
 		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(testInstance::next);
@@ -57,7 +57,7 @@ public class MethodIteratorTest {
 		assertThat(testInstance.hasNext()).isFalse();
 		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(testInstance::next);
 		
-		// without hasNext() invokation
+		// without hasNext() invocation
 		testInstance = new MethodIterator(Object.class, Object.class);
 		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(testInstance::next);
 	}

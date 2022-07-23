@@ -147,7 +147,7 @@ public class Functions {
 		}
 		
 		/**
-		 * Overriden to make it null proof
+		 * Overridden to make it null proof
 		 * @param after the next function to apply on the result of this one
 		 * @param <V> type of the result of the combined functions
 		 * @return a new {@link NullProofFunction} that chains {@code this} with {@code after} only if the result of {@code this} is not null

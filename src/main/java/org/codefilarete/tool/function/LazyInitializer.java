@@ -3,8 +3,8 @@ package org.codefilarete.tool.function;
 import java.util.function.Supplier;
 
 /**
- * A {@link Supplier} for use case that needs a lazy instanciation of a variable.
- * Non thread-safe (would need a volatile internal variable and a internaly synchronized get())
+ * A {@link Supplier} for use case that needs a lazy instantiation of a variable.
+ * Non thread-safe (would need a volatile internal variable and an internally synchronized get())
  * 
  * @param <T> the type of the created instance
  */

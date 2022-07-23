@@ -18,7 +18,7 @@ public class InstanceFieldIterator extends FieldIterator {
 	}
 	
 	/**
-	 * Overriden to keep non-static fields only
+	 * Overridden to keep non-static fields only
 	 *
 	 * @param clazz the class for which fields must be given
 	 * @return non-static fields of the class only

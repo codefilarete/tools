@@ -42,7 +42,7 @@ class ConnectionWrapperTest {
 		Iterable<Method> methods = () -> methodIterator;
 		int methodCount = 0;
 		for (Method method : methods) {
-			Object invokationResult;
+			Object invocationResult;
 			try {
 				// we create default arguments otherwise we get IllegalArgumentException from the JVM at invoke() time
 				Object[] args = new Object[method.getParameterCount()];
@@ -55,13 +55,13 @@ class ConnectionWrapperTest {
 						args[i] = Reflections.PRIMITIVE_DEFAULT_VALUES.getOrDefault(arg, null /* default value for any non-primitive Object */);
 					}
 				}
-				invokationResult = method.invoke(testInstance, args);
+				invocationResult = method.invoke(testInstance, args);
 				Object delegateResult = method.invoke(Mockito.verify(delegate), args);
 				// small hack because Mockito is not consistent with itself : mock() returns an empty instances whereas verify() returns null
 				if (method.getName().equals("getTypeMap")) {
 					delegateResult = new HashMap<>();
 				}
-				assertThat(invokationResult).isEqualTo(delegateResult);
+				assertThat(invocationResult).isEqualTo(delegateResult);
 				Mockito.clearInvocations(delegate);
 				methodCount++;
 			} catch (ReflectiveOperationException | IllegalArgumentException e) {

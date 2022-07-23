@@ -19,9 +19,9 @@ import static org.codefilarete.tool.collection.Iterables.collect;
 import static org.codefilarete.tool.function.Functions.chain;
 
 /**
- * A class aimed at creating proxy that will redirect some interface methods to some concrete implementation, fallbacking non-redirecting method
+ * A class aimed at creating proxy that will redirect some interface methods to some concrete implementation, fallback non-redirecting method
  * to a concrete instance.
- * This allows to "extend" or decorate an instance (the fallbacking one) with some additional feature.
+ * This allows to "extend" or decorate an instance (the fallback one) with some additional feature.
  * 
  * @author Guillaume Mary
  */
@@ -34,7 +34,7 @@ public class MethodDispatcher {
 	 */
 	protected final Map<String /* simple method signature */, Interceptor> interceptors = new HashMap<>();
 	
-	/** Final target when no interceptor handled method, not null after {@link #build(Class)} invokation */
+	/** Final target when no interceptor handled method, not null after {@link #build(Class)} invocation */
 	private Object fallback;
 	
 	public Map<String, Interceptor> getInterceptors() {
@@ -58,7 +58,7 @@ public class MethodDispatcher {
 	
 	/**
 	 * Same as {@link #redirect(Class, Object)} but proxy will be returned by all methods invocation : result of them will be ignored.
-	 * Usefull when return types of extensionSurrogate methods don't match those of {@link #build(Class)} (kind of rare case).
+	 * Useful when return types of extensionSurrogate methods don't match those of {@link #build(Class)} (kind of rare case).
 	 * 
 	 * @param interfazz an interface, must be extended by the one that will be given to {@link #build(Class)} (should be a super type of it) 
 	 * @param extensionSurrogate an instance implementing X so methods of X can be redirected to it
@@ -73,8 +73,8 @@ public class MethodDispatcher {
 	}
 	
 	/**
-	 * Same as {@link #redirect(Class, Object)} but given object will be returned by all methods invocation.
-	 * Usefull when creating a fluent API where given interfazz methods should be invoked once, then methods return type is not herself but another
+	 * Same as {@link #redirect(Class, Object)} but given object will be returned by all method invocation.
+	 * Useful when creating a fluent API where given interfazz methods should be invoked once, then methods return type is not herself but another
 	 * one, the one that given returningMethodsTarget must implement (kind of rare case).
 	 * 
 	 * @param interfazz an interface, must be extended by the one that will be given to {@link #build(Class)} (should be a super type of it) 
@@ -196,8 +196,8 @@ public class MethodDispatcher {
 	 * @param target instance target of the method
 	 * @param method the method to be called
 	 * @param args method arguments
-	 * @return the result of invokation of the given method and arguments on given instance
-	 * @throws Throwable the one thrown by method invokation or one wrapping it for bettter understanding
+	 * @return the result of invocation of the given method and arguments on given instance
+	 * @throws Throwable the one thrown by method invocation or one wrapping it for better understanding
 	 */
 	protected Object invoke(Object target, Method method, Object[] args) throws Throwable {
 		try {

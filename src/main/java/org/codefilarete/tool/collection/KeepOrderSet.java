@@ -73,8 +73,8 @@ public class KeepOrderSet<E> extends SetWrapper<E> {
 	}
 	
 	/**
-	 * Overriden to refine return type
-	 * @return the surrogate map casted as a {@link LinkedHashSet}
+	 * Overridden to refine return type
+	 * @return the surrogate map cast as a {@link LinkedHashSet}
 	 */
 	@Override
 	public LinkedHashSet<E> getSurrogate() {

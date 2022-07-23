@@ -127,7 +127,7 @@ public class StringAppender implements Serializable, CharSequence {
 	}
 	
 	/**
-	 * Gives access to delegate appender, because it can be usefull to append directly to the standard API StringBuilder
+	 * Gives access to delegate appender, because it can be useful to append directly to the standard API StringBuilder
 	 *
 	 * @return the underlying appender
 	 */

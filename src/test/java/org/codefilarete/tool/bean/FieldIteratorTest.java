@@ -40,14 +40,14 @@ public class FieldIteratorTest {
 	
 	@Test
 	public void testNext_throwsNoSuchElementException() {
-		// with intermediary hasNext() invokation
+		// with intermediary hasNext() invocation
 		FieldIterator testInstance = new FieldIterator(X.class);
 		assertThat(testInstance.hasNext()).isTrue();
 		testInstance.next();
 		assertThat(testInstance.hasNext()).isFalse();
 		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(testInstance::next);
 		
-		// without hasNext() invokation
+		// without hasNext() invocation
 		testInstance = new FieldIterator(X.class);
 		testInstance.next();
 		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(testInstance::next);
@@ -57,7 +57,7 @@ public class FieldIteratorTest {
 		assertThat(testInstance.hasNext()).isFalse();
 		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(testInstance::next);
 		
-		// without hasNext() invokation
+		// without hasNext() invocation
 		testInstance = new FieldIterator(Object.class);
 		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(testInstance::next);
 	}

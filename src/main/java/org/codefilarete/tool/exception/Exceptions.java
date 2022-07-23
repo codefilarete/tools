@@ -14,7 +14,7 @@ public interface Exceptions {
 	
 	/**
 	 * Convert a {@link Throwable} into a {@link RuntimeException}. Do nothing if the {@link Throwable} is already a {@link RuntimeException},
-	 * else instanciate a {@link RuntimeException} with the exception as the init cause.
+	 * else instantiate a {@link RuntimeException} with the exception as the init cause.
 	 * <b>Please use with caution because doing this can be considered as a bad practice.</b>
 	 *
 	 * @param t any kinf of exception

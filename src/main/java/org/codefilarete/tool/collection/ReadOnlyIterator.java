@@ -12,7 +12,7 @@ public abstract class ReadOnlyIterator<E> implements Iterator<E> {
 	
 	/**
 	 * Simple shortcut to {@link ReadOnlyWrappedIterator#ReadOnlyWrappedIterator(Iterator)}, made because it seems more readable
-	 * at usage than instanciating the class. Totally subjective.
+	 * at usage than instantiating the class. Totally subjective.
 	 *
 	 * @param iterable the {@link Iterable} that the iterator will be taken on
 	 * @param <C> iterator element type
@@ -24,7 +24,7 @@ public abstract class ReadOnlyIterator<E> implements Iterator<E> {
 	
 	/**
 	 * Simple shortcut to {@link ReadOnlyWrappedIterator#ReadOnlyWrappedIterator(Iterator)}, made because it seems more readable
-	 * at usage than instanciating the class. Totally subjective.
+	 * at usage than instantiating the class. Totally subjective.
 	 *
 	 * @param iterator the wrapped iterator
 	 * @param <C> iterator element type
@@ -34,7 +34,7 @@ public abstract class ReadOnlyIterator<E> implements Iterator<E> {
 		return new ReadOnlyWrappedIterator<>(iterator);
 	}
 	
-	/** Overriden to mark it final */
+	/** Overridden to mark it final */
 	@Override
 	public final void remove() {
 		throw new UnsupportedOperationException();
