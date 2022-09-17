@@ -1,6 +1,5 @@
 package org.codefilarete.tool.collection;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.AbstractCollection;
 import java.util.ArrayList;
@@ -24,8 +23,8 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import org.codefilarete.tool.collection.PairIterator.UntilBothIterator;
 import org.codefilarete.tool.Duo;
+import org.codefilarete.tool.collection.PairIterator.UntilBothIterator;
 import org.codefilarete.tool.trace.ModifiableInt;
 
 /**
@@ -430,7 +429,7 @@ public final class Iterables {
 	 * @param iterable an {@link Iterable}, not null
 	 * @return the given {@link List}
 	 */
-	public static <E, C extends Collection<E>> C copy(@Nonnull Iterable<E> iterable, C result) {
+	public static <E, C extends Collection<E>> C copy(Iterable<E> iterable, C result) {
 		if (iterable instanceof Collection) {
 			result.addAll((Collection<E>) iterable);
 		} else {
@@ -445,7 +444,7 @@ public final class Iterables {
 	 * @param iterator an {@link Iterator}, not null
 	 * @return the given {@link List}
 	 */
-	public static <E, C extends Collection<E>> C copy(@Nonnull Iterator<E> iterator, C result) {
+	public static <E, C extends Collection<E>> C copy(Iterator<E> iterator, C result) {
 		while (iterator.hasNext()) {
 			result.add(iterator.next());
 		}
@@ -465,7 +464,7 @@ public final class Iterables {
 	public static <E> Set<E> intersect(Collection<? extends E> c1, Collection<? extends E> c2) {
 		Set<E> copy = new HashSet<>(c1);
 		copy.retainAll(c2);
-		return copy; 
+		return copy;
 	}
 	
 	/**
@@ -477,15 +476,16 @@ public final class Iterables {
 	 * @param <E> type of elements
 	 * @return the intersection between two {@link Collection}s according to the given {@link Comparator}
 	 */
-	public static <E> Set<E> intersect(Collection<? extends E> c1, Collection<? extends E> c2, Comparator<? super E> comparator) {
+	public static <E, T> Set<E> intersect(Collection<E> c1, Collection<T> c2, BiPredicate<E, T> predicate) {
 		Set<E> copy = new HashSet<>(c1);
-		copy.retainAll(Arrays.asTreeSet(comparator, c2));
-		return copy; 
+		copy.removeIf(e -> !contains(c2, c -> predicate.test(e, c)));
+		return copy;
 	}
 	
 	/**
 	 * Gives the complement of c2 in c1 : all elements of c1 that are not member of c2
-	 * Implementation has no particular optimization, it is based on a {@link HashSet#removeAll(Collection)}.
+	 * Implementation has no particular optimization, it is based on a {@link HashSet#removeAll(Collection)} and as such
+	 * is based on {@link Object#equals}
 	 * 
 	 * @param c1 a {@link Collection}, not null
 	 * @param c2 a {@link Collection}, not null
@@ -498,8 +498,9 @@ public final class Iterables {
 	
 	/**
 	 * Gives the complement of c2 in c1 : all elements of c1 that are not member of c2
-	 * Implementation has no particular optimization, it is based on a {@link HashSet#removeAll(Collection)}.
-	 * Result is pushed to given resultHolder
+	 * Implementation has no particular optimization, it is based on a {@link HashSet#removeAll(Collection)} and as such
+	 * is based on {@link Object#equals}.
+	 * Result is pushed to given resultHolder.
 	 *
 	 * @param c1 a {@link Collection}, not null
 	 * @param c2 a {@link Collection}, not null
@@ -510,7 +511,7 @@ public final class Iterables {
 	public static <E, S extends Set<E>> S minus(Collection<E> c1, Collection<E> c2, Function<Collection<E>, S> resultHolder) {
 		S copy = resultHolder.apply(c1);
 		copy.removeAll(c2);
-		return copy; 
+		return copy;
 	}
 	
 	/**
@@ -522,9 +523,9 @@ public final class Iterables {
 	 * @param <E> type of elements
 	 * @return the complement of c1 in c2
 	 */
-	public static <E> Set<E> minus(Collection<E> c1, Collection<E> c2, Comparator<E> comparator) {
+	public static <E, T> Set<E> minus(Collection<E> c1, Collection<T> c2, BiPredicate<E, T> predicate) {
 		Set<E> copy = new HashSet<>(c1);
-		copy.removeAll(Arrays.asTreeSet(comparator, c2));
+		copy.removeIf(e -> contains(c2, c -> predicate.test(e, c)));
 		return copy;
 	}
 	
@@ -557,7 +558,7 @@ public final class Iterables {
 	 * @param <V> type of values
 	 * @return a new {@link HashMap} composed of keys and values from both {@link Iterator}s
 	 */
-	public static <K, V> Map<K, V> pair(@Nonnull Iterable<K> keys, @Nonnull Iterable<V> values) {
+	public static <K, V> Map<K, V> pair(Iterable<K> keys, Iterable<V> values) {
 		return pair(keys, values, HashMap::new);
 	}
 	
@@ -635,7 +636,7 @@ public final class Iterables {
 	 * @param <E> type of elements
 	 * @return given iterable without elements that doesn't match the given predicate
 	 */
-	public static <E> Iterable<E> filter(@Nonnull Iterable<E> iterable, @Nonnull Predicate<E> includer) {
+	public static <E> Iterable<E> filter(Iterable<E> iterable, Predicate<E> includer) {
 		return () -> filter(iterable.iterator(), includer);
 	}
 	
@@ -647,7 +648,7 @@ public final class Iterables {
 	 * @param <E> type of elements
 	 * @return given iterator without elements that doesn't match the given predicate
 	 */
-	public static <E> Iterator<E> filter(@Nonnull Iterator<E> iterator, @Nonnull Predicate<E> includer) {
+	public static <E> Iterator<E> filter(Iterator<E> iterator, Predicate<E> includer) {
 		return new Iterator<E>() {
 			
 			private boolean hasNext = true;
@@ -867,7 +868,7 @@ public final class Iterables {
 	 * 
 	 * @param collection any (non null) {@link AbstractCollection}
 	 * @param <E> collection elements type
-	 * @return a reverse-order {@link Iterator} of the given colleciton
+	 * @return a reverse-order {@link Iterator} of the given collection
 	 */
 	public static <E> ReadOnlyIterator<E> reverseIterator(AbstractCollection<E> collection) {
 		return new ReverseArrayIterator<>((E[]) collection.toArray());

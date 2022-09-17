@@ -2,7 +2,6 @@ package org.codefilarete.tool.collection;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -10,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiPredicate;
 
 import org.codefilarete.tool.Duo;
 import org.codefilarete.tool.collection.PairIterator.EmptyIterator;
@@ -20,15 +20,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.codefilarete.tool.collection.Arrays.asHashSet;
-import static org.codefilarete.tool.collection.Arrays.asList;
-import static org.codefilarete.tool.collection.Arrays.asSet;
-import static org.codefilarete.tool.collection.Iterables.asIterable;
-import static org.codefilarete.tool.collection.Iterables.collectToList;
-import static org.codefilarete.tool.collection.Iterables.copy;
+import static org.codefilarete.tool.collection.Arrays.*;
 import static org.codefilarete.tool.collection.Iterables.first;
-import static org.codefilarete.tool.collection.Iterables.firstValue;
 import static org.codefilarete.tool.collection.Iterables.last;
+import static org.codefilarete.tool.collection.Iterables.*;
 
 /**
  * @author Guillaume Mary
@@ -194,7 +189,7 @@ class IterablesTest {
 	}
 	
 	@Test
-	void intersect_withComparator() {
+	void intersect_withPredicate() {
 		// let's take a non-Comparable class : StringBuilder (which is simple to compare in fact)
 		StringBuilder a = new StringBuilder().append("a");
 		StringBuilder a$ = new StringBuilder().append("a");
@@ -206,7 +201,7 @@ class IterablesTest {
 		StringBuilder d$ = new StringBuilder().append("d");
 		assertThat(Iterables.intersect(asList(a, b, c), asList(a$, b$))).isEqualTo(emptySet());
 		
-		Comparator<StringBuilder> stringBuilderComparator = Comparator.comparing(StringBuilder::toString);
+		BiPredicate<StringBuilder, StringBuilder> stringBuilderComparator = (sb1, sb2) -> sb1.toString().equals(sb2.toString());
 		assertThat(Iterables.intersect(asList(a, b, c), asList(a$, b$), stringBuilderComparator)).isEqualTo(asHashSet(a, b));
 		assertThat(Iterables.intersect(asList(a, d, c), asList(d$, b$), stringBuilderComparator)).isEqualTo(asHashSet(d));
 		assertThat(Iterables.intersect(asList(c, b, c), asList(b$, a$, b$, c$), stringBuilderComparator)).isEqualTo(asHashSet(b, c));
@@ -214,7 +209,7 @@ class IterablesTest {
 		assertThat(Iterables.intersect(emptyList(), asList(c, a, d), stringBuilderComparator)).isEqualTo(emptySet());
 		// test with strictly same instance
 		List<StringBuilder> c1 = asList(b, c);
-		assertThat(Iterables.intersect(c1, c1)).isEqualTo(asHashSet(b, c));
+		assertThat(Iterables.intersect(c1, c1, stringBuilderComparator)).isEqualTo(asHashSet(b, c));
 	}
 	
 	@Test
@@ -223,9 +218,34 @@ class IterablesTest {
 		assertThat(Iterables.minus(asList(2, 3, 6), asList(1, 2, 3, 4, 5))).isEqualTo(asHashSet(6));
 		assertThat(Iterables.minus(asList(1, 2, 3, 4, 5), emptyList())).isEqualTo(asHashSet(1, 2, 3, 4, 5));
 		assertThat(Iterables.minus(emptyList(), asList(1, 2, 3, 4, 5))).isEqualTo(emptySet());
-		// test with striclty same instance
+		// test with strictly same instance
 		List<Integer> c1 = asList(1, 2, 3, 4, 5);
 		assertThat(Iterables.minus(c1, c1)).isEqualTo(emptySet());
+	}
+	
+	@Test
+	void minus_withPredicate() {
+		// let's take a non-Comparable class : StringBuilder (which is simple to compare in fact)
+		StringBuilder a = new StringBuilder().append("a");
+		StringBuilder a$ = new StringBuilder().append("a");
+		StringBuilder b = new StringBuilder().append("b");
+		StringBuilder b$ = new StringBuilder().append("b");
+		StringBuilder c = new StringBuilder().append("c");
+		StringBuilder c$ = new StringBuilder().append("c");
+		StringBuilder d = new StringBuilder().append("d");
+		StringBuilder d$ = new StringBuilder().append("d");
+		assertThat(Iterables.intersect(asList(a, b, c), asList(a$, b$))).isEqualTo(emptySet());
+		
+		BiPredicate<StringBuilder, StringBuilder> stringBuilderComparator = (sb1, sb2) -> sb1.toString().equals(sb2.toString());
+		
+		assertThat(Iterables.minus(asList(a, b, c), asList(a$, b$), stringBuilderComparator)).isEqualTo(asHashSet(c));
+		assertThat(Iterables.minus(asList(a, d, c), asList(d$, b$), stringBuilderComparator)).isEqualTo(asHashSet(a, c));
+		assertThat(Iterables.minus(asList(c, b, c), asList(b$, a$, b$, c$), stringBuilderComparator)).isEmpty();
+		assertThat(Iterables.minus(asList(b, c), emptyList(), stringBuilderComparator)).isEqualTo(asHashSet(b, c));
+		assertThat(Iterables.minus(emptyList(), asList(c, a, d), stringBuilderComparator)).isEmpty();
+		// test with strictly same instance
+		List<StringBuilder> c1 = asList(b, c);
+		assertThat(Iterables.minus(c1, c1, stringBuilderComparator)).isEmpty();
 	}
 	
 	@Test
@@ -265,7 +285,7 @@ class IterablesTest {
 		List<Integer> c1 = asList(1, 2, 3, 4, 5);
 		List<Integer> c2 = asList(1, 2, 3, 4, 5);
 		assertThat(Iterables.equals(c1, c2, Object::equals)).isTrue();
-		// test with striclty same instance
+		// test with strictly same instance
 		assertThat(Iterables.equals(c1, c1, Object::equals)).isTrue();
 		
 		// check with another Predicate
