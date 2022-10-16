@@ -80,11 +80,4 @@ public class KeepOrderSet<E> extends SetWrapper<E> {
 	public LinkedHashSet<E> getSurrogate() {
 		return (LinkedHashSet<E>) super.getSurrogate();
 	}
-	
-	/**
-	 * @return a copy of its content as a {@link LinkedHashSet}
-	 */
-	public LinkedHashSet<E> asSet() {
-		return new LinkedHashSet<>(getSurrogate());
-	}
 }
