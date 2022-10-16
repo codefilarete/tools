@@ -2,6 +2,7 @@ package org.codefilarete.tool.collection;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Map that keeps insertion order. Made for clearer intention (by its name) than {@link java.util.LinkedHashMap} (which is the surrogate)
@@ -18,8 +19,8 @@ public class KeepOrderMap<K, V> extends MapWrapper<K, V> {
 		super(surrogate);
 	}
 	
-	public KeepOrderMap(KeepOrderMap<K, V> surrogate) {
-		super(surrogate);
+	public KeepOrderMap(Map<K, V> surrogate) {
+		super(new LinkedHashMap<>(surrogate));
 	}
 	
 	/**
