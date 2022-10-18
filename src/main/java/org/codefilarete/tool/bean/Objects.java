@@ -10,10 +10,22 @@ import org.codefilarete.tool.function.Predicates;
  */
 public class Objects {
 	
+	/**
+	 * Returns an empty {@link String} if given one is null
+	 * @param value any {@link String}, null included
+	 * @return an empty {@link String} if given one is null
+	 */
 	public static String preventNull(String value) {
 		return preventNull(value, "");
 	}
 	
+	/**
+	 * Returns nullValue if given value is null
+	 * @param value any {@link Object}, even null
+	 * @param nullValue any replacing {@link Object}
+	 * @return nullValue if given value is null
+	 * @param <E> input and output type
+	 */
 	public static <E> E preventNull(E value, E nullValue) {
 		return value == null ? nullValue : value;
 	}
@@ -21,7 +33,7 @@ public class Objects {
 	/**
 	 * Returns a fallback value if the given input equals a matching one
 	 *
-	 * @param input value that may equals the matching one
+	 * @param input value that may equal the matching one
 	 * @param matchingCase value on which fallback value will be return
 	 * @param fallbackValue value returned when input equals matching value
 	 * @param <C> type of mangaed value
@@ -38,7 +50,7 @@ public class Objects {
 	/**
 	 * Static method to negate the given predicate so one can write {@code not(String::contains)}.
 	 * 
-	 * @param predicate any {@link Predicate}, a method reference is prefered else this method as no purpose and can be replaced by {@link Predicate#negate}
+	 * @param predicate any {@link Predicate}, a method reference is preferred else this method as no purpose and can be replaced by {@link Predicate#negate}
 	 * @param <E> input type of tested elements
 	 * @return a negated {@link Predicate} of the given one
 	 */
@@ -47,7 +59,7 @@ public class Objects {
 	}
 	
 	/**
-	 * Returns true if the arguments are equal to each other and false otherwise. As the opposit of {@link java.util.Objects#equals(Object, Object)}
+	 * Returns true if the arguments are equal to each other and false otherwise. As the opposite of {@link java.util.Objects#equals(Object, Object)}
 	 * this implementation works on array since it's bounded to {@link java.util.Objects#deepEquals(Object, Object)}.
 	 *
 	 * @param a an object
