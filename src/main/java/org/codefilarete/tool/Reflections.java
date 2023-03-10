@@ -559,6 +559,10 @@ public final class Reflections {
 			case "V":
 				return void.class;
 			default:
+				// we try default JVM type representation : see Class.getName() javadoc
+				if (typeName.startsWith("L") && typeName.endsWith(";")) {
+					typeName = typeName.substring(1, typeName.length() - 1);
+				}
 				try {
 					return Class.forName(typeName);
 				} catch (ClassNotFoundException e) {

@@ -391,6 +391,7 @@ public class ReflectionsTest {
 		assertThat(Reflections.forName("V")).isEqualTo(void.class);
 		assertThat(Reflections.forName(String.class.getName())).isEqualTo(String.class);
 		assertThat(Reflections.forName("[Ljava.lang.Object;")).isEqualTo(Object[].class);
+		assertThat(Reflections.forName("Ljava.lang.Object;")).isEqualTo(Object.class);
 		assertThat(Reflections.forName("java.lang.Object")).isEqualTo(Object.class);
 		assertThat(Reflections.forName("[Z")).isEqualTo(boolean[].class);
 		assertThat(Reflections.forName("[[Z")).isEqualTo(boolean[][].class);
