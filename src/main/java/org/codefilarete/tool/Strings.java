@@ -3,6 +3,8 @@ package org.codefilarete.tool;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 
 import org.codefilarete.tool.bean.Objects;
@@ -80,6 +82,29 @@ public abstract class Strings {
 		}
 		for (int i = 0; i < remainer; i++) {
 			result.append(s);
+		}
+		return result;
+	}
+	
+	/**
+	 * Equivalent to {@link String#split(String)} without regexp which is unnecessary for char separator
+	 * @param stringToBeSplit
+	 * @param separator
+	 * @param keepSeparatorInResult
+	 * @return a {@link String} split into pieces each time separator is found in it
+	 */
+	public static List<String> split(String stringToBeSplit, char separator, boolean keepSeparatorInResult) {
+		List<String> result = new ArrayList<>();
+		int separatorIndex = stringToBeSplit.indexOf(separator);
+		int previousSeparatorIndex = 0;
+		int substringPadding = keepSeparatorInResult ? 1 : 0;
+		while (separatorIndex != -1) {
+			result.add(stringToBeSplit.substring(previousSeparatorIndex, separatorIndex + substringPadding));
+			previousSeparatorIndex = separatorIndex + 1;
+			separatorIndex = stringToBeSplit.indexOf(separator, previousSeparatorIndex);
+		}
+		if (previousSeparatorIndex < stringToBeSplit.length()) {
+			result.add(stringToBeSplit.substring(previousSeparatorIndex));
 		}
 		return result;
 	}
