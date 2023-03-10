@@ -54,9 +54,8 @@ public final class Maps {
 	public static <K, V1, V2> Map<V1, V2> innerJoin(Map<K, V1> map1, Map<K, V2> map2) {
 		Map<V1, V2> result = new HashMap<>();
 		map1.forEach((k, v) -> {
-			V2 v2 = map2.get(k);
-			if (v2 != null) {
-				result.put(v, v2);
+			if (map2.containsKey(k)) {
+				result.put(v, map2.get(k));
 			}
 		});
 		return result;

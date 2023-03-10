@@ -22,6 +22,16 @@ class MapsTest {
 	}
 	
 	@Test
+	void innerJoin_withNull() {
+		Map<Integer, Integer> result = Maps.innerJoin(
+				Maps.forHashMap(String.class, Integer.class)
+				.add("a", 1).add("b", 2).add("c", 3),
+				Maps.forHashMap(String.class, Integer.class)
+				.add("b", null).add("c", 5).add("d", 6));
+		assertThat(result).isEqualTo(Maps.forHashMap(Integer.class, Integer.class).add(2, null).add(3, 5));
+	}
+	
+	@Test
 	void innerJoinOnValuesAndKeys() {
 		Map<String, String> result = Maps.innerJoinOnValuesAndKeys(
 				Maps.forHashMap(String.class, Integer.class)
