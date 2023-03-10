@@ -125,4 +125,9 @@ public class SetWrapper<E> implements Set<E> {
 	public void forEach(Consumer<? super E> action) {
 		surrogate.forEach(action);
 	}
+	
+	@Override
+	public String toString() {
+		return surrogate.toString();
+	}
 }
