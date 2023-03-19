@@ -581,6 +581,45 @@ public final class Iterables {
 	}
 	
 	/**
+	 * Creates an {@link Iterable} by applying a mapping function on each element of the {@link Iterator} given by
+	 * the source {@link Iterable}.
+	 *
+	 * @param iterable the {@link Iterable} that gives the source of the {@link Iterator} on which the mapping function will be applied
+	 * @param mapper the mapping function of each element
+	 * @return an {@link Iterable} which {@link Iterator} is one backed by given {@link Iterable} {@link Iterator} combined with mapping function
+	 * @param <E> {@link Iterable} {@link Iterator} source element type
+	 * @param <O> {@link Iterable} {@link Iterator} result element type
+	 * @see #mappingIterator(Iterator, Function)
+	 */
+	public static <E, O> Iterable<O> mappingIterator(Iterable<E> iterable, Function<E, O> mapper) {
+		return () -> mappingIterator(iterable.iterator(), mapper);
+	}
+	
+	/**
+	 * Creates an {@link Iterator} by applying a mapping function on each element of the given {@link Iterator}.
+	 *
+	 * @param iterator the {@link Iterator} on which the mapping function will be applied
+	 * @param mapper the mapping function of each element
+	 * @return an {@link Iterator} backed by given {@link Iterator} combined with mapping function
+	 * @param <E> {@link Iterator} source element type
+	 * @param <O> {@link Iterator} result element type
+	 * @see #mappingIterator(Iterable, Function)
+	 */
+	public static <E, O> Iterator<O> mappingIterator(Iterator<E> iterator, Function<E, O> mapper) {
+		return new Iterator<O>() {
+			@Override
+			public boolean hasNext() {
+				return iterator.hasNext();
+			}
+			
+			@Override
+			public O next() {
+				return mapper.apply(iterator.next());
+			}
+		};
+	}
+	
+	/**
 	 * Converts an {@link Iterator} to a {@link Stream}.
 	 * If the {@link Iterator} comes from a {@link Collection}, then prefer usage of {@link Collection#stream()}
 	 * 

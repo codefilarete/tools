@@ -2,6 +2,7 @@ package org.codefilarete.tool.collection;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -378,7 +379,7 @@ class IterablesTest {
 	
 	@ParameterizedTest
 	@MethodSource("consume")
-	void Consume_stream(List<String> input, String lookupElement, Set<Integer> expected) {
+	void consume_stream(List<String> input, String lookupElement, Set<Integer> expected) {
 		Set<Integer> collectedIndexes = new HashSet<>();
 		Iterables.consume(input.stream(), lookupElement::equals, (s, i) -> collectedIndexes.add(i));
 		assertThat(collectedIndexes).isEqualTo(expected);
@@ -423,6 +424,22 @@ class IterablesTest {
 		
 		integers = asList(1, 2, 3, 4, 5);
 		assertThat(Iterables.pair(strings, integers)).isEqualTo(Maps.asMap("a", 1).add("b", 2).add("c", 3).add(null, 5));
+	}
+	
+	@Test
+	void mappingIterator() {
+		List<Integer> aList = asList(7, 4, 33);
+		Iterable<String> n = Iterables.mappingIterator(aList, Object::toString);
+		Iterator<String> iterator = n.iterator();
+		assertThat(iterator.hasNext()).isTrue();
+		assertThat(iterator.next()).isEqualTo("7");
+		assertThat(iterator.hasNext()).isTrue();
+		assertThat(iterator.next()).isEqualTo("4");
+		assertThat(iterator.hasNext()).isTrue();
+		assertThat(iterator.next()).isEqualTo("33");
+		assertThat(iterator.hasNext()).isFalse();
+		
+		assertThat(Iterables.mappingIterator(Collections.emptyIterator(), Object::toString).hasNext()).isFalse();
 	}
 	
 	@Test
