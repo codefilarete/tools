@@ -409,7 +409,7 @@ public final class Iterables {
 	 * @param iterable an {@link Iterable}, not null
 	 * @return a new {@link List}<E> containing all elements of <t>iterable</t>
 	 */
-	public static <E> List<E> copy(Iterable<E> iterable) {
+	public static <E> List<E> copy(Iterable<? extends E> iterable) {
 		return copy(iterable, new ArrayList<>());
 	}
 	
@@ -419,7 +419,7 @@ public final class Iterables {
 	 * @param iterator an {@link Iterator}, not null
 	 * @return a new {@link List}<E> containing all elements of <t>iterator</t>
 	 */
-	public static <E> List<E> copy(Iterator<E> iterator) {
+	public static <E> List<E> copy(Iterator<? extends E> iterator) {
 		return copy(iterator, new ArrayList<>());
 	}
 	
@@ -429,7 +429,7 @@ public final class Iterables {
 	 * @param iterable an {@link Iterable}, not null
 	 * @return the given {@link List}
 	 */
-	public static <E, C extends Collection<E>> C copy(Iterable<E> iterable, C result) {
+	public static <E, C extends Collection<E>> C copy(Iterable<? extends E> iterable, C result) {
 		if (iterable instanceof Collection) {
 			result.addAll((Collection<E>) iterable);
 		} else {
@@ -444,7 +444,7 @@ public final class Iterables {
 	 * @param iterator an {@link Iterator}, not null
 	 * @return the given {@link List}
 	 */
-	public static <E, C extends Collection<E>> C copy(Iterator<E> iterator, C result) {
+	public static <E, C extends Collection<E>> C copy(Iterator<? extends E> iterator, C result) {
 		while (iterator.hasNext()) {
 			result.add(iterator.next());
 		}
