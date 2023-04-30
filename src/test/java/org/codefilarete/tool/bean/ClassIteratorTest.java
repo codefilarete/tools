@@ -15,9 +15,9 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 /**
  * @author Guillaume Mary
  */
-public class ClassIteratorTest {
+class ClassIteratorTest {
 	
-	public static Object[][] testNextMethodsData() {
+	static Object[][] nextMethodsData() {
 		return new Object[][] {
 				{ X.class, Arrays.asList((Class) X.class) },
 				{ Y.class, Arrays.asList((Class) Y.class, X.class) }
@@ -25,26 +25,26 @@ public class ClassIteratorTest {
 	}
 	
 	@ParameterizedTest
-	@MethodSource("testNextMethodsData")
-	public void testNext(Class clazz, List<Class> expectedClasses) {
+	@MethodSource("nextMethodsData")
+	void next(Class clazz, List<Class> expectedClasses) {
 		ClassIterator testInstance = new ClassIterator(clazz);
 		assertThat(Iterables.copy(testInstance)).isEqualTo(expectedClasses);
 	}
 	
 	@Test
-	public void testNext_stopClass() {
+	void next_stopClass() {
 		ClassIterator testInstance = new ClassIterator(Z.class, X.class);
 		assertThat(Iterables.copy(testInstance)).isEqualTo(Arrays.asList((Class) Z.class, Y.class));
 	}
 	
 	@Test
-	public void testHasNext_false() {
+	void nasNext_false() {
 		ClassIterator testInstance = new ClassIterator(X.class, X.class);
 		assertThat(testInstance.hasNext()).isFalse();
 	}
 	
 	@Test
-	public void testNext_throwsNoSuchElementException() {
+	void next_throwsNoSuchElementException() {
 		// with intermediary hasNext() invocation
 		ClassIterator testInstance = new ClassIterator(Object.class);
 		assertThat(testInstance.hasNext()).isFalse();

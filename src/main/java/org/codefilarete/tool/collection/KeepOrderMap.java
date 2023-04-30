@@ -19,7 +19,7 @@ public class KeepOrderMap<K, V> extends MapWrapper<K, V> {
 		super(surrogate);
 	}
 	
-	public KeepOrderMap(Map<K, V> surrogate) {
+	public KeepOrderMap(Map<? extends K, ? extends V> surrogate) {
 		super(new LinkedHashMap<>(surrogate));
 	}
 	
