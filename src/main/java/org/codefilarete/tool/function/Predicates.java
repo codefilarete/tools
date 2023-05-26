@@ -14,7 +14,7 @@ public class Predicates {
 	/**
 	 * Static method to negate the given predicate so one can write {@code not(String::contains)}.
 	 *
-	 * @param predicate any {@link Predicate}, a method reference is prefered else this method as no purpose and can be replaced by {@link Predicate#negate}
+	 * @param predicate any {@link Predicate}, a method reference is preferred else this method as no purpose and can be replaced by {@link Predicate#negate}
 	 * @param <E> input type of tested elements
 	 * @return a negated {@link Predicate} of the given one
 	 */
