@@ -1,3 +1,3 @@
-My personal project of tool classes.
+Codefilarete toolbox classes.
 
-Methods should not be called outside of my own projects because they has no goal of maintenance, retrocompatibility and may experiment things.
+Classes and methods are not expected to be used outside of Codefilarete projects because they have no goal of maintenance, retro-compatibility and may experiment things.
