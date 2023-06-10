@@ -3,6 +3,8 @@ package org.codefilarete.tool.collection;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Storage of key-value pairs based on key {@link System#identityHashCode} to avoid loss of bean in classical
@@ -50,6 +52,14 @@ public class IdentityMap<K, V> {
 	
 	public V putIfAbsent(K key, V value) {
 		return delegate.putIfAbsent(hash(key), value);
+	}
+	
+	public V putIfAbsent(K key, Supplier<V> value) {
+		return delegate.putIfAbsent(hash(key), value.get());
+	}
+	
+	public V computeIfAbsent(K key, Function<? super K, ? extends V> mappingFunction) {
+		return delegate.computeIfAbsent(hash(key), k -> mappingFunction.apply(key));
 	}
 	
 	public Collection<V> values() {

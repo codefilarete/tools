@@ -7,7 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class IdentityMapTest {
 	
 	@Test
-	void add() {
+	void put() {
 		IdentityMap<String, Object> testInstance = new IdentityMap<>();
 		String firstA = "a";
 		testInstance.put(firstA, 1);
@@ -51,6 +51,27 @@ class IdentityMapTest {
 		assertThat(testInstance.size()).isEqualTo(0);
 		assertThat(testInstance.containsKey("a")).isFalse();
 		assertThat(testInstance.containsKey(aClone)).isFalse();
+	}
+	
+	@Test
+	void putIfAbsent_value() {
+		IdentityMap<String, Object> testInstance = new IdentityMap<>();
+		assertThat(testInstance.putIfAbsent("a", 1)).isNull();
+		assertThat(testInstance.putIfAbsent("a", 2)).isEqualTo(1);
+	}
+	
+	@Test
+	void putIfAbsent_supplier() {
+		IdentityMap<String, Object> testInstance = new IdentityMap<>();
+		assertThat(testInstance.putIfAbsent("a", () -> 1)).isNull();
+		assertThat(testInstance.putIfAbsent("a", () -> 2)).isEqualTo(1);
+	}
+	
+	@Test
+	void computeIfAbsent() {
+		IdentityMap<String, Object> testInstance = new IdentityMap<>();
+		assertThat(testInstance.computeIfAbsent("a", k -> 1)).isEqualTo(1);
+		assertThat(testInstance.computeIfAbsent("a", k -> 2)).isEqualTo(1);
 	}
 	
 }
