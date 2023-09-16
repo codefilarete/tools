@@ -21,9 +21,11 @@ import java.util.function.Supplier;
 
 import org.codefilarete.tool.bean.FieldIterator;
 import org.codefilarete.tool.bean.MethodIterator;
+import org.codefilarete.tool.collection.ArrayIterator;
 import org.codefilarete.tool.collection.Arrays;
 import org.codefilarete.tool.collection.Iterables;
 import org.codefilarete.tool.collection.Maps;
+import org.codefilarete.tool.collection.PairIterator;
 import org.codefilarete.tool.function.ThrowingFunction;
 import org.codefilarete.tool.reflect.MemberPrinter;
 
@@ -230,8 +232,10 @@ public final class Reflections {
 	}
 	
 	/**
-	 * Returns the method with the given signature elements. Class hierarchy is checked also until Object class. 
-	 * 
+	 * Returns the method with the given signature elements
+	 * - Class hierarchy is checked also until Object class
+	 * - Method argument compatibility is also taken into account : primitive / boxed type and super type in declared method
+	 *
 	 * @param clazz the class of the method
 	 * @param name the name of the method
 	 * @param argTypes the argument types of the method
@@ -240,7 +244,16 @@ public final class Reflections {
 	@Nullable
 	public static Method findMethod(Class<?> clazz, String name, Class<?>... argTypes) {
 		return Iterables.stream(new MethodIterator(clazz, null))
-				.filter(method -> method.getName().equals(name) && java.util.Arrays.equals(method.getParameterTypes(), argTypes))
+				.filter(method -> method.getName().equals(name) && method.getParameterTypes().length == argTypes.length)
+				.filter(method -> {
+					PairIterator<Class<?>, Class<?>> argsIterator = new PairIterator<>(new ArrayIterator<>(method.getParameterTypes()), new ArrayIterator<>(argTypes));
+					boolean argsAreCompatible = true;
+					while (argsAreCompatible && argsIterator.hasNext()) {
+						Duo<Class<?>, Class<?>> next = argsIterator.next();
+						argsAreCompatible = isAssignableFrom(next.getLeft(), next.getRight());
+					}
+					return argsAreCompatible;
+				})
 				.findAny().orElse(null);
 	}
 	

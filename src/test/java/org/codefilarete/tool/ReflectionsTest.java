@@ -11,8 +11,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.assertj.core.api.AbstractThrowableAssert;
-import org.codefilarete.tool.Reflections.InvokationRuntimeException;
-import org.codefilarete.tool.Reflections.MemberNotFoundException;
 import org.codefilarete.tool.exception.Exceptions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -21,11 +19,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.InstanceOfAssertFactories.THROWABLE;
-import static org.codefilarete.tool.Reflections.PACKAGES_PRINT_MODE_CONTEXT;
-import static org.codefilarete.tool.Reflections.findField;
-import static org.codefilarete.tool.Reflections.findMethod;
-import static org.codefilarete.tool.Reflections.onJavaBeanPropertyWrapper;
-import static org.codefilarete.tool.Reflections.onJavaBeanPropertyWrapperName;
+import static org.codefilarete.tool.Reflections.*;
 
 /**
  * @author Guillaume Mary
@@ -33,7 +27,7 @@ import static org.codefilarete.tool.Reflections.onJavaBeanPropertyWrapperName;
 public class ReflectionsTest {
 	
 	@Test
-	void toString_flatPackagePrintOtionSwitching() {
+	void toString_flatPackagePrintOptionSwitching() {
 		assertThat(Reflections.toString(String.class)).isEqualTo("j.l.String");
 		
 		// testing option change with "off"
@@ -135,13 +129,18 @@ public class ReflectionsTest {
 		assertThat(field.getDeclaringClass()).isEqualTo(expectedDeclaringClass);
 	}
 	
-	public static Object[][] testGetMethodData() {
+	public static Object[][] findGetMethodData() {
 		return new Object[][] {
 				{ Toto.class, "toto", null, Toto.class, 0 },
 				{ Toto.class, "toto2", null, Toto.class, 0 },
 				// with parameter
 				{ Toto.class, "toto", Integer.TYPE, Toto.class, 1 },
 				{ Toto.class, "toto2", Integer.TYPE, Toto.class, 1 },
+				// with primitive and boxing type
+				{ Toto.class, "setA", Integer.class, Toto.class, 1 },
+				// with super type in declared method
+				{ Toto.class, "setC", String.class, Toto.class, 1 },
+				{ Toto.class, "setC", StringBuffer.class, Toto.class, 1 },
 				// inheritance test
 				{ Tutu.class, "toto", null, Toto.class, 0 },
 				{ Tutu.class, "toto2", null, Toto.class, 0 },
@@ -151,18 +150,18 @@ public class ReflectionsTest {
 	}
 	
 	@ParameterizedTest
-	@MethodSource("testGetMethodData")
-	void getMethod(Class<Toto> methodClass, String methodName, Class parameterType, Class expectedDeclaringClass, int exectedParameterCount) {
+	@MethodSource("findGetMethodData")
+	void findMethod(Class<Toto> methodClass, String methodName, Class parameterType, Class expectedDeclaringClass, int expectedParameterCount) {
 		Method method;
 		if (parameterType == null) {
-			method = findMethod(methodClass, methodName);
+			method = Reflections.findMethod(methodClass, methodName);
 		} else {
-			method = findMethod(methodClass, methodName, parameterType);
+			method = Reflections.findMethod(methodClass, methodName, parameterType);
 		}
 		assertThat(method).isNotNull();
 		assertThat(method.getName()).isEqualTo(methodName);
 		assertThat(method.getDeclaringClass()).isEqualTo(expectedDeclaringClass);
-		assertThat(method.getParameterTypes().length).isEqualTo(exectedParameterCount);
+		assertThat(method.getParameterTypes().length).isEqualTo(expectedParameterCount);
 	}
 	
 	@Test
@@ -496,6 +495,10 @@ public class ReflectionsTest {
 		/** Non conventional setter */
 		public void fixB(String b) {
 			setB(b);
+		}
+		
+		public void setC(CharSequence s) {
+		
 		}
 	}
 	
