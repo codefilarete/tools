@@ -7,6 +7,7 @@ import java.util.function.Supplier;
  * Non thread-safe (would need a volatile internal variable and an internally synchronized get())
  * 
  * @param <T> the type of the created instance
+ * @see ThreadSafeLazyInitializer
  */
 public abstract class LazyInitializer<T> implements Supplier<T> {
 	
@@ -15,6 +16,7 @@ public abstract class LazyInitializer<T> implements Supplier<T> {
 	public LazyInitializer() {
 	}
 	
+	@Override
 	public T get() {
 		if (this.instance == null) {
 			this.instance = this.createInstance();
