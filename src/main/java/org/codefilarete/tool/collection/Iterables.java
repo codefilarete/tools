@@ -796,6 +796,8 @@ public final class Iterables {
 		while (iterator.hasNext() && !found) {
 			I step = iterator.next();
 			O mapperResult = mapper.apply(step);
+			// voluntary variable reassignment
+			//noinspection ReassignedVariable
 			if (found = predicate.test(mapperResult)) {
 				result = new Duo<>(step, mapperResult);
 			}
@@ -808,7 +810,7 @@ public final class Iterables {
 	 *
 	 * @param iterable the {@link Iterable} to scan
 	 * @param matcher the test to execute for equality
-	 * @param foundConsumer will be called with every mathing element and its index
+	 * @param foundConsumer will be called with every matching element and its index
 	 * @param <E> input type
 	 */
 	public static <E> void consume(Iterable<E> iterable, Predicate<E> matcher, BiConsumer<E, Integer> foundConsumer) {
@@ -820,7 +822,7 @@ public final class Iterables {
 	 *
 	 * @param iterator the {@link Iterator} to scan
 	 * @param matcher the test to execute for equality
-	 * @param foundConsumer will be called with every mathing element and its index
+	 * @param foundConsumer will be called with every matching element and its index
 	 * @param <E> input type
 	 */
 	public static <E> void consume(Iterator<E> iterator, Predicate<E> matcher, BiConsumer<E, Integer> foundConsumer) {
@@ -839,7 +841,7 @@ public final class Iterables {
 	 * 
 	 * @param stream the {@link Stream} to scan
 	 * @param matcher the test to execute for equality
-	 * @param foundConsumer will be called with every mathing element and its index
+	 * @param foundConsumer will be called with every matching element and its index
 	 * @param <E> input type
 	 */
 	public static <E> void consume(Stream<E> stream, Predicate<E> matcher, BiConsumer<E, Integer> foundConsumer) {
