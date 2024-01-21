@@ -59,7 +59,8 @@ public class IteratorIterator<E> implements Iterator<E> {
 				}
 			}
 		}
-		return currentIterator.hasNext();
+		// here currentIterator != null && currentIterator.hasNext() or found = true => both conditions are always true
+		return true;
 	}
 	
 	@Override

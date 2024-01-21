@@ -445,9 +445,7 @@ public final class Iterables {
 	 * @return the given {@link List}
 	 */
 	public static <E, C extends Collection<E>> C copy(Iterator<? extends E> iterator, C result) {
-		while (iterator.hasNext()) {
-			result.add(iterator.next());
-		}
+		iterator.forEachRemaining(result::add);
 		return result;
 	}
 	
@@ -547,7 +545,7 @@ public final class Iterables {
 	
 	
 	/**
-	 * Puts 2 {@link Iterator}s side by side as a {@link Map}.
+	 * Puts 2 {@link Iterator}s side by side in a {@link Map}.
 	 * If {@link Iterator}s are not of same length then null elements will be used into the {@link Map}.
 	 * This leads to a cumulative null key if {@code values} {@link Iterator} is larger than {@code keys} {@link Iterator} because all overflowing
 	 * elements will be put onto a null key.
@@ -563,7 +561,7 @@ public final class Iterables {
 	}
 	
 	/**
-	 * Puts 2 {@link Iterator}s side by side as a {@link Map}.
+	 * Puts 2 {@link Iterator}s side by side in a {@link Map}.
 	 * If {@link Iterator}s are not of same length then null elements will be used into the {@link Map}.
 	 * This leads to a cumulative null key if {@code values} {@link Iterator} is larger than {@code keys} {@link Iterator} because all overflowing
 	 * elements will be put onto a null key.

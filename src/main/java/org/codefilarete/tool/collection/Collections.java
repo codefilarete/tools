@@ -55,10 +55,10 @@ public class Collections {
 	}
 	
 	/**
-	 * Create a Last-In-Firt-Out {@link Queue}
+	 * Create a Last-In-First-Out {@link Queue}
 	 * 
 	 * @param <E> element type
-	 * @return a new Last-In-Firt-Out {@link Queue}
+	 * @return a new Last-In-First-Out {@link Queue}
 	 */
 	public static <E> Queue<E> newLifoQueue() {
 		return java.util.Collections.asLifoQueue(new ArrayDeque<>());
@@ -110,7 +110,7 @@ public class Collections {
 	 */
 	public static <E> List<List<E>> parcel(Iterable<E> data, int blockSize) {
 		final List<List<E>> blocks = new ArrayList<>();
-		// on s'assure d'avoir une liste pour permettre l'utilisation de subList ensuite
+		// we ensure to have a list to allow sublist(..) usage afterward
 		List<E> dataAsList = asList(data);
 		int i = 0;
 		int dataSize = dataAsList.size();

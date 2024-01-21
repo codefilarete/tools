@@ -243,7 +243,7 @@ public final class Reflections {
 	 */
 	@Nullable
 	public static Method findMethod(Class<?> clazz, String name, Class<?>... argTypes) {
-		return Iterables.stream(new MethodIterator(clazz, null))
+		return Iterables.stream(new MethodIterator(clazz, null))	// having null here allows to take Object class into account
 				.filter(method -> method.getName().equals(name) && method.getParameterTypes().length == argTypes.length)
 				.filter(method -> {
 					PairIterator<Class<?>, Class<?>> argsIterator = new PairIterator<>(new ArrayIterator<>(method.getParameterTypes()), new ArrayIterator<>(argTypes));

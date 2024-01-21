@@ -14,9 +14,9 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 /**
  * @author Guillaume Mary
  */
-public class IteratorIteratorTest {
+class IteratorIteratorTest {
 	
-	public static Object[][] test_data() {
+	static Object[][] test_data() {
 		return new Object[][] {
 				new Object[] { Arrays.asList(Arrays.asList("a"), Arrays.asList("b")), Arrays.asList("a", "b")},
 				new Object[] { Arrays.asList(Arrays.asList("a"), Arrays.asList("b", "c")), Arrays.asList("a", "b", "c")},
@@ -29,25 +29,25 @@ public class IteratorIteratorTest {
 	
 	@ParameterizedTest
 	@MethodSource("test_data")
-	public void test(Collection<Iterable<String>> input, List<String> expectedResult) {
+	void copy(Collection<Iterable<String>> input, List<String> expectedResult) {
 		IteratorIterator<String> testInstance = new IteratorIterator<>(input.iterator());
 		assertThat(Iterables.copy(testInstance)).isEqualTo(expectedResult);
 	}
 	
 	@Test
-	public void testContructor() {
+	void constructor() {
 		IteratorIterator<String> testInstance = new IteratorIterator<>(Arrays.asList("a"), Arrays.asList("b", "c"), Arrays.asList("d"));
 		assertThat(Iterables.copy(testInstance)).isEqualTo(Arrays.asList("a", "b", "c", "d"));
 	}
 	
 	@Test
-	public void testNoSuchElementException() {
+	void noSuchElementException() {
 		IteratorIterator<String> testInstance = new IteratorIterator<>(Arrays.asList());
 		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(testInstance::next);
 	}
 	
 	@Test
-	public void testRemove() {
+	void remove() {
 		IteratorIterator<String> testInstance = new IteratorIterator<>(Arrays.asList("a"), Arrays.asList("b", "c"), Arrays.asList("d"));
 		assertThat(testInstance.next()).isEqualTo("a");
 		testInstance.remove();
