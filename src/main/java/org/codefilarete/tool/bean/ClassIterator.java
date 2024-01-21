@@ -34,7 +34,7 @@ public class ClassIterator extends ReadOnlyIterator<Class> {
 	
 	@Override
 	public boolean hasNext() {
-		return currentClass != topBoundAncestor && currentClass.getSuperclass() != null;
+		return currentClass != topBoundAncestor && currentClass != null;
 	}
 	
 	@Override
