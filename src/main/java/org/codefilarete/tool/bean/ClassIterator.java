@@ -34,7 +34,7 @@ public class ClassIterator extends ReadOnlyIterator<Class> {
 	
 	@Override
 	public boolean hasNext() {
-		return currentClass != topBoundAncestor;
+		return currentClass != topBoundAncestor && currentClass.getSuperclass() != null;
 	}
 	
 	@Override
@@ -44,12 +44,7 @@ public class ClassIterator extends ReadOnlyIterator<Class> {
 			throw new NoSuchElementException();
 		}
 		Class next = currentClass;
-		try {
-			currentClass = currentClass.getSuperclass();
-		} catch (NullPointerException e) {
-			// this is necessary to be compliant with Iterator#next(..) contract
-			throw new NoSuchElementException();
-		}
+		currentClass = currentClass.getSuperclass();
 		return next;
 	}
 }
