@@ -386,6 +386,12 @@ class IterablesTest {
 	}
 	
 	@Test
+	void concat() {
+		assertThat(Iterables.concat(Arrays.asList("a"), Arrays.asList("b"), Arrays.asList("a", "b")))
+				.toIterable().containsExactly("a", "b", "a", "b");
+	}
+	
+	@Test
 	void contains() {
 		List<String> strings = asList("a", "b");
 		assertThat(Iterables.contains(strings.iterator(), s -> s.equalsIgnoreCase("B"))).isTrue();

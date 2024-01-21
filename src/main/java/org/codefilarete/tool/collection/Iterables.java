@@ -643,6 +643,38 @@ public final class Iterables {
 	}
 	
 	/**
+	 * Concatenates given {@link Iterable}s as a single one to have a linear view of all of them.
+	 *
+	 * @param iterables some {@link Iterable}s
+	 * @return a {@link Iterable} than will iterate over all given {@link Iterable}s
+	 */
+	public static <E> Iterator<E> concat(Iterable<E>... iterables) {
+		return new IteratorIterator<>(iterables);
+	}
+	
+	/**
+	 * Concatenates given {@link Iterator}s as a single one to have a linear view of all of them.
+	 *
+	 * @param iterators some {@link Iterator}s
+	 * @return a {@link Iterator} than will iterate over all given {@link Iterator}s
+	 */
+	public static <E> Iterator<E> concat(Iterator<E>... iterators) {
+		return new IteratorIterator<>(iterators);
+	}
+	
+	/**
+	 * Wraps given array of elements into an {@link Iterator}.
+	 *
+	 * @param elements elements to be iterated
+	 * @return an {@link Iterator} of given elements
+	 * @param <E> the elements type
+	 */
+	@SafeVarargs // method body doesn't handle improperly varargs parameter so it would generate ClassCastException
+	public static <E> Iterator<E> ofElements(E... elements ) {
+		return new ArrayIterator<>(elements);
+	}
+	
+	/**
 	 * Consumes an {@link Iterable} with an action that gets index of each element of the {@link Iterable}
 	 * 
 	 * @param iterable any {@link Iterable}

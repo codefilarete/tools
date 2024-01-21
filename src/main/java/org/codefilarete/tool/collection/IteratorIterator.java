@@ -14,8 +14,28 @@ public class IteratorIterator<E> implements Iterator<E> {
 	
 	private Iterator<E> currentIterator;
 	
-	public IteratorIterator(Iterable<E> seed, Iterable<E> ... iterables) {
-		this(Collections.cat(Arrays.asList(seed), Arrays.asList(iterables)).iterator());
+	@SafeVarargs // method body doesn't handle improperly varargs parameter so it would generate ClassCastException
+	public IteratorIterator(Iterator<E> ... iterables) {
+		// we wrap given iterator array into an array of iterables, no very cleanly done but it's a very local usage.
+		this(new Iterator<Iterable<E>>() {
+			
+			private final Iterator<Iterator<E>> delegate = new ArrayIterator<>(iterables);
+			
+			@Override
+			public boolean hasNext() {
+				return delegate.hasNext();
+			}
+			
+			@Override
+			public Iterable<E> next() {
+				return delegate::next;
+			}
+		});
+	}
+	
+	@SafeVarargs // method body doesn't handle improperly varargs parameter so it would generate ClassCastException
+	public IteratorIterator(Iterable<E> ... iterables) {
+		this(new ArrayIterator<>(iterables));
 	}
 	
 	public IteratorIterator(Iterable<Iterable<E>> iterables) {
