@@ -4,7 +4,7 @@
 	
 	<groupId>org.codefilarete</groupId>
 	<artifactId>tools</artifactId>
-	<version>1.0.3-SNAPSHOT</version>
+	<version>1.1.0-SNAPSHOT</version>
 	
 	<name>Tools</name>
 	<description>Codefilarete Tools project is used for Codefilarete projects and is not expected to be used directly out of them.</description>
