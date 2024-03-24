@@ -216,7 +216,7 @@
 	<scm>
 		<connection>scm:git:git@github.com/codefilarete/tools.git</connection>
 		<developerConnection>scm:git:git@github.com/codefilarete/tools.git</developerConnection>
-		<url>git@github.com/codefilarete/tools.git</url>
+		<url>https://github.com/codefilarete/tools.git</url>
 		<tag>HEAD</tag>
 	</scm>
 	
