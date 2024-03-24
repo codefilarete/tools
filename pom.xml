@@ -4,7 +4,7 @@
 	
 	<groupId>org.codefilarete</groupId>
 	<artifactId>tools</artifactId>
-	<version>1.1.0-SNAPSHOT</version>
+	<version>1.1.0</version>
 	
 	<name>Tools</name>
 	<description>Codefilarete Tools project is used for Codefilarete projects and is not expected to be used directly out of them.</description>
@@ -217,7 +217,7 @@
 		<connection>scm:git:https://github.com/codefilarete/tools.git</connection>
 		<developerConnection>scm:git:https://github.com/codefilarete/tools.git</developerConnection>
 		<url>https://github.com/codefilarete/tools.git</url>
-		<tag>HEAD</tag>
+		<tag>1.1.0</tag>
 	</scm>
 	
 	<distributionManagement>
