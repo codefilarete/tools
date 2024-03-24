@@ -214,8 +214,8 @@
 	</profiles>
 	
 	<scm>
-		<connection>scm:git:git@github.com:codefilarete/tools.git</connection>
-		<developerConnection>scm:git:git@github.com:codefilarete/tools.git</developerConnection>
+		<connection>scm:git:https://github.com/codefilarete/tools.git</connection>
+		<developerConnection>scm:git:https://github.com/codefilarete/tools.git</developerConnection>
 		<url>https://github.com/codefilarete/tools.git</url>
 		<tag>HEAD</tag>
 	</scm>
