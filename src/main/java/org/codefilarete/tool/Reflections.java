@@ -226,7 +226,8 @@ public final class Reflections {
 	public static Field getField(Class<?> clazz, String name) {
 		Field field = findField(clazz, name);
 		if (field == null) {
-			throw new MemberNotFoundException("Field " + name + " on " + toString(clazz) + " was not found");
+			String className = toString(clazz);
+			throw new MemberNotFoundException(className + "." + name, "Field " + name + " on " + className + " was not found");
 		}
 		return field;
 	}
@@ -270,8 +271,11 @@ public final class Reflections {
 	public static Method getMethod(Class<?> clazz, String name, Class<?>... argTypes) {
 		Method method = findMethod(clazz, name, argTypes);
 		if (method == null) {
-			throw new MemberNotFoundException("Method " + name + "(" + new StringAppender().ccat(argTypes, ", ").toString()
-					+ ") on " + toString(clazz) + " was not found");
+			String className = toString(clazz);
+			String args = new StringAppender().ccat(argTypes, ", ").toString();
+			throw new MemberNotFoundException(
+					className + "." + name + "(" + args + ")",
+					"Method " + name + "(" + args + ") on " + className + " was not found");
 		}
 		return method;
 	}
@@ -305,11 +309,13 @@ public final class Reflections {
 		try {
 			return clazz.getDeclaredConstructor(argTypes);
 		} catch (NoSuchMethodException e) {
-			MemberNotFoundException detailedException = new MemberNotFoundException("Constructor of " + toString(clazz) 
-					+ " with arguments (" + new StringAppender().ccat(argTypes, ", ") + ") was not found");
+			String className = toString(clazz);
+			MemberNotFoundException detailedException = new MemberNotFoundException(
+					className + ".<init>",
+					"Constructor of " + className + " with arguments (" + new StringAppender().ccat(argTypes, ", ") + ") was not found");
 			if (isInnerClass(clazz)
 					&& (argTypes.length == 0 || argTypes[0] != clazz.getEnclosingClass())) {
-				throw new MemberNotFoundException("Non static inner classes require an enclosing class parameter as first argument", detailedException);
+				throw new MemberNotFoundException(className + ".<init>", "Non static inner classes require an enclosing class parameter as first argument", detailedException);
 			} else {
 				throw detailedException;
 			}
@@ -458,7 +464,7 @@ public final class Reflections {
 	}
 	
 	private static MemberNotFoundException newEncapsulationException(Supplier<String> methodName) {
-		return new MemberNotFoundException("Field wrapper " + methodName.get() + " doesn't fit encapsulation naming convention");
+		return new MemberNotFoundException(methodName.get(), "Field wrapper " + methodName.get() + " doesn't fit encapsulation naming convention");
 	}
 	
 	/**
@@ -579,7 +585,7 @@ public final class Reflections {
 				try {
 					return Class.forName(typeName);
 				} catch (ClassNotFoundException e) {
-					throw new Reflections.MemberNotFoundException(e);
+					throw new Reflections.MemberNotFoundException(typeName, e);
 				}
 		}
 	}
@@ -690,16 +696,26 @@ public final class Reflections {
 	}
 	
 	public static class MemberNotFoundException extends RuntimeException {
-		public MemberNotFoundException(String message) {
+		
+		private final String memberName;
+		
+		public MemberNotFoundException(String memberName, String message) {
 			super(message);
+			this.memberName = memberName;
 		}
 		
-		public MemberNotFoundException(String message, Throwable cause) {
+		public MemberNotFoundException(String memberName, String message, Throwable cause) {
 			super(message, cause);
+			this.memberName = memberName;
 		}
 		
-		public MemberNotFoundException(Throwable cause) {
+		public MemberNotFoundException(String memberName, Throwable cause) {
 			super(cause);
+			this.memberName = memberName;
+		}
+		
+		public String getMemberName() {
+			return memberName;
 		}
 	}
 	
