@@ -1,5 +1,7 @@
 package org.codefilarete.tool.collection;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
@@ -39,6 +41,19 @@ class MapsTest {
 				Maps.forHashMap(Integer.class, String.class)
 						.add(1, "A").add(2, "B").add(3, "C"));
 		assertThat(result).isEqualTo(Maps.forHashMap(String.class, String.class).add("a", "A").add("b", "B").add("c", "C"));
+		assertThat(result).isInstanceOf(HashMap.class);
+	}
+	
+	@Test
+	void innerJoinOnValuesAndKeys_withSupplier() {
+		Map<String, String> result = Maps.innerJoinOnValuesAndKeys(
+				Maps.forHashMap(String.class, Integer.class)
+						.add("a", 1).add("b", 2).add("c", 3),
+				Maps.forHashMap(Integer.class, String.class)
+						.add(1, "A").add(2, "B").add(3, "C"),
+				LinkedHashMap::new);
+		assertThat(result).isEqualTo(Maps.forHashMap(String.class, String.class).add("a", "A").add("b", "B").add("c", "C"));
+		assertThat(result).isInstanceOf(LinkedHashMap.class);
 	}
 	
 	@Test
