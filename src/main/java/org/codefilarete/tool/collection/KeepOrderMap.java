@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Map that keeps insertion order. Made for clearer intention (by its name) than {@link java.util.LinkedHashMap} (which is the surrogate)
+ * Map that keeps insertion order. Made for clearer intention (by its name) than {@link java.util.LinkedHashMap} (which is the delegate)
  * 
  * @author Guillaume Mary
  */
@@ -13,6 +13,14 @@ public class KeepOrderMap<K, V> extends MapWrapper<K, V> {
 	
 	public KeepOrderMap() {
 		this(new LinkedHashMap<>());
+	}
+	
+	public KeepOrderMap(int initialCapacity) {
+		this(new LinkedHashMap<>(initialCapacity));
+	}
+	
+	public KeepOrderMap(int initialCapacity, float loadFactor) {
+		this(new LinkedHashMap<>(initialCapacity, loadFactor));
 	}
 	
 	public KeepOrderMap(LinkedHashMap<K, V> surrogate) {
