@@ -54,4 +54,9 @@ public class ReadOnlyCollection<E, C extends Collection<E>> extends CollectionWr
 	public Iterator<E> iterator() {
 		return ReadOnlyIterator.wrap(delegate.iterator());
 	}
+	
+	@Override
+	public String toString() {
+		return delegate.toString();
+	}
 }
