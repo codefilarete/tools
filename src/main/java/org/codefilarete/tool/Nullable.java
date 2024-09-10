@@ -237,14 +237,15 @@ public class Nullable<T> implements Supplier<T> {
 	}
 	
 	/**
-	 * Applies a function on current value if present
+	 * Applies a function on current value if present and changes the content of this instance by the new value.
 	 *
 	 * @param mapper a function to be applied on value
 	 * @param <O> the function returned type
-	 * @return a {@link Nullable} of the function result or of null if value wasn't present
+	 * @return this instance cast with mapper value type
 	 */
-	public<O> Nullable<O> map(Function<? super T, ? extends O> mapper) {
-		return nullable(ifPresent(mapper::apply));
+	public <O> Nullable<O> map(Function<? super T, ? extends O> mapper) {
+		set((T) ifPresent(mapper::apply));
+		return (Nullable<O>) this;
 	}
 	
 	/**
