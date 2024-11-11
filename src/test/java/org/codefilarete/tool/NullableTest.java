@@ -69,6 +69,18 @@ class NullableTest {
 	}
 	
 	@Test
+	void isAbsent() {
+		assertThat(Nullable.nullable(new Object()).isAbsent()).isFalse();
+		assertThat(Nullable.nullable((Object) null).isAbsent()).isTrue();
+	}
+	
+	@Test
+	void setIfAbsent() {
+		assertThat(Nullable.nullable("Hello").setIfAbsent("world").get()).isEqualTo("Hello");
+		assertThat(Nullable.nullable((Object) null).setIfAbsent("Hello").get()).isEqualTo("Hello");
+	}
+	
+	@Test
 	void getOr_object() {
 		Object value = new Object();
 		assertThat(Nullable.nullable(value).getOr("hello")).isEqualTo(value);

@@ -125,6 +125,13 @@ public class Nullable<T> implements Supplier<T> {
 	}
 	
 	/**
+	 * @return true if internal value is null
+	 */
+	public boolean isAbsent() {
+		return value.get() == null;
+	}
+	
+	/**
 	 * Return current value: null or not
 	 * 
 	 * @return internal value
@@ -143,6 +150,13 @@ public class Nullable<T> implements Supplier<T> {
 	 */
 	public Nullable<T> set(@javax.annotation.Nullable T value) {
 		this.value = () -> value;
+		return this;
+	}
+	
+	public Nullable<T> setIfAbsent(@javax.annotation.Nullable T value) {
+		if (isAbsent()) {
+			this.value = () -> value;
+		}
 		return this;
 	}
 	
