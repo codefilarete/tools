@@ -86,6 +86,19 @@ public class IdentityMap<K, V> {
 		return delegate;
 	}
 	
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		IdentityMap<?, ?> that = (IdentityMap<?, ?>) o;
+		return delegate.equals(that.delegate);
+	}
+	
+	@Override
+	public int hashCode() {
+		return delegate.hashCode();
+	}
+	
 	/**
 	 * Implemented for easier debug
 	 *

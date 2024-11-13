@@ -74,4 +74,31 @@ class IdentityMapTest {
 		assertThat(testInstance.computeIfAbsent("a", k -> 2)).isEqualTo(1);
 	}
 	
+	@Test
+	void equals() {
+		IdentityMap<String, Object> testInstance = new IdentityMap<>();
+		testInstance.put("a", 1);
+		testInstance.put("b", 2);
+		IdentityMap<String, Object> other = new IdentityMap<>();
+		other.put("a", 1);
+		
+		assertThat(testInstance.equals(other)).isFalse();
+		
+		other.put("b", 2);
+		assertThat(testInstance.equals(other)).isTrue();
+	}
+	
+	@Test
+	void hashcode() {
+		IdentityMap<String, Object> testInstance = new IdentityMap<>();
+		testInstance.put("a", 1);
+		testInstance.put("b", 2);
+		IdentityMap<String, Object> other = new IdentityMap<>();
+		other.put("a", 1);
+		
+		assertThat(testInstance.hashCode()).isNotEqualTo(other.hashCode());
+		
+		other.put("b", 2);
+		assertThat(testInstance.hashCode()).isEqualTo(other.hashCode());
+	}
 }
