@@ -1,14 +1,18 @@
 package org.codefilarete.tool;
 
-import java.io.Serializable;
 import java.util.Iterator;
 
 /**
  * Kind of StringBuilder aimed at being simpler by its API.
+ * This class can be inherited and it {@link #cat(Object)} method overridden to append any appropriate representation of its given object, according
+ * to its type for example.
+ * All other methods refer to it, therefore, by overriding this method, it is guaranteed that the representation will also be applied
+ * by other methods.
  *
  * @author Guillaume Mary
+ * @see #cat(Object)
  */
-public class StringAppender implements Serializable, CharSequence {
+public class StringAppender implements CharSequence {
 	
 	protected StringBuilder appender;
 	
@@ -20,41 +24,81 @@ public class StringAppender implements Serializable, CharSequence {
 		appender = new StringBuilder(capacity);
 	}
 	
-	public StringAppender(Object... s) {
+	public StringAppender(StringBuilder appender) {
+		this.appender = appender;
+	}
+	
+	public StringAppender(Object... objects) {
 		this();
-		cat(s);
+		cat(objects);
 	}
 	
-	public StringAppender cat(Object s) {
-		appender.append(s);
+	/**
+	 * Appends given objects to current instance.
+	 * This method is expected o be overridden to let the user append an appropriate representation of the object, typically according to its type.
+	 * All other methods refer to this method, therefore, by overriding this method, it is guaranteed that the representation will also be applied
+	 * by other methods.
+	 *
+	 * @param object object to be appended
+	 * @return this
+	 * @see #ccat(Object...)
+	 */
+	public StringAppender cat(Object object) {
+		appender.append(object);
 		return this;
 	}
 	
-	public StringAppender cat(Object s1, Object s2) {
+	/**
+	 * Appends given objects to current instance
+	 * @param object1 object to be appended
+	 * @param object2 object to be appended
+	 * @return this
+	 * @see #ccat(Object...)
+	 */
+	public StringAppender cat(Object object1, Object object2) {
 		// we skip an array creation by calling cat() multiple times
-		return cat(s1).cat(s2);
+		return cat(object1).cat(object2);
 	}
 	
-	public StringAppender cat(Object s1, Object s2, Object s3) {
+	/**
+	 * Appends given objects to current instance
+	 * @param object1 object to be appended
+	 * @param object2 object to be appended
+	 * @param object3 object to be appended
+	 * @return this
+	 * @see #ccat(Object...)
+	 */
+	public StringAppender cat(Object object1, Object object2, Object object3) {
 		// we skip an array creation by calling cat() multiple times
-		return cat(s1).cat(s2).cat(s3);
+		return cat(object1).cat(object2).cat(object3);
 	}
 	
-	public StringAppender cat(Object... ss) {
-		for (Object s : ss) {
+	/**
+	 * Appends given objects to current instance
+	 * @param objects objects to be appended
+	 * @return this
+	 * @see #ccat(Object...)
+	 */
+	public StringAppender cat(Object... objects) {
+		for (Object s : objects) {
 			cat(s);
 		}
 		return this;
 	}
 	
-	public StringAppender cat(Iterable ss) {
-		for (Object s : ss) {
+	/**
+	 * Appends objects present in given {@link Iterable}
+	 * @param objects objects to be appended
+	 * @return this
+	 */
+	public StringAppender cat(Iterable<?> objects) {
+		for (Object s : objects) {
 			cat(s);
 		}
 		return this;
 	}
 	
-	public StringAppender catAt(int index, Object... ss) {
+	public StringAppender catAt(int index, Object... objects) {
 		// We make this method uses cat() to ensure that any override of cat() is also used by this method
 		// otherwise we could simply use appender.insert(..) 
 		// So, we swap this.appender with a new StringBuilder to make cat(..) fill it 
@@ -62,26 +106,43 @@ public class StringAppender implements Serializable, CharSequence {
 		StringBuilder target = new StringBuilder();
 		this.appender = target;
 		// cat() will append to the temporary StringBuilder
-		cat(ss);
+		cat(objects);
 		this.appender = previous;
 		// finally inserting at index
 		this.appender.insert(index, target);
 		return this;
 	}
 	
-	public StringAppender catIf(boolean condition, Object... ss) {
+	/**
+	 * Appends some object if a condition is met
+	 * @param condition indicates if given objects must be appended
+	 * @param objects objects to be appended
+	 * @return this
+	 */
+	public StringAppender catIf(boolean condition, Object... objects) {
 		if (condition) {
-			cat(ss);
+			cat(objects);
 		}
 		return this;
 	}
 	
-	public StringAppender ccat(Object... s) {
-		return ccat(s, s[s.length - 1], s.length - 1);
+	/**
+	 * Appends given objects, except last one which is used as a separator between them
+	 * @param objects objects to be appended, last one is used as a separator
+	 * @return this
+	 */
+	public StringAppender ccat(Object... objects) {
+		return ccat(objects, objects[objects.length - 1], objects.length - 1);
 	}
 	
-	public StringAppender ccat(Iterable ss, Object sep) {
-		Iterator iterator = ss.iterator();
+	/**
+	 * Appends objects present in given {@link Iterable}, separated by given separator
+	 * @param objects objects to be appended
+	 * @param sep separator of objects
+	 * @return this
+	 */
+	public StringAppender ccat(Iterable<?> objects, Object sep) {
+		Iterator<?> iterator = objects.iterator();
 		while (iterator.hasNext()) {
 			Object s = iterator.next();
 			cat(s).catIf(iterator.hasNext(), sep);
@@ -89,30 +150,58 @@ public class StringAppender implements Serializable, CharSequence {
 		return this;
 	}
 	
-	public StringAppender ccat(Object[] s, Object sep) {
-		return ccat(s, sep, s.length);
+	/**
+	 * Appends objects present in given array, separated by given separator
+	 * @param objects objects to be appended
+	 * @param sep separator of objects
+	 * @return this
+	 */
+	public StringAppender ccat(Object[] objects, Object sep) {
+		return ccat(objects, sep, objects.length);
 	}
 	
-	public StringAppender ccat(Object[] s, Object sep, int objectCount) {
-		if (s.length > 0) {
+	/**
+	 * Appends <code>objectCount</code> first objects of given array, separated by given separator
+	 * @param objects objects to be appended
+	 * @param sep separator of objects
+	 * @param objectCount count of object to be taken in input array
+	 * @return this
+	 */
+	public StringAppender ccat(Object[] objects, Object sep, int objectCount) {
+		if (objects.length > 0) {
 			int lastIndex = objectCount < 1 ? 0 : objectCount - 1;
 			for (int i = 0; i < objectCount; i++) {
-				cat(s[i]).catIf(i != lastIndex, sep);
+				cat(objects[i]).catIf(i != lastIndex, sep);
 			}
 		}
 		return this;
 	}
 	
+	/**
+	 * Appends some objects at the beginning and end of current instance
+	 * @param open the object to be added at very first place of current instance
+	 * @param close the object to be appended at the end of current instance
+	 * @return this
+	 */
 	public StringAppender wrap(Object open, Object close) {
 		catAt(0, open).cat(close);
 		return this;
 	}
 	
+	/**
+	 * Implemented to print the underlying char sequence
+	 * @return a {@link String} representation of all appended objects
+	 */
 	@Override
 	public String toString() {
 		return appender.toString();
 	}
 	
+	/**
+	 * Removes some last characters of current instance.
+	 * @param nbChar count of character to be removed
+	 * @return this
+	 */
 	public StringAppender cutTail(int nbChar) {
 		int newLength = length() - nbChar;
 		if (newLength > -1) {
@@ -121,6 +210,11 @@ public class StringAppender implements Serializable, CharSequence {
 		return this;
 	}
 	
+	/**
+	 * Removes some first characters of current instance.
+	 * @param nbChar count of character to be removed
+	 * @return this
+	 */
 	public StringAppender cutHead(int nbChar) {
 		appender.delete(0, nbChar);
 		return this;

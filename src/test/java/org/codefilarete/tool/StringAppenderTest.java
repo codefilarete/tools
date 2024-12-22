@@ -9,17 +9,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Guillaume Mary
  */
-public class StringAppenderTest {
+class StringAppenderTest {
 	
 	@Test
-	public void testConstructor_array() {
-		// test all kind of cat signature
+	void constructor_array() {
 		StringAppender testInstance = new StringAppender("a", "b", "c", "d");
 		assertThat(testInstance.toString()).isEqualTo("abcd");
 	}
 	
 	@Test
-	public void testCat() {
+	void constructor_StringBuilder() {
+		StringAppender testInstance = new StringAppender(new StringBuilder("Hello"));
+		testInstance.cat(" World !");
+		assertThat(testInstance.toString()).isEqualTo("Hello World !");
+	}
+	
+	@Test
+	void cat() {
 		// test all kind of cat signature
 		StringAppender testInstance = new StringAppender();
 		testInstance
@@ -33,7 +39,7 @@ public class StringAppenderTest {
 	}
 	
 	@Test
-	public void testCatIf() {
+	void catIf() {
 		StringAppender testInstance = new StringAppender();
 		testInstance
 				.catIf(true, "a")
@@ -45,12 +51,12 @@ public class StringAppenderTest {
 	}
 	
 	@Test
-	public void testCat_overriden() {
+	void cat_overridden() {
 		// every Number appended to the StringAppender will be replaced by "999" (stupid !)
 		StringAppender testInstance = new StringAppender() {
 			@Override
 			public StringAppender cat(Object o) {
-				return o instanceof Number ? cat("999") : super.cat(o);
+				return o instanceof Number ? super.cat("999") : super.cat(o);
 			}
 		};
 		
@@ -75,7 +81,7 @@ public class StringAppenderTest {
 	}
 	
 	@Test
-	public void testWrap() {
+	void wrap() {
 		// simple use case
 		StringAppender testInstance = new StringAppender();
 		testInstance.cat("a").wrap("#", "$");
@@ -88,28 +94,28 @@ public class StringAppenderTest {
 	}
 	
 	@Test
-	public void testCcat() {
+	void ccat() {
 		StringAppender testInstance = new StringAppender();
 		testInstance.ccat("a", 1, "b", 2, ",");
 		assertThat(testInstance.toString()).isEqualTo("a,1,b,2");
 	}
 	
 	@Test
-	public void testCcat_iterable() {
+	void ccat_iterable() {
 		StringAppender testInstance = new StringAppender();
 		testInstance.ccat(Arrays.asList("a", 1, "b", 2), ",");
 		assertThat(testInstance.toString()).isEqualTo("a,1,b,2");
 	}
 	
 	@Test
-	public void testCcat_array() {
+	void ccat_array() {
 		StringAppender testInstance = new StringAppender();
 		testInstance.ccat(new Object[] { "a", 1, "b", 2, "c", 3, "d", 4 }, ",");
 		assertThat(testInstance.toString()).isEqualTo("a,1,b,2,c,3,d,4");
 	}
 	
 	@Test
-	public void testCcat_array_bounded() {
+	void ccat_array_bounded() {
 		StringAppender testInstance = new StringAppender();
 		testInstance.ccat(new Object[] { "a", 1, "b", 2, "c", 3, "d", 4 }, ",", 2);
 		assertThat(testInstance.toString()).isEqualTo("a,1");
@@ -121,23 +127,35 @@ public class StringAppenderTest {
 	}
 	
 	@Test
-	public void testCutTail() {
+	void cutTail() {
 		StringAppender testInstance = new StringAppender();
 		testInstance.cat("snake tail").cutTail(5);
 		assertThat(testInstance.toString()).isEqualTo("snake");
 	}
 	
 	@Test
-	public void testCutHead() {
+	void cutHead() {
 		StringAppender testInstance = new StringAppender();
 		testInstance.cat("headache").cutHead(4);
 		assertThat(testInstance.toString()).isEqualTo("ache");
 	}
 	
 	@Test
-	public void testCutAndInsert() {
+	void cutAndInsert() {
 		StringAppender testInstance = new StringAppender();
 		testInstance.cat("headache").cutHead(4).catAt(0, "sstom").cutHead(1);
 		assertThat(testInstance.toString()).isEqualTo("stomache");
+	}
+	
+	@Test
+	void charAt() {
+		StringAppender testInstance = new StringAppender("Hello World !");
+		assertThat(testInstance.charAt(6)).isEqualTo('W');
+	}
+	
+	@Test
+	void subSequence() {
+		StringAppender testInstance = new StringAppender("Hello World !");
+		assertThat(testInstance.subSequence(6, 11)).isEqualTo("World");
 	}
 }
