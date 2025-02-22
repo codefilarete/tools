@@ -68,6 +68,14 @@ class StringsTest {
 	}
 	
 	@Test
+	void tail_stringBoundary() {
+		assertThat(Strings.tail("snake", "a")).isEqualTo("ke");
+		assertThat(Strings.tail("snake", "n")).isEqualTo("ake");
+		assertThat(Strings.tail("snake", "x")).isEqualTo("snake");
+		assertThat(Strings.tail(null, "x")).isEqualTo(null);
+	}
+	
+	@Test
 	void cutTail() {
 		assertThat(Strings.cutTail("snake", 2)).isEqualTo("sna");
 		assertThat(Strings.cutTail("snake", 3)).isEqualTo("sn");

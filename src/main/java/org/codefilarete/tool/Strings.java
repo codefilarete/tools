@@ -118,7 +118,7 @@ public abstract class Strings {
 		});
 	}
 	
-	public static CharSequence head(@Nullable String cs, @Nonnull String untilIncluded) {
+	public static CharSequence head(@Nullable String cs, String untilIncluded) {
 		return doWithDelegate(cs, new DefaultNullOrEmptyDelegate() {
 			@Override
 			public CharSequence onNotNullNotEmpty(@Nonnull CharSequence cs) {
@@ -142,6 +142,21 @@ public abstract class Strings {
 			@Override
 			public CharSequence onNotNullNotEmpty(@Nonnull CharSequence cs) {
 				return cs.subSequence(Math.max(0, cs.length() - tailSize), cs.length());
+			}
+		});
+	}
+	
+	/**
+	 * Gives the tailing {@link String} of a {@link CharSequence} that occurs after the last occurrence of given {@link String}
+	 * @param cs any {@link CharSequence}, even null
+	 * @param afterLast the occurring {@link String} to be found near the end
+	 * @return the tailing {@link String} of given {@link CharSequence} that occurs after the last occurrence of given {@link String}
+	 */
+	public static CharSequence tail(@Nullable CharSequence cs, String afterLast) {
+		return doWithDelegate(cs, new DefaultNullOrEmptyDelegate() {
+			@Override
+			public CharSequence onNotNullNotEmpty(@Nonnull CharSequence cs) {
+				return cs.subSequence(Math.max(0, cs.toString().lastIndexOf(afterLast) + afterLast.length()), cs.length());
 			}
 		});
 	}

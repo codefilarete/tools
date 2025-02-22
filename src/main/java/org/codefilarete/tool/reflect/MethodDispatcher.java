@@ -9,14 +9,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.codefilarete.tool.StringAppender;
-import org.codefilarete.tool.collection.Iterables;
-import org.codefilarete.tool.function.Functions;
 import org.codefilarete.tool.InvocationHandlerSupport;
 import org.codefilarete.tool.Reflections;
-
-import static org.codefilarete.tool.collection.Iterables.collect;
-import static org.codefilarete.tool.function.Functions.chain;
+import org.codefilarete.tool.StringAppender;
+import org.codefilarete.tool.Strings;
+import org.codefilarete.tool.collection.Iterables;
+import org.codefilarete.tool.function.Functions;
 
 /**
  * A class aimed at creating proxy that will redirect some interface methods to some concrete implementation, fallback non-redirecting method
@@ -203,8 +201,12 @@ public class MethodDispatcher {
 		try {
 			return method.invoke(target, args);
 		} catch (InvocationTargetException e) {
+			Throwable cause = e.getCause();
+			if (cause instanceof java.lang.ClassCastException) {
+				throw new WrongTypeReturnedException((java.lang.ClassCastException) cause, method);
+			}
 			// we rethrow the main exception so caller will not be polluted by InvocationTargetException
-			throw e.getCause();
+			throw cause;
 		} catch (IllegalArgumentException e) {
 			// See ExceptionConverter for some code correlation
 			IllegalArgumentException result = e;
@@ -253,6 +255,32 @@ public class MethodDispatcher {
 		
 		public Object getReturningMethodsTarget() {
 			return returningMethodsTarget;
+		}
+	}
+	
+	public static class WrongTypeReturnedException extends RuntimeException {
+		
+		private final Class expected;
+		private final Class given;
+		private final Method method;
+		
+		public WrongTypeReturnedException(java.lang.ClassCastException classCastException, Method method) {
+			this(Reflections.forName(Strings.tail(classCastException.getMessage(), " cannot be cast to ").toString()),
+					Reflections.forName(Strings.head(classCastException.getMessage(), " cannot be cast to ").toString()),
+					method,
+					classCastException);
+		}
+		
+		public WrongTypeReturnedException(Class expected, Class given, Method method, java.lang.ClassCastException cause) {
+			super(cause);
+			this.expected = expected;
+			this.given = given;
+			this.method = method;
+		}
+		
+		@Override
+		public String getMessage() {
+			return "Code handling " + Reflections.toString(method) + " is expected to return a " + Reflections.toString(expected) + " but returned a " + Reflections.toString(given);
 		}
 	}
 }

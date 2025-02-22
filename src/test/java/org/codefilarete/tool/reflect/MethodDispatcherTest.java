@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 
 import org.codefilarete.tool.function.Hanger;
 import org.codefilarete.tool.function.Hanger.Holder;
+import org.codefilarete.tool.reflect.MethodDispatcher.WrongTypeReturnedException;
 import org.codefilarete.tool.trace.ModifiableInt;
 import org.junit.jupiter.api.Test;
 
@@ -85,11 +86,11 @@ class MethodDispatcherTest {
 		
 		assertThat(testInstance.get()).isEqualTo("Hello world !");
 		assertThatThrownBy(() ->
-				// This can't be successfull because hanger instance expects an Integer so it will throw a ClassCastException
+				// This can't be successful because hanger instance expects an Integer so it will throw a ClassCastException
 				// This test checks that the exception is not wrapped in a UndeclaredThrowableException or InvocationTargetException
 				testInstance.set("sqds"))
-				.isInstanceOf(ClassCastException.class)
-				.hasMessage("java.lang.String cannot be cast to java.lang.Integer");
+				.isInstanceOf(WrongTypeReturnedException.class)
+				.hasMessage("Code handling o.c.t.f.Hanger.set(j.l.Object) is expected to return a j.l.Integer but returned a j.l.String");
 	}
 	
 	@Test
@@ -136,7 +137,7 @@ class MethodDispatcherTest {
 		
 		// This won't work because FluentInterfaceSupport returns itself which doesn't match DummyFluentInterface : they are dissociated subclasses.
 		assertThatThrownBy(() -> testInstance.doSomething().doSomethingElse())
-				.isInstanceOf(ClassCastException.class)
+				.isInstanceOf(java.lang.ClassCastException.class)
 				.hasMessage("org.codefilarete.tool.reflect.MethodDispatcherTest$FluentInterfaceSupport cannot be cast"
 						+ " to org.codefilarete.tool.reflect.MethodDispatcherTest$DummyFluentInterface");
 	}
