@@ -1,8 +1,10 @@
 package org.codefilarete.tool;
 
 import javax.annotation.Nullable;
+import java.time.Duration;
 
 import org.codefilarete.tool.function.ThrowingExecutable;
+import org.codefilarete.tool.trace.Chrono;
 
 /**
  * Basic implementation of a retryer processor.
@@ -16,15 +18,25 @@ public abstract class Retryer {
 	public static final Retryer NO_RETRY = new NoRetryer();
 	
 	private final int maxRetries;
-	private final long retryDelay;
+	private final Duration retryDelay;
+	
+	/**
+	 * Constructor with necessary parameters.
+	 *
+	 * @param maxRetries maximum attempts before action is not retried
+	 * @param retryDelayMilliseconds delay between each attempt, in millisecond
+	 */
+	public Retryer(int maxRetries, long retryDelayMilliseconds) {
+		this(maxRetries, Duration.ofMillis(retryDelayMilliseconds));
+	}
 	
 	/**
 	 * Constructor with necessary parameters.
 	 * 
 	 * @param maxRetries maximum attempts before action is not retried
-	 * @param retryDelay delay between each attempt, in millisecond
+	 * @param retryDelay delay between each attempt
 	 */
-	public Retryer(int maxRetries, long retryDelay) {
+	public Retryer(int maxRetries, Duration retryDelay) {
 		this.maxRetries = maxRetries;
 		this.retryDelay = retryDelay;
 	}
@@ -44,10 +56,18 @@ public abstract class Retryer {
 	 */
 	protected abstract boolean shouldRetry(Result result);
 	
-	public static class RetryException extends Exception {
+	public static class RetryException extends RuntimeException {
 		
-		public RetryException(String action, int tryCount, long retryDelay, Throwable cause) {
-			super("Action \"" + action + "\" has been executed " + tryCount + " times every " + retryDelay + "ms and always failed", cause);
+		public RetryException(String message) {
+			super(message);
+		}
+		
+		public RetryException(String message, Throwable cause) {
+			super(message, cause);
+		}
+		
+		public RetryException(String action, int tryCount, Duration retryDelay, Throwable cause) {
+			this("Action \"" + action + "\" has been executed " + tryCount + " times every " + Chrono.format(retryDelay.toMillis()) + " and always failed", cause);
 		}
 	}
 	
@@ -94,7 +114,7 @@ public abstract class Retryer {
 		
 		private void waitRetryDelay() {
 			try {
-				Thread.sleep(retryDelay);
+				Thread.sleep(retryDelay.toMillis());
 			} catch (InterruptedException ie) {
 				Thread.currentThread().interrupt();
 			}
@@ -103,7 +123,7 @@ public abstract class Retryer {
 	
 	private static final class NoRetryer extends Retryer {
 		public NoRetryer() {
-			super(0, 0);
+			super(0, Duration.ZERO);
 		}
 		
 		@Override
