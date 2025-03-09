@@ -6,9 +6,10 @@ import java.util.Iterator;
  * {@link Iterator} that invokes a method every N iterations
  * {@link #hasNext()} triggers the invocation to {@link #onStep()} to mimic a while(hasNext) or a foreach : {@link #next()} doesn't do it because
  * it seems to be one iteration too late in this context of usage.
- * {@link #onStep()} os also invoked when {@link #hasNext()} returns false (except if it is the very first call) to treat the remaining objects.
+ * {@link #onStep()} is also invoked when {@link #hasNext()} returns false (except if it is the very first call) to treat the remaining objects.
  * 
  * @author Guillaume Mary
+ * @see #onStep()
  */
 public abstract class SteppingIterator<E> implements Iterator<E> {
 	
@@ -52,6 +53,9 @@ public abstract class SteppingIterator<E> implements Iterator<E> {
 		return stepCount;
 	}
 	
+	/**
+	 * To be overridden to perform some action when steps are reached and remaining items are processed (on {@link #hasNext()} returns false)
+	 */
 	protected abstract void onStep();
 	
 	@Override

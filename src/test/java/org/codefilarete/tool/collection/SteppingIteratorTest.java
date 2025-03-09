@@ -2,6 +2,7 @@ package org.codefilarete.tool.collection;
 
 import java.util.Iterator;
 
+import org.codefilarete.tool.trace.ModifiableInt;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -13,27 +14,27 @@ import static org.mockito.Mockito.when;
 /**
  * @author Guillaume Mary
  */
-public class SteppingIteratorTest {
+class SteppingIteratorTest {
 	
 	@Test
-	public void testHasNext() {
-		Iterator<String> iterator = mock(Iterator.class);
-		SteppingIterator testInstance = new SteppingIterator<String>(iterator, 10) {
+	void hasNext_mustCallDelegateHasNext() {
+		Iterator<String> delegate = mock(Iterator.class);
+		SteppingIterator testInstance = new SteppingIterator<String>(delegate, 10) {
 			@Override
 			protected void onStep() {
 				
 			}
 		};
 		testInstance.hasNext();
-		verify(iterator).hasNext();
+		verify(delegate).hasNext();
 		testInstance.hasNext();
-		verify(iterator, Mockito.times(2)).hasNext();
+		verify(delegate, Mockito.times(2)).hasNext();
 		testInstance.hasNext();
-		verify(iterator, Mockito.times(3)).hasNext();
+		verify(delegate, Mockito.times(3)).hasNext();
 	}
 	
 	@Test
-	public void testNext() {
+	void next_mustCallDelegateNext() {
 		Iterator<String> iterator = mock(Iterator.class);
 		SteppingIterator testInstance = new SteppingIterator<String>(iterator, 10) {
 			@Override
@@ -50,7 +51,7 @@ public class SteppingIteratorTest {
 	}
 	
 	@Test
-	public void testRemove() {
+	void remove_mustCallDelegateRemove() {
 		Iterator<String> iterator = mock(Iterator.class);
 		SteppingIterator testInstance = new SteppingIterator<String>(iterator, 10) {
 			@Override
@@ -67,34 +68,44 @@ public class SteppingIteratorTest {
 	}
 	
 	@Test
-	public void testOnStep() {
+	void onStep() {
 		Iterator<String> iterator = mock(Iterator.class);
 		when(iterator.hasNext()).thenReturn(true);
-		final int[] i= new int[1];
+		ModifiableInt counter = new ModifiableInt();
 		SteppingIterator testInstance = new SteppingIterator<String>(iterator, 2) {
 			@Override
 			protected void onStep() {
-				i[0]++;
+				counter.increment();
 			}
 		};
+		// very first call should not call onStep()
 		testInstance.hasNext();
-		assertThat(i[0]).isEqualTo(0);
-		testInstance.next();
-		testInstance.hasNext();
-		assertThat(i[0]).isEqualTo(0);
-		testInstance.next();
-		testInstance.hasNext();
-		assertThat(i[0]).isEqualTo(1);
-		testInstance.next();
-		testInstance.hasNext();
-		assertThat(i[0]).isEqualTo(1);
-		testInstance.next();
-		testInstance.hasNext();
-		assertThat(i[0]).isEqualTo(2);
+		assertThat(counter.getValue()).isEqualTo(0);
 		
+		// forcing to go to step 1, still, should not call onStep()
+		testInstance.next();
+		testInstance.hasNext();
+		assertThat(counter.getValue()).isEqualTo(0);
+		
+		// forcing to go to step 2, should call onStep() because we reach chunk size of 2
+		testInstance.next();
+		testInstance.hasNext();
+		assertThat(counter.getValue()).isEqualTo(1);
+		
+		// forcing to go to step 3, should not call onStep() because previous call reset step count
+		testInstance.next();
+		testInstance.hasNext();
+		assertThat(counter.getValue()).isEqualTo(1);
+		
+		// forcing to go to step 4, should call onStep() because we reach chunk size of 2 (again)
+		testInstance.next();
+		testInstance.hasNext();
+		assertThat(counter.getValue()).isEqualTo(2);
+		
+		// faking that underlying iterator has no more items to make test instance end, should call onStep() due to remaining items clearance
 		when(iterator.hasNext()).thenReturn(false);
 		testInstance.next();
 		testInstance.hasNext();
-		assertThat(i[0]).isEqualTo(3);
+		assertThat(counter.getValue()).isEqualTo(3);
 	}
 }
