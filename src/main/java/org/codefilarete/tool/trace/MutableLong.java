@@ -5,15 +5,15 @@ package org.codefilarete.tool.trace;
  *
  * @author Guillaume Mary
  */
-public class ModifiableLong {
+public class MutableLong {
 	
 	private long value;
 	
-	public ModifiableLong() {
+	public MutableLong() {
 		this(0);
 	}
 	
-	public ModifiableLong(long value) {
+	public MutableLong(long value) {
 		this.value = value;
 	}
 	

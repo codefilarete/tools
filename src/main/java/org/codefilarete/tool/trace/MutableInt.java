@@ -5,15 +5,15 @@ package org.codefilarete.tool.trace;
  *
  * @author Guillaume Mary
  */
-public class ModifiableInt {
+public class MutableInt {
 	
 	private int value;
 	
-	public ModifiableInt() {
+	public MutableInt() {
 		this(0);
 	}
 	
-	public ModifiableInt(int value) {
+	public MutableInt(int value) {
 		this.value = value;
 	}
 	

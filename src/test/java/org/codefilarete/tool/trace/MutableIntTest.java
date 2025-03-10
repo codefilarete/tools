@@ -7,11 +7,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Guillaume Mary
  */
-class ModifiableLongTest {
+class MutableIntTest {
 	
 	@Test
 	void increment() {
-		ModifiableLong testInstance = new ModifiableLong();
+		MutableInt testInstance = new MutableInt();
 		
 		testInstance.increment();
 		assertThat(testInstance.getValue()).isEqualTo(1);
@@ -25,7 +25,7 @@ class ModifiableLongTest {
 	
 	@Test
 	void decrement() {
-		ModifiableLong testInstance = new ModifiableLong();
+		MutableInt testInstance = new MutableInt();
 		
 		testInstance.decrement();
 		assertThat(testInstance.getValue()).isEqualTo(-1);
@@ -39,7 +39,7 @@ class ModifiableLongTest {
 	
 	@Test
 	void reset() {
-		ModifiableLong testInstance = new ModifiableLong();
+		MutableInt testInstance = new MutableInt();
 		
 		testInstance.reset(3);
 		assertThat(testInstance.getValue()).isEqualTo(3);
@@ -47,7 +47,7 @@ class ModifiableLongTest {
 	
 	@Test
 	void constructor() {
-		ModifiableLong testInstance = new ModifiableLong(2);
+		MutableInt testInstance = new MutableInt(2);
 		
 		assertThat(testInstance.getValue()).isEqualTo(2);
 		

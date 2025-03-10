@@ -7,7 +7,7 @@ import java.util.function.Supplier;
 import org.codefilarete.tool.function.Hanger;
 import org.codefilarete.tool.function.Hanger.Holder;
 import org.codefilarete.tool.reflect.MethodDispatcher.WrongTypeReturnedException;
-import org.codefilarete.tool.trace.ModifiableInt;
+import org.codefilarete.tool.trace.MutableInt;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -77,7 +77,7 @@ class MethodDispatcherTest {
 	
 	@Test
 	void redirect_whenInvokedMethodThrowsAnException_exceptionMustBeThrownWithoutWrapping() {
-		ModifiableInt hanger = new ModifiableInt();
+		MutableInt hanger = new MutableInt();
 		Holder2 testInstance = new MethodDispatcher()
 				.redirect(Supplier.class, () -> "Hello world !")
 				// this will produce ClassCastException because Holder2 implements Hanger<String> whereas we used Hanger accepts Integer
@@ -293,7 +293,7 @@ class MethodDispatcherTest {
 	
 	private static class IntegerHanger implements Hanger<Integer> {
 		
-		private final ModifiableInt hanger = new ModifiableInt();
+		private final MutableInt hanger = new MutableInt();
 		
 		
 		@Override

@@ -25,7 +25,7 @@ import java.util.stream.StreamSupport;
 
 import org.codefilarete.tool.Duo;
 import org.codefilarete.tool.collection.PairIterator.UntilBothIterator;
-import org.codefilarete.tool.trace.ModifiableInt;
+import org.codefilarete.tool.trace.MutableInt;
 
 /**
  * @author Guillaume Mary
@@ -875,7 +875,7 @@ public final class Iterables {
 	 * @param <E> input type
 	 */
 	public static <E> void consume(Stream<E> stream, Predicate<E> matcher, BiConsumer<E, Integer> foundConsumer) {
-		final ModifiableInt index = new ModifiableInt(-1);
+		final MutableInt index = new MutableInt(-1);
 		stream.map(e -> new Duo<>(e, index.increment()))
 				.filter(d -> matcher.test(d.getLeft()))
 				.forEach(d -> foundConsumer.accept(d.getLeft(), d.getRight()));

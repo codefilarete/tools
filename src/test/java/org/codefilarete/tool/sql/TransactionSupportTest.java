@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import org.codefilarete.tool.function.ThrowingConsumer;
-import org.codefilarete.tool.trace.ModifiableBoolean;
+import org.codefilarete.tool.trace.MutableBoolean;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -25,7 +25,7 @@ class TransactionSupportTest {
 	
 	@Test
 	void commitStateReversion_true() throws SQLException {
-		ModifiableBoolean commitState = new ModifiableBoolean(true);
+		MutableBoolean commitState = new MutableBoolean(true);
 		
 		TransactionSupport testInstance = new TransactionSupport(new ConnectionWrapper() {
 			@Override
@@ -50,7 +50,7 @@ class TransactionSupportTest {
 	
 	@Test
 	void commitStateReversion_false() throws SQLException {
-		ModifiableBoolean commitState = new ModifiableBoolean(false);
+		MutableBoolean commitState = new MutableBoolean(false);
 		
 		TransactionSupport testInstance = new TransactionSupport(new ConnectionWrapper() {
 			@Override

@@ -2,7 +2,7 @@ package org.codefilarete.tool.collection;
 
 import java.util.Iterator;
 
-import org.codefilarete.tool.trace.ModifiableInt;
+import org.codefilarete.tool.trace.MutableInt;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -71,7 +71,7 @@ class SteppingIteratorTest {
 	void onStep() {
 		Iterator<String> iterator = mock(Iterator.class);
 		when(iterator.hasNext()).thenReturn(true);
-		ModifiableInt counter = new ModifiableInt();
+		MutableInt counter = new MutableInt();
 		SteppingIterator testInstance = new SteppingIterator<String>(iterator, 2) {
 			@Override
 			protected void onStep() {

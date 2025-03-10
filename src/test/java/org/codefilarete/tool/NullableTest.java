@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import org.codefilarete.tool.trace.ModifiableInt;
+import org.codefilarete.tool.trace.MutableInt;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -146,7 +146,7 @@ class NullableTest {
 	@Test
 	void invoke() {
 		String value = "hello";
-		ModifiableInt isCalled = new ModifiableInt();
+		MutableInt isCalled = new MutableInt();
 		Consumer<String> dummyFunction = s -> isCalled.increment();
 		Nullable.nullable(value).invoke(dummyFunction);
 		assertThat(isCalled.getValue()).isEqualTo(1);

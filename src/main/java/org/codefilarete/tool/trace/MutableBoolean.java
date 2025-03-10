@@ -1,16 +1,18 @@
 package org.codefilarete.tool.trace;
 
 /**
+ * A simple modifiable boolean. Not thread-safe. Prefer {@link java.util.concurrent.atomic.AtomicBoolean} for thread safety.
+ *
  * @author Guillaume Mary
  */
-public class ModifiableBoolean {
+public class MutableBoolean {
 	
 	private Boolean value;
 	
-	public ModifiableBoolean() {
+	public MutableBoolean() {
 	}
 	
-	public ModifiableBoolean(Boolean value) {
+	public MutableBoolean(Boolean value) {
 		this.value = value;
 	}
 	
