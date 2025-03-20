@@ -85,22 +85,6 @@ public class Collections {
 		return toReturn;
 	}
 	
-	public static <E> List<E> cutHead(List<E> list) {
-		return cutHead(list, 1);
-	}
-	
-	public static <E> List<E> cutHead(List<E> list, int elementCount) {
-		return new ArrayList<>(list.subList(elementCount, list.size()));
-	}
-	
-	public static <E> List<E> cutTail(List<E> list) {
-		return cutTail(list, 1);
-	}
-	
-	public static <E> List<E> cutTail(List<E> list, int elementCount) {
-		return new ArrayList<>(list.subList(0, list.size() - elementCount));
-	}
-	
 	/**
 	 * Parcels a Collection into pieces.
 	 * 

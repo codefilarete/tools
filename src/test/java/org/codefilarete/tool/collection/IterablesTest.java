@@ -132,6 +132,24 @@ class IterablesTest {
 	}
 	
 	@Test
+	void head_int() {
+		List<String> result = Iterables.head(Arrays.asList("a", "b", "c", "d", "e"), 3);
+		assertThat(result).containsExactly("a", "b", "c");
+	}
+	
+	@Test
+	void cutHead() {
+		List<String> result = Iterables.cutHead(Arrays.asList("a", "b", "c", "d", "e"), 3);
+		assertThat(result).containsExactly("d", "e");
+	}
+	
+	@Test
+	void cutTail() {
+		List<String> result = Iterables.cutTail(Arrays.asList("a", "b", "c", "d", "e"), 3);
+		assertThat(result).containsExactly("a", "b");
+	}
+	
+	@Test
 	void copy_iterable() {
 		// test with content
 		Set<String> aSet = Arrays.asSet("d", "a");

@@ -242,7 +242,7 @@ public final class Iterables {
 	}
 	
 	/**
-	 * Collects iterable elements until a given element
+	 * Collects some elements from an iterable until a given element
 	 * 
 	 * @param iterable the iterable to scan
 	 * @param untilExcluded stopping element
@@ -259,6 +259,71 @@ public final class Iterables {
 			}
 		}
 		return result;
+	}
+	
+	/**
+	 * Collects the <code>count</code> first elements of given {@link List}.
+	 * Shortcut for {@link List#subList(int, int)}
+	 *
+	 * @param iterable the iterable to extract elements from
+	 * @param count number of elements to be collected
+	 * @param <E> elements type
+	 * @return firsts elements of given iterable
+	 */
+	public static <E> List<E> head(List<E> iterable, int count) {
+		return new ArrayList<>(iterable.subList(0, count));
+	}
+	
+	/**
+	 * Returns the head of given {@link List} without its last element.
+	 * Returns a copy of given argument
+	 *
+	 * @param list the {@link List} to extract elements from
+	 * @return a copy of given argument without its very last element
+	 * @param <E> element type
+	 * @see #cutHead(List)
+	 */
+	public static <E> List<E> cutTail(List<E> list) {
+		return cutTail(list, 1);
+	}
+	
+	/**
+	 * Returns the head of given {@link List}, without its last <code>elementCount</code> elements.
+	 * Returns a copy of given argument
+	 *
+	 * @param list the {@link List} to extract elements from
+	 * @return a copy of given argument without its last elements
+	 * @param <E> element type
+	 * @see #cutHead(List, int)
+	 */
+	public static <E> List<E> cutTail(List<E> list, int elementCount) {
+		return new ArrayList<>(list.subList(0, list.size() - elementCount));
+	}
+	
+	/**
+	 * Returns the tail of given {@link List} without its first element.
+	 * Returns a copy of given argument
+	 *
+	 * @param list the {@link List} to extract elements from
+	 * @return a copy of given argument without its very first element
+	 * @param <E> element type
+	 * @see #cutTail(List)}
+	 */
+	public static <E> List<E> cutHead(List<E> list) {
+		return cutHead(list, 1);
+	}
+	
+	/**
+	 * Returns the tail of given {@link List}, without its first <code>elementCount</code> elements.
+	 * Returns a copy of given argument
+	 *
+	 * @param list the {@link List} to extract elements from
+	 * @return a copy of given argument without its first elements
+	 * @param <E> element type
+	 * @see #cutTail(List, int)}
+	 */
+	public static <E> List<E> cutHead(List<E> list, int elementCount) {
+		return new ArrayList<>(list.subList(elementCount, list.size()));
 	}
 	
 	/**
