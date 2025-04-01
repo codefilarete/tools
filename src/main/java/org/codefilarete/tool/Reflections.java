@@ -665,12 +665,12 @@ public final class Reflections {
 	
 	private static class GetOrThrow<E> implements Function<Method, E> {
 		
-		private final Function<Method, E> surrogate;
+		private final Function<Method, E> delegate;
 		private final Checker predicate;
 		private final Supplier<RuntimeException> throwableSupplier;
 		
-		private GetOrThrow(Function<Method, E> surrogate, Checker predicate, Supplier<RuntimeException> s) {
-			this.surrogate = surrogate;
+		private GetOrThrow(Function<Method, E> delegate, Checker predicate, Supplier<RuntimeException> s) {
+			this.delegate = delegate;
 			this.predicate = predicate;
 			this.throwableSupplier = s;
 		}
@@ -678,7 +678,7 @@ public final class Reflections {
 		@Override
 		public E apply(Method method) {
 			if (predicate.check()) {
-				return surrogate.apply(method);
+				return delegate.apply(method);
 			} else {
 				throw throwableSupplier.get();
 			}

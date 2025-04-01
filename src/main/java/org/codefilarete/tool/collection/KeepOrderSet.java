@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 
 /**
- * Set that keeps insertion order. Made for clearer intention (by its name) than {@link LinkedHashSet} (which is the surrogate)
+ * Set that keeps insertion order. Made for clearer intention (by its name) than {@link LinkedHashSet} (which is the delegate)
  * 
  * @author Guillaume Mary
  */
@@ -74,10 +74,10 @@ public class KeepOrderSet<E> extends SetWrapper<E> {
 	
 	/**
 	 * Overridden to refine return type
-	 * @return the surrogate map cast as a {@link LinkedHashSet}
+	 * @return the delegate map cast as a {@link LinkedHashSet}
 	 */
 	@Override
-	public LinkedHashSet<E> getSurrogate() {
-		return (LinkedHashSet<E>) super.getSurrogate();
+	public LinkedHashSet<E> getDelegate() {
+		return (LinkedHashSet<E>) super.getDelegate();
 	}
 }

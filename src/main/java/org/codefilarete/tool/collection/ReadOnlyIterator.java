@@ -42,25 +42,25 @@ public abstract class ReadOnlyIterator<E> implements Iterator<E> {
 	
 	private static class ReadOnlyWrappedIterator<C> extends ReadOnlyIterator<C> {
 		
-		private final Iterator<C> surrogate;
+		private final Iterator<C> delegate;
 		
-		public ReadOnlyWrappedIterator(Iterator<C> surrogate) {
-			this.surrogate = surrogate;
+		public ReadOnlyWrappedIterator(Iterator<C> delegate) {
+			this.delegate = delegate;
 		}
 		
 		@Override
 		public boolean hasNext() {
-			return surrogate.hasNext();
+			return delegate.hasNext();
 		}
 		
 		@Override
 		public C next() {
-			return surrogate.next();
+			return delegate.next();
 		}
 		
 		@Override
 		public void forEachRemaining(Consumer<? super C> action) {
-			surrogate.forEachRemaining(action);
+			delegate.forEachRemaining(action);
 		}
 	}
 }

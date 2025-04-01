@@ -43,7 +43,7 @@ public class PairIterator<K, V> implements Iterator<Duo<K, V>> {
 	}
 	
 	/**
-	 * {@link Iterator} which continues while one of the surrogate {@link Iterator} still has elements. So it stops when both {@link Iterator}s are
+	 * {@link Iterator} which continues while one of the delegate {@link Iterator} still has elements. So it stops when both {@link Iterator}s are
 	 * drained.
 	 * Gives the pair as a {@link Duo}.
 	 * Missing values are overridable through {@link #getMissingKey()} and {@link #getMissingValue()}.
@@ -93,7 +93,7 @@ public class PairIterator<K, V> implements Iterator<Duo<K, V>> {
 	}
 	
 	/**
-	 * {@link Iterator} running indefinitely, starts by giving surrogate's elements, then gives what {@link #getMissingElement()} returns
+	 * {@link Iterator} running indefinitely, starts by giving delegate's elements, then gives what {@link #getMissingElement()} returns
 	 * (default is null).
 	 * 
 	 * @param <E>

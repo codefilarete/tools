@@ -21,14 +21,14 @@ class MethodDispatcherTest {
 	
 	@Test
 	void redirect_interface() {
-		IntegerHanger surrogate = new IntegerHanger();
+		IntegerHanger delegate = new IntegerHanger();
 		Holder1 testInstance = new MethodDispatcher()
-				.redirect(Hanger.class, surrogate)
+				.redirect(Hanger.class, delegate)
 				.fallbackOn(666)
 				.build(Holder1.class);
 		
 		testInstance.set(42);
-		assertThat(surrogate.getValue()).isEqualTo(42);
+		assertThat (delegate.getValue()).isEqualTo(42);
 		assertThat(testInstance).hasToString("Dispatcher to 666");
 	}
 	
@@ -36,7 +36,7 @@ class MethodDispatcherTest {
 	void redirect_interfaceToObject_allMethodResultAreRedirectedToObject() {
 		List<String> resultHolder = new ArrayList<>();
 		
-		EntryPoint surrogate1 = new EntryPoint() {
+		EntryPoint delegate1 = new EntryPoint() {
 			@Override
 			public NextStep doSomething() {
 				resultHolder.add("something done");
@@ -49,14 +49,14 @@ class MethodDispatcherTest {
 				return null;
 			}
 		};
-		NextStep surrogate2 = new NextStep() {
+		NextStep delegate2 = new NextStep() {
 			@Override
 			public void doStepThing() {
 				resultHolder.add("step thing done");
 			}
 		};
 		EntryPoint testInstance = new MethodDispatcher()
-				.redirect(EntryPoint.class, surrogate1, surrogate2)
+				.redirect(EntryPoint.class, delegate1, delegate2)
 				.build(EntryPoint.class);
 		
 		testInstance.doSomething().doStepThing();

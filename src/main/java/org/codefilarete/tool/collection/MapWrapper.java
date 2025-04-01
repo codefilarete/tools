@@ -15,138 +15,138 @@ import java.util.function.Function;
  */
 public class MapWrapper<K, V> implements Map<K, V> {
 	
-	private final Map<K, V> surrogate;
+	private final Map<K, V> delegate;
 	
-	public MapWrapper(Map<K, V> surrogate) {
-		this.surrogate = surrogate;
+	public MapWrapper(Map<K, V> delegate) {
+		this.delegate = delegate;
 	}
 	
-	public Map<K, V> getSurrogate() {
-		return surrogate;
+	public Map<K, V> getDelegate() {
+		return delegate;
 	}
 	
 	@Override
 	public int size() {
-		return surrogate.size();
+		return delegate.size();
 	}
 	
 	@Override
 	public boolean isEmpty() {
-		return surrogate.isEmpty();
+		return delegate.isEmpty();
 	}
 	
 	@Override
 	public boolean containsKey(Object key) {
-		return surrogate.containsKey(key);
+		return delegate.containsKey(key);
 	}
 	
 	@Override
 	public boolean containsValue(Object value) {
-		return surrogate.containsValue(value);
+		return delegate.containsValue(value);
 	}
 	
 	@Override
 	public V get(Object key) {
-		return surrogate.get(key);
+		return delegate.get(key);
 	}
 	
 	@Override
 	public V put(K key, V value) {
-		return surrogate.put(key, value);
+		return delegate.put(key, value);
 	}
 	
 	@Override
 	public V remove(Object key) {
-		return surrogate.remove(key);
+		return delegate.remove(key);
 	}
 	
 	@Override
 	public void putAll(Map<? extends K, ? extends V> m) {
-		surrogate.putAll(m);
+		delegate.putAll(m);
 	}
 	
 	@Override
 	public void clear() {
-		surrogate.clear();
+		delegate.clear();
 	}
 	
 	@Override
 	public Set<K> keySet() {
-		return surrogate.keySet();
+		return delegate.keySet();
 	}
 	
 	@Override
 	public Collection<V> values() {
-		return surrogate.values();
+		return delegate.values();
 	}
 	
 	@Override
 	public Set<Entry<K, V>> entrySet() {
-		return surrogate.entrySet();
+		return delegate.entrySet();
 	}
 	
 	@Override
 	public boolean equals(Object o) {
-		return surrogate.equals(o);
+		return delegate.equals(o);
 	}
 	
 	@Override
 	public int hashCode() {
-		return surrogate.hashCode();
+		return delegate.hashCode();
 	}
 	
 	@Override
 	public V getOrDefault(Object key, V defaultValue) {
-		return surrogate.getOrDefault(key, defaultValue);
+		return delegate.getOrDefault(key, defaultValue);
 	}
 	
 	@Override
 	public void forEach(BiConsumer<? super K, ? super V> action) {
-		surrogate.forEach(action);
+		delegate.forEach(action);
 	}
 	
 	@Override
 	public void replaceAll(BiFunction<? super K, ? super V, ? extends V> function) {
-		surrogate.replaceAll(function);
+		delegate.replaceAll(function);
 	}
 	
 	@Override
 	public V putIfAbsent(K key, V value) {
-		return surrogate.putIfAbsent(key, value);
+		return delegate.putIfAbsent(key, value);
 	}
 	
 	@Override
 	public boolean remove(Object key, Object value) {
-		return surrogate.remove(key, value);
+		return delegate.remove(key, value);
 	}
 	
 	@Override
 	public boolean replace(K key, V oldValue, V newValue) {
-		return surrogate.replace(key, oldValue, newValue);
+		return delegate.replace(key, oldValue, newValue);
 	}
 	
 	@Override
 	public V replace(K key, V value) {
-		return surrogate.replace(key, value);
+		return delegate.replace(key, value);
 	}
 	
 	@Override
 	public V computeIfAbsent(K key, Function<? super K, ? extends V> mappingFunction) {
-		return surrogate.computeIfAbsent(key, mappingFunction);
+		return delegate.computeIfAbsent(key, mappingFunction);
 	}
 	
 	@Override
 	public V computeIfPresent(K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
-		return surrogate.computeIfPresent(key, remappingFunction);
+		return delegate.computeIfPresent(key, remappingFunction);
 	}
 	
 	@Override
 	public V compute(K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
-		return surrogate.compute(key, remappingFunction);
+		return delegate.compute(key, remappingFunction);
 	}
 	
 	@Override
 	public V merge(K key, V value, BiFunction<? super V, ? super V, ? extends V> remappingFunction) {
-		return surrogate.merge(key, value, remappingFunction);
+		return delegate.merge(key, value, remappingFunction);
 	}
 }

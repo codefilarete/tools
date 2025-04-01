@@ -16,118 +16,118 @@ import java.util.stream.Stream;
  */
 public class SetWrapper<E> implements Set<E> {
 	
-	private final Set<E> surrogate;
+	private final Set<E> delegate;
 	
-	public SetWrapper(Set<E> surrogate) {
-		this.surrogate = surrogate;
+	public SetWrapper(Set<E> delegate) {
+		this.delegate = delegate;
 	}
 	
-	public Set<E> getSurrogate() {
-		return surrogate;
+	public Set<E> getDelegate() {
+		return delegate;
 	}
 	
 	@Override
 	public int size() {
-		return surrogate.size();
+		return delegate.size();
 	}
 	
 	@Override
 	public boolean isEmpty() {
-		return surrogate.isEmpty();
+		return delegate.isEmpty();
 	}
 	
 	@Override
 	public boolean contains(Object o) {
-		return surrogate.contains(o);
+		return delegate.contains(o);
 	}
 	
 	@Override
 	public Iterator<E> iterator() {
-		return surrogate.iterator();
+		return delegate.iterator();
 	}
 	
 	@Override
 	public Object[] toArray() {
-		return surrogate.toArray();
+		return delegate.toArray();
 	}
 	
 	@Override
 	public <T> T[] toArray(T[] a) {
-		return surrogate.toArray(a);
+		return delegate.toArray(a);
 	}
 	
 	@Override
 	public boolean add(E e) {
-		return surrogate.add(e);
+		return delegate.add(e);
 	}
 	
 	@Override
 	public boolean remove(Object o) {
-		return surrogate.remove(o);
+		return delegate.remove(o);
 	}
 	
 	@Override
 	public boolean containsAll(Collection<?> c) {
-		return surrogate.containsAll(c);
+		return delegate.containsAll(c);
 	}
 	
 	@Override
 	public boolean addAll(Collection<? extends E> c) {
-		return surrogate.addAll(c);
+		return delegate.addAll(c);
 	}
 	
 	@Override
 	public boolean retainAll(Collection<?> c) {
-		return surrogate.retainAll(c);
+		return delegate.retainAll(c);
 	}
 	
 	@Override
 	public boolean removeAll(Collection<?> c) {
-		return surrogate.removeAll(c);
+		return delegate.removeAll(c);
 	}
 	
 	@Override
 	public void clear() {
-		surrogate.clear();
+		delegate.clear();
 	}
 	
 	@Override
 	public boolean equals(Object o) {
-		return surrogate.equals(o);
+		return delegate.equals(o);
 	}
 	
 	@Override
 	public int hashCode() {
-		return surrogate.hashCode();
+		return delegate.hashCode();
 	}
 	
 	@Override
 	public Spliterator<E> spliterator() {
-		return surrogate.spliterator();
+		return delegate.spliterator();
 	}
 	
 	@Override
 	public boolean removeIf(Predicate<? super E> filter) {
-		return surrogate.removeIf(filter);
+		return delegate.removeIf(filter);
 	}
 	
 	@Override
 	public Stream<E> stream() {
-		return surrogate.stream();
+		return delegate.stream();
 	}
 	
 	@Override
 	public Stream<E> parallelStream() {
-		return surrogate.parallelStream();
+		return delegate.parallelStream();
 	}
 	
 	@Override
 	public void forEach(Consumer<? super E> action) {
-		surrogate.forEach(action);
+		delegate.forEach(action);
 	}
 	
 	@Override
 	public String toString() {
-		return surrogate.toString();
+		return delegate.toString();
 	}
 }

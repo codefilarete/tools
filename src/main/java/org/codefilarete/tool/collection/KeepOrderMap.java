@@ -23,21 +23,21 @@ public class KeepOrderMap<K, V> extends MapWrapper<K, V> {
 		this(new LinkedHashMap<>(initialCapacity, loadFactor));
 	}
 	
-	public KeepOrderMap(LinkedHashMap<K, V> surrogate) {
-		super(surrogate);
+	public KeepOrderMap(LinkedHashMap<K, V> delegate) {
+		super (delegate);
 	}
 	
-	public KeepOrderMap(Map<? extends K, ? extends V> surrogate) {
-		super(new LinkedHashMap<>(surrogate));
+	public KeepOrderMap(Map<? extends K, ? extends V> delegate) {
+		super(new LinkedHashMap<> (delegate));
 	}
 	
 	/**
 	 * Overridden to refine return type
-	 * @return the surrogate map cast as a {@link LinkedHashMap}
+	 * @return the delegate map cast as a {@link LinkedHashMap}
 	 */
 	@Override
-	public LinkedHashMap<K, V> getSurrogate() {
-		return (LinkedHashMap<K, V>) super.getSurrogate();
+	public LinkedHashMap<K, V> getDelegate() {
+		return (LinkedHashMap<K, V>) super.getDelegate();
 	}
 	
 	/**

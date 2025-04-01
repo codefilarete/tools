@@ -122,20 +122,20 @@ public class InvocationHandlerSupport implements InvocationHandler {
 	}
 	
 	/**
-	 * {@link InvocationHandler} that returns default primitve values for method returning primitive types, else fallbacks to its surrogate
+	 * {@link InvocationHandler} that returns default primitve values for method returning primitive types, else fallbacks to its delegate
 	 */
 	public static class DefaultPrimitiveValueInvocationProvider implements InvocationHandler {
 		
-		private final InvocationHandler surrogate;
+		private final InvocationHandler delegate;
 		
-		public DefaultPrimitiveValueInvocationProvider(InvocationHandler surrogate) {
-			this.surrogate = surrogate;
+		public DefaultPrimitiveValueInvocationProvider(InvocationHandler delegate) {
+			this.delegate = delegate;
 		}
 		
 		@Override
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 			Object defaultReturnTypeValue = Reflections.PRIMITIVE_DEFAULT_VALUES.get(method.getReturnType());
-			return defaultReturnTypeValue != null ? defaultReturnTypeValue : surrogate.invoke(proxy, method, args);
+			return defaultReturnTypeValue != null ? defaultReturnTypeValue : delegate.invoke(proxy, method, args);
 		}
 	}
 	

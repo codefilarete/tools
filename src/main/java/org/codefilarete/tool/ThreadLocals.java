@@ -144,25 +144,25 @@ public class ThreadLocals {
 	 */
 	public static class AutoRemoveThreadLocal<T> implements AutoCloseable, Supplier<T>, Hanger<T> {
 		
-		private final ThreadLocal<T> surrogate;
+		private final ThreadLocal<T> delegate;
 		
-		public AutoRemoveThreadLocal(ThreadLocal<T> surrogate) {
-			this.surrogate = surrogate;
+		public AutoRemoveThreadLocal(ThreadLocal<T> delegate) {
+			this.delegate = delegate;
 		}
 		
 		@Override
 		public T get() {
-			return surrogate.get();
+			return delegate.get();
 		}
 		
 		@Override
 		public void set(T value) {
-			surrogate.set(value);
+			delegate.set(value);
 		}
 		
 		@Override
 		public void close() {
-			surrogate.remove();
+			delegate.remove();
 		}
 	}
 }

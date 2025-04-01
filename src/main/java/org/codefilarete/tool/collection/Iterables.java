@@ -35,7 +35,7 @@ public final class Iterables {
 	/**
 	 * Transforms an {@link Iterator} to an {@link Iterable}
 	 * 
-	 * @param iterator the surrogate
+	 * @param iterator the delegate
 	 * @param <E> the content typed of the {@link Iterator}
 	 * @return an {@link Iterable} which {@link Iterable#iterator()} returns the given {@link Iterator}
 	 */
@@ -787,11 +787,11 @@ public final class Iterables {
 			
 			private boolean hasNext = true;
 			private E currentItem = null;
-			private final Iterator<E> surrogate = iterator;
+			private final Iterator<E> delegate = iterator;
 			
 			private void lookAhead() {
-				while (hasNext = surrogate.hasNext()) {
-					E item = surrogate.next();
+				while (hasNext = delegate.hasNext()) {
+					E item = delegate.next();
 					if (!includer.test(item)) {
 						hasNext = false;
 						currentItem = null;
@@ -822,7 +822,7 @@ public final class Iterables {
 			
 			@Override
 			public void remove() {
-				surrogate.remove();
+				delegate.remove();
 			}
 		};
 	}

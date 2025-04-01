@@ -135,15 +135,15 @@ public class Functions {
 	 */
 	public static class NullProofFunction<I, O> implements Function<I, O> {
 		
-		private final Function<I, O> surrogate;
+		private final Function<I, O> delegate;
 		
-		public NullProofFunction(Function<I, O> surrogate) {
-			this.surrogate = surrogate;
+		public NullProofFunction(Function<I, O> delegate) {
+			this.delegate = delegate;
 		}
 		
 		@Override
 		public O apply(I input) {
-			return input == null ? null : surrogate.apply(input);
+			return input == null ? null : delegate.apply(input);
 		}
 		
 		/**

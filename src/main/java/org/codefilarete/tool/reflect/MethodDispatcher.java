@@ -44,28 +44,28 @@ public class MethodDispatcher {
 	}
 	
 	/**
-	 * Redirects all interfazz methods to extensionSurrogate
+	 * Redirects all interfazz methods to extensionDelegate
 	 * @param interfazz an interface, must be extended by the one that will be given by {@link #build(Class)} (should be a super type of it) 
-	 * @param extensionSurrogate an instance implementing X so methods of X can be redirected to it
+	 * @param extensionDelegate an instance implementing X so methods of X can be redirected to it
 	 * @param <X> a interface type
 	 * @return this
 	 */
-	public <X> MethodDispatcher redirect(Class<X> interfazz, X extensionSurrogate) {
-		return redirect(interfazz, extensionSurrogate, false);
+	public <X> MethodDispatcher redirect(Class<X> interfazz, X extensionDelegate) {
+		return redirect(interfazz, extensionDelegate, false);
 	}
 	
 	/**
 	 * Same as {@link #redirect(Class, Object)} but proxy will be returned by all methods invocation : result of them will be ignored.
-	 * Useful when return types of extensionSurrogate methods don't match those of {@link #build(Class)} (kind of rare case).
+	 * Useful when return types of extensionDelegate methods don't match those of {@link #build(Class)} (kind of rare case).
 	 * 
 	 * @param interfazz an interface, must be extended by the one that will be given to {@link #build(Class)} (should be a super type of it) 
-	 * @param extensionSurrogate an instance implementing X so methods of X can be redirected to it
+	 * @param extensionDelegate an instance implementing X so methods of X can be redirected to it
 	 * @param <X> an interface type
 	 * @return this
 	 */
-	public <X> MethodDispatcher redirect(Class<X> interfazz, X extensionSurrogate, boolean returnProxy) {
+	public <X> MethodDispatcher redirect(Class<X> interfazz, X extensionDelegate, boolean returnProxy) {
 		for (Method method : interfazz.getMethods()) {
-			addInterceptor(method, extensionSurrogate, returnProxy);
+			addInterceptor(method, extensionDelegate, returnProxy);
 		}
 		return this;
 	}
@@ -76,24 +76,24 @@ public class MethodDispatcher {
 	 * one, the one that given returningMethodsTarget must implement (kind of rare case).
 	 * 
 	 * @param interfazz an interface, must be extended by the one that will be given to {@link #build(Class)} (should be a super type of it) 
-	 * @param extensionSurrogate an instance implementing X so methods of X can be redirected to it
+	 * @param extensionDelegate an instance implementing X so methods of X can be redirected to it
 	 * @param returningMethodsTarget an instance that implements all interfazz' methods return types
 	 * @param <X> an interface type
 	 * @return this
 	 */
-	public <X> MethodDispatcher redirect(Class<X> interfazz, X extensionSurrogate, Object returningMethodsTarget) {
+	public <X> MethodDispatcher redirect(Class<X> interfazz, X extensionDelegate, Object returningMethodsTarget) {
 		for (Method method : interfazz.getMethods()) {
-			addInterceptor(method, extensionSurrogate, returningMethodsTarget);
+			addInterceptor(method, extensionDelegate, returningMethodsTarget);
 		}
 		return this;
 	}
 	
-	protected  <X> void addInterceptor(Method method, X extensionSurrogate, boolean returnProxy) {
-		interceptors.put(giveSignature(method), new Interceptor(method, extensionSurrogate, returnProxy));
+	protected  <X> void addInterceptor(Method method, X extensionDelegate, boolean returnProxy) {
+		interceptors.put(giveSignature(method), new Interceptor(method, extensionDelegate, returnProxy));
 	}
 	
-	protected  <X> void addInterceptor(Method method, X extensionSurrogate, Object returningMethodsTarget) {
-		interceptors.put(giveSignature(method), new Interceptor(method, extensionSurrogate, returningMethodsTarget));
+	protected  <X> void addInterceptor(Method method, X extensionDelegate, Object returningMethodsTarget) {
+		interceptors.put(giveSignature(method), new Interceptor(method, extensionDelegate, returningMethodsTarget));
 	}
 	
 	/**
