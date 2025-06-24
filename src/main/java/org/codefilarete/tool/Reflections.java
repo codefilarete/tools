@@ -80,6 +80,18 @@ public final class Reflections {
 			.add(Double.class, 0D)
 	);
 	
+	private static final Set<Class> PRIMITIVE_TYPES = Collections.unmodifiableSet(Arrays.asHashSet(
+			boolean.class,
+			char.class,
+			byte.class,
+			short.class,
+			int.class,
+			long.class,
+			float.class,
+			double.class,
+			void.class
+	));
+	
 	public static final ThreadLocal<Optional<String>> PACKAGES_PRINT_MODE_CONTEXT = ThreadLocal.withInitial(
 			//AccessControlException
 			() -> Optional.ofNullable(System.getProperty(FLAT_PACKAGES_OPTION_KEY)));
@@ -643,6 +655,24 @@ public final class Reflections {
 		if (clazz == Void.TYPE)
 			return Void.class;
 		return null;
+	}
+	
+	/**
+	 * Indicates if given class is primitive or not
+	 * @param type the class to test
+	 * @return true if the given class is a primitive type, else false
+	 */
+	public static boolean isPrimitiveType(Class<?> type) {
+		return PRIMITIVE_TYPES.contains(type);
+	}
+	
+	/**
+	 * Indicates if given class is complex (non primitive) or not
+	 * @param type the class to test
+	 * @return true if the given class is a complex type, else false
+	 */
+	public static boolean isComplexType(Class<?> type) {
+		return !isPrimitiveType(type);
 	}
 	
 	/**

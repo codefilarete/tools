@@ -413,6 +413,35 @@ public class ReflectionsTest {
 	}
 	
 	@Test
+	void isPrimitive() {
+		assertThat(Reflections.isPrimitiveType(boolean.class)).isTrue();
+		assertThat(Reflections.isPrimitiveType(int.class)).isTrue();
+		assertThat(Reflections.isPrimitiveType(long.class)).isTrue();
+		assertThat(Reflections.isPrimitiveType(short.class)).isTrue();
+		assertThat(Reflections.isPrimitiveType(byte.class)).isTrue();
+		assertThat(Reflections.isPrimitiveType(double.class)).isTrue();
+		assertThat(Reflections.isPrimitiveType(float.class)).isTrue();
+		assertThat(Reflections.isPrimitiveType(char.class)).isTrue();
+		assertThat(Reflections.isPrimitiveType(void.class)).isTrue();
+		assertThat(Reflections.isPrimitiveType(Object.class)).isFalse();
+	}
+	
+	
+	@Test
+	void isComplexType() {
+		assertThat(Reflections.isComplexType(boolean.class)).isFalse();
+		assertThat(Reflections.isComplexType(int.class)).isFalse();
+		assertThat(Reflections.isComplexType(long.class)).isFalse();
+		assertThat(Reflections.isComplexType(short.class)).isFalse();
+		assertThat(Reflections.isComplexType(byte.class)).isFalse();
+		assertThat(Reflections.isComplexType(double.class)).isFalse();
+		assertThat(Reflections.isComplexType(float.class)).isFalse();
+		assertThat(Reflections.isComplexType(char.class)).isFalse();
+		assertThat(Reflections.isComplexType(void.class)).isFalse();
+		assertThat(Reflections.isComplexType(Object.class)).isTrue();
+	}
+	
+	@Test
 	void isAssignableFrom() {
 		assertThat(Reflections.isAssignableFrom(boolean.class, Boolean.class)).isTrue();
 		assertThat(Reflections.isAssignableFrom(Boolean.class, boolean.class)).isTrue();

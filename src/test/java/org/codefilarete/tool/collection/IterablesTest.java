@@ -10,7 +10,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.function.BiPredicate;
+import java.util.stream.IntStream;
+import java.util.stream.StreamSupport;
 
 import org.codefilarete.tool.Duo;
 import org.codefilarete.tool.collection.PairIterator.EmptyIterator;
@@ -21,6 +25,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.codefilarete.tool.collection.Arrays.*;
 import static org.codefilarete.tool.collection.Iterables.first;
 import static org.codefilarete.tool.collection.Iterables.last;
@@ -30,6 +35,50 @@ import static org.codefilarete.tool.collection.Iterables.*;
  * @author Guillaume Mary
  */
 class IterablesTest {
+	
+	@Test
+	void size() {
+		Iterable<String> strings = asList("a", "b");
+		assertThat(Iterables.size(strings)).isEqualTo(2);
+		assertThat(Iterables.size(Collections.emptySet())).isEqualTo(0);
+		assertThat(Iterables.size(new Iterable<Object>() {
+			
+			@Override
+			public Spliterator<Object> spliterator() {
+				return Spliterators.spliterator(new Object[] {1, 2, 3, 4, 5, 6, 7}, Spliterator.SIZED);
+			}
+			
+			@Override
+			public Iterator<Object> iterator() {
+				return Collections.emptyIterator();
+			}
+		})).isEqualTo(7);
+		assertThat(Iterables.size(new Iterable<Object>() {
+			
+			@Override
+			public Spliterator<Object> spliterator() {
+				return Spliterators.emptySpliterator();
+			}
+			
+			@Override
+			public Iterator<Object> iterator() {
+				return Collections.emptyIterator();
+			}
+		})).isEqualTo(0);
+		assertThatThrownBy(() -> Iterables.size(new Iterable<Object>() {
+			
+			@Override
+			public Spliterator<Object> spliterator() {
+				return Spliterators.spliteratorUnknownSize(Arrays.asList(new Object(),new Object()).iterator(), Spliterator.SIZED);
+			}
+			
+			@Override
+			public Iterator<Object> iterator() {
+				return Collections.emptyIterator();
+			}
+		})).isInstanceOf(UnsupportedOperationException.class)
+				.hasMessage("Can't give size of Iterable, make it override Spliterator.getExactSizeIfKnown() or support Spliterator.SIZED");
+	}
 	
 	@Test
 	void first_iterable() {

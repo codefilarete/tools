@@ -15,6 +15,7 @@ import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.Spliterator;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
@@ -26,6 +27,8 @@ import java.util.stream.StreamSupport;
 import org.codefilarete.tool.Duo;
 import org.codefilarete.tool.collection.PairIterator.UntilBothIterator;
 import org.codefilarete.tool.trace.MutableInt;
+
+import static java.util.Spliterator.SIZED;
 
 /**
  * @author Guillaume Mary
@@ -41,6 +44,25 @@ public final class Iterables {
 	 */
 	public static <E> Iterable<E> asIterable(Iterator<E> iterator) {
 		return () -> iterator;
+	}
+	
+	/**
+	 * Gives the size of given {@link Iterable}
+	 * @param iterable
+	 * @return
+	 */
+	public static long size(Iterable<?> iterable) {
+		if (iterable instanceof Collection) {
+			return ((Collection<?>) iterable).size();
+		} else {
+			Spliterator<?> spliterator = iterable.spliterator();
+			long exactSizeIfKnown = spliterator.getExactSizeIfKnown();
+			if (exactSizeIfKnown == -1) {
+				throw new UnsupportedOperationException("Can't give size of Iterable, make it override Spliterator.getExactSizeIfKnown() or support Spliterator.SIZED");
+			} else {
+				return exactSizeIfKnown;
+			}
+		}
 	}
 	
 	/**
@@ -406,6 +428,14 @@ public final class Iterables {
 	 */
 	public static <I, O> List<O> collectToList(Iterable<? extends I> iterable, Function<I, O> mapper) {
 		return collect(iterable, mapper, ArrayList::new);
+	}
+	
+	public static <O> List<O> asList(Iterable<O> iterable) {
+		if (iterable instanceof List) {
+			return (List<O>) iterable;
+		} else {
+			return collectToList(iterable, Function.identity());
+		}
 	}
 	
 	/**
