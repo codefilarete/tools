@@ -22,7 +22,7 @@ public class CollectionsTest {
 	@ParameterizedTest
 	@MethodSource("testParcelData")
 	public void testParcel(List<Integer> integers, int blockSize, List<List<Integer>> expected) throws Exception {
-		List<List<Integer>> blocks = Collections.parcel(integers, blockSize);
+		List<List<Integer>> blocks = Iterables.chunk(integers, blockSize);
 		assertThat(blocks).isEqualTo(expected);
 	}
 	

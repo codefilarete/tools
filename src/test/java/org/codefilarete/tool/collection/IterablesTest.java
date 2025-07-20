@@ -7,20 +7,26 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.Spliterators;
+import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
 
 import org.codefilarete.tool.Duo;
 import org.codefilarete.tool.collection.PairIterator.EmptyIterator;
+import org.codefilarete.tool.function.Hanger.Holder;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.ArgumentCaptor;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
@@ -78,6 +84,33 @@ class IterablesTest {
 			}
 		})).isInstanceOf(UnsupportedOperationException.class)
 				.hasMessage("Can't give size of Iterable, make it override Spliterator.getExactSizeIfKnown() or support Spliterator.SIZED");
+	}
+	
+	@Test
+	void forEachChunk() {
+		String s = "Hello world ";
+		List<Object> beforeAllCaptor = new ArrayList<>();
+		List<Integer> beforeCaptor = new ArrayList<>();
+		List<Duo<Object, List<? super String>>> consumerCaptor = new ArrayList<>();
+		List<Object> afterCaptor = new ArrayList<>();
+		
+		Iterables.forEachChunk(
+				Arrays.asList("a", "b", "c", "d", "e", "f", "g"),
+				3,
+				chunks -> beforeAllCaptor.add(chunks),
+				chunkSize -> {
+					beforeCaptor.add(chunkSize);
+					return s + chunkSize;
+				},
+				(o, objects) -> consumerCaptor.add(new Duo<>(o, objects)),
+				afterCaptor::add);
+		assertThat(beforeAllCaptor).containsExactly(Arrays.asList(Arrays.asList("a", "b", "c"), Arrays.asList("d", "e", "f"), Arrays.asList("g")));
+		assertThat(beforeCaptor).containsExactly(3, 1);
+		assertThat(consumerCaptor).containsExactly(
+				new Duo<>(s + 3, Arrays.asList("a", "b", "c")),
+				new Duo<>(s + 3, Arrays.asList("d", "e", "f")),
+				new Duo<>(s + 1, Arrays.asList("g")));
+		assertThat(afterCaptor).containsExactly("Hello world 3", "Hello world 1");
 	}
 	
 	@Test

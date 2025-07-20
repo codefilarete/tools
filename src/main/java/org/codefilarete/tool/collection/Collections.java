@@ -84,40 +84,4 @@ public class Collections {
 		}
 		return toReturn;
 	}
-	
-	/**
-	 * Parcels a Collection into pieces.
-	 * 
-	 * @param data an Iterable
-	 * @param blockSize the size of blocks to be created (the last will contain remaining elements)
-	 * @return a List of blocks of elements
-	 */
-	public static <E> List<List<E>> parcel(Iterable<E> data, int blockSize) {
-		final List<List<E>> blocks = new ArrayList<>();
-		// we ensure to have a list to allow sublist(..) usage afterward
-		List<E> dataAsList = asList(data);
-		int i = 0;
-		int dataSize = dataAsList.size();
-		int blockCount = dataSize / blockSize;
-		// if some remain, an additional block must be created
-		if (dataSize % blockSize != 0) {
-			blockCount++;
-		}
-		// parcelling
-		while (i < blockCount) {
-			blocks.add(new ArrayList<>(dataAsList.subList(i * blockSize, Math.min(dataSize, ++i * blockSize))));
-		}
-		return blocks;
-	}
-	
-	/**
-	 * Returns a Iterable as a List: return it if it's one, else create a new one from it.
-	 * 
-	 * @param c a Iterable
-	 * @param <E> contained element type
-	 * @return a new List or the Collection if it's one
-	 */
-	public static <E> List<E> asList(Iterable<E> c) {
-		return c instanceof List ? (List<E>) c : Iterables.copy(c);
-	}
 }

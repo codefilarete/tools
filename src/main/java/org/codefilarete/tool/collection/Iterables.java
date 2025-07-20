@@ -18,6 +18,7 @@ import java.util.SortedMap;
 import java.util.Spliterator;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -47,18 +48,82 @@ public final class Iterables {
 	}
 	
 	/**
-	 * Gives the size of given {@link Iterable}
-	 * @param iterable
-	 * @return
+	 * Iterates over the given {@link Iterable} by chunks of <code>chunkSize</code> size.
+	 * This method is made to avoid boilerplate code that wraps "batch treatments"; thus, each chunk is given to the <code>consumer</code> argument,
+	 * even the very last one even if it is not of <code>chunkSize</code>.
+	 * Hence, <code>beforeConsumer</code> is called only once before iterating over all chunks, because it is expected to prepare a
+	 * "context" that is passed back to the chunk consumer.
+	 * As well, <code>afterConsumer</code> is called only once after all chunks iteration, because it is expected to clean this "context".
+	 *
+	 * @param iterable the iterable to be iterated over by partition of chunkSize
+	 * @param beforeAllConsumer code to be invoked before the treatment of all chunks
+	 * @param chunkSize the size of the chunk to be passed to the consumer
+	 * @param beforeConsumer code to be invoked once before all chunks that have chunkSize size, and the remaining one
+	 * @param consumer the consumer to invoke with each chunk
+	 * @param afterConsumer code to be invoked once after all chunks that have chunkSize size, and the remaining one
+	 * @param <E> the iterable element type
+	 * @param <O> the context type
 	 */
-	public static long size(Iterable<?> iterable) {
+	public static <E, O> void forEachChunk(Iterable<E> iterable,
+										   int chunkSize,
+										   Consumer<List<List<E>>> beforeAllConsumer,
+										   Function<Integer, O> beforeConsumer,
+										   BiConsumer<O, ? super List<E>> consumer,
+										   Consumer<O> afterConsumer) {
+		List<List<E>> chunks = chunk(iterable, chunkSize);
+		if (!chunks.isEmpty()) {
+			beforeAllConsumer.accept(chunks);
+			List<E> lastChunk = last(chunks, java.util.Collections.emptyList());
+			if (lastChunk.size() != chunkSize) {
+				chunks = Iterables.cutTail(chunks);
+			} else {
+				lastChunk = java.util.Collections.emptyList();
+			}
+			if (!chunks.isEmpty()) {
+				O initObject = beforeConsumer.apply(chunkSize);
+				chunks.forEach(chunk -> consumer.accept(initObject, chunk));
+				afterConsumer.accept(initObject);
+			}
+			
+			// last packet treatment (chunk size may be different)
+			if (!lastChunk.isEmpty()) {
+				O initObject = beforeConsumer.apply(lastChunk.size());
+				consumer.accept(initObject, lastChunk);
+				afterConsumer.accept(initObject);
+			}
+		}
+	}
+	
+	/**
+	 * Gives the size of the given {@link Iterable}.
+	 * Throws an exception if its size can't be known (if it is not a {@link Collection} and its {@link Spliterator} doesn't have a
+	 * {@link Spliterator#getExactSizeIfKnown()}).
+	 *
+	 * @param iterable the object of which we need the size
+	 * @return the size of the given {@link Iterable}
+	 */
+	public static int size(Iterable<?> iterable) {
+		return size(iterable, () -> {
+			throw new UnsupportedOperationException("Can't give size of Iterable, make it override Spliterator.getExactSizeIfKnown() or support Spliterator.SIZED");
+		});
+	}
+	
+	/**
+	 * Gives the size of the given {@link Iterable} or returns a default size if its size can't be known (if it is not a {@link Collection} and
+	 * its {@link Spliterator} doesn't have a {@link Spliterator#getExactSizeIfKnown()}).
+	 *
+	 * @param iterable the object of which we need the size
+	 * @param defaultSizeSupplier supplier of a the value to return if the size can't be computed
+	 * @return the size of the given {@link Iterable}
+	 */
+	public static int size(Iterable<?> iterable, Supplier<Integer> defaultSizeSupplier) {
 		if (iterable instanceof Collection) {
 			return ((Collection<?>) iterable).size();
 		} else {
 			Spliterator<?> spliterator = iterable.spliterator();
-			long exactSizeIfKnown = spliterator.getExactSizeIfKnown();
+			int exactSizeIfKnown = (int) spliterator.getExactSizeIfKnown();
 			if (exactSizeIfKnown == -1) {
-				throw new UnsupportedOperationException("Can't give size of Iterable, make it override Spliterator.getExactSizeIfKnown() or support Spliterator.SIZED");
+				return defaultSizeSupplier.get();
 			} else {
 				return exactSizeIfKnown;
 			}
@@ -430,12 +495,15 @@ public final class Iterables {
 		return collect(iterable, mapper, ArrayList::new);
 	}
 	
-	public static <O> List<O> asList(Iterable<O> iterable) {
-		if (iterable instanceof List) {
-			return (List<O>) iterable;
-		} else {
-			return collectToList(iterable, Function.identity());
-		}
+	/**
+	 * Returns an {@link Iterable} as a {@link List}: return it if it's one, else creates a new one from it.
+	 *
+	 * @param c an {@link Iterable}
+	 * @param <E> contained element type
+	 * @return a new {@link List} or the Collection if it's one
+	 */
+	public static <E> List<E> asList(Iterable<E> c) {
+		return c instanceof List ? (List<E>) c : copy(c);
 	}
 	
 	/**
@@ -1041,4 +1109,29 @@ public final class Iterables {
 	}
 	
 	private Iterables() {}
+	
+	/**
+	 * Divides the iven {@link Iterable} into consecutive, equally-sized pieces (except possibly the last, which may be smaller)
+	 *
+	 * @param data an Iterable
+	 * @param blockSize the size of blocks to be created (the last will contain remaining elements)
+	 * @return a {@link List} of blocks of elements
+	 */
+	public static <E> List<List<E>> chunk(Iterable<E> data, int blockSize) {
+		final List<List<E>> blocks = new ArrayList<>();
+		// we ensure to have a list to allow sublist(..) usage afterward
+		List<E> dataAsList = asList(data);
+		int i = 0;
+		int dataSize = dataAsList.size();
+		int blockCount = dataSize / blockSize;
+		// if some remain, an additional block must be created
+		if (dataSize % blockSize != 0) {
+			blockCount++;
+		}
+		// parcelling
+		while (i < blockCount) {
+			blocks.add(new ArrayList<>(dataAsList.subList(i * blockSize, Math.min(dataSize, ++i * blockSize))));
+		}
+		return blocks;
+	}
 }
