@@ -29,8 +29,6 @@ import org.codefilarete.tool.Duo;
 import org.codefilarete.tool.collection.PairIterator.UntilBothIterator;
 import org.codefilarete.tool.trace.MutableInt;
 
-import static java.util.Spliterator.SIZED;
-
 /**
  * @author Guillaume Mary
  */
