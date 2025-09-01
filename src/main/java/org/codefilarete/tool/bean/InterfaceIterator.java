@@ -8,23 +8,25 @@ import org.codefilarete.tool.collection.Iterables;
 
 /**
  * An {@link java.util.Iterator} that gives interfaces of each class encountered in a hierarchy.
- * 
+ *
+ * @see ClassIterator
+ * @see TypeIterator
  * @author Guillaume Mary
  */
-public class InterfaceIterator extends InheritedElementIterator<Class> {
+public class InterfaceIterator extends InheritedElementIterator<Class<?>> {
 	
-	public InterfaceIterator(Class aClass) {
+	public InterfaceIterator(Class<?> aClass) {
 		this(new ClassIterator(aClass, null));
 	}
 	
-	public InterfaceIterator(Iterator<Class> classIterator) {
+	public InterfaceIterator(Iterator<Class<?>> classIterator) {
 		super(classIterator);
 	}
 	
 	@Override
-	protected Class[] getElements(Class clazz) {
-		Class[] interfaces = clazz.getInterfaces();
-		List<Class> result = Iterables.copy(new ArrayIterator<>(interfaces));
+	protected Class<?>[] getElements(Class<?> clazz) {
+		Class<?>[] interfaces = clazz.getInterfaces();
+		List<Class<?>> result = Iterables.copy(new ArrayIterator<>(interfaces));
 		// getting all (parent) interfaces of previous interfaces: we use our own class since getInterfaces() returns super interfaces of an interface
 		InterfaceIterator interfaceIterator = new InterfaceIterator(new ArrayIterator<>(interfaces));
 		Iterables.copy(interfaceIterator, result);

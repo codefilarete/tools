@@ -17,15 +17,15 @@ public class MethodIterator extends InheritedElementIterator<Method> {
 	/** Jacoco (code coverage tool) synthetic method name so it can be removed of method list because it breaks some tests */
 	private static final String JACOCO_METHOD_NAME = "$jacocoInit";
 	
-	public MethodIterator(Class fromClass) {
+	public MethodIterator(Class<?> fromClass) {
 		this(fromClass, Object.class);
 	}
 	
-	public MethodIterator(Class fromClass, Class toClass) {
+	public MethodIterator(Class<?> fromClass, Class<?> toClass) {
 		this(new ClassIterator(fromClass, toClass));
 	}
 	
-	public MethodIterator(Iterator<Class> classIterator) {
+	public MethodIterator(Iterator<Class<?>> classIterator) {
 		super(classIterator);
 	}
 	

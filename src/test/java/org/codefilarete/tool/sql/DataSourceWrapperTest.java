@@ -28,7 +28,7 @@ class DataSourceWrapperTest {
 	void methodsInvocation_forwardToDelegateMethods() {
 		DataSource delegate = Mockito.mock(DataSource.class);
 		DataSourceWrapper testInstance = new DataSourceWrapper(delegate);
-		List<Class> dataSourceClassInheritance = Iterables.copy(new InterfaceIterator(new ClassIterator(DataSource.class, null)));
+		List<Class<?>> dataSourceClassInheritance = Iterables.copy(new InterfaceIterator(new ClassIterator(DataSource.class, null)));
 		// DataSource.class must be added because it is not included by inheritance iterator
 		dataSourceClassInheritance.add(0, DataSource.class);
 		MethodIterator methodIterator = new MethodIterator(dataSourceClassInheritance.iterator());

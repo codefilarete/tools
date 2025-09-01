@@ -34,7 +34,7 @@ class ConnectionWrapperTest {
 	void methodsInvokeDelegateMethods() {
 		Connection delegate = Mockito.mock(Connection.class);
 		ConnectionWrapper testInstance = new ConnectionWrapper(delegate);
-		List<Class> dataSourceClassInheritance = Iterables.copy(new InterfaceIterator(new ClassIterator(Connection.class, null)));
+		List<Class<?>> dataSourceClassInheritance = Iterables.copy(new InterfaceIterator(new ClassIterator(Connection.class, null)));
 		// Connection.class must be added because it is not included by inheritance iterator
 		dataSourceClassInheritance.add(0, Connection.class);
 		dataSourceClassInheritance.remove(Wrapper.class);

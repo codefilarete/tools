@@ -17,11 +17,11 @@ public class FieldIterator extends InheritedElementIterator<Field> {
 	/** Jacoco (code coverage tool) synthetic field name so it can be removed of field list because it breaks some tests */
 	private static final String JACOCO_FIELD_NAME = "$jacocoData";
 	
-	public FieldIterator(Class aClass) {
+	public FieldIterator(Class<?> aClass) {
 		this(new ClassIterator(aClass));
 	}
 	
-	public FieldIterator(Iterator<Class> classIterator) {
+	public FieldIterator(Iterator<Class<?>> classIterator) {
 		super(classIterator);
 	}
 	

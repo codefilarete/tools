@@ -90,7 +90,7 @@ class ReadOnlySetTest {
 		Mockito.when(set.iterator()).thenReturn(delegate);
 		
 		Iterator testInstance = new ReadOnlySet<>(set).iterator();
-		List<Class> iteratorClassInheritance = Iterables.copy(new InterfaceIterator(new ClassIterator(Iterator.class, null)));
+		List<Class<?>> iteratorClassInheritance = Iterables.copy(new InterfaceIterator(new ClassIterator(Iterator.class, null)));
 		// ListIterator.class must be added because it is not included by inheritance iterator
 		iteratorClassInheritance.add(0, Iterator.class);
 		MethodIterator methodInHierarchyIterator = new MethodIterator(iteratorClassInheritance.iterator());

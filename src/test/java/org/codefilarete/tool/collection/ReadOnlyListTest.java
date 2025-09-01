@@ -82,7 +82,7 @@ class ReadOnlyListTest {
 		List delegate = Mockito.mock(List.class);
 		
 		ReadOnlyList testInstance = new ReadOnlyList(delegate);
-		List<Class> listClassInheritance = Iterables.copy(new InterfaceIterator(new ClassIterator(List.class, null)));
+		List<Class<?>> listClassInheritance = Iterables.copy(new InterfaceIterator(new ClassIterator(List.class, null)));
 		// List.class must be added because it is not included by inheritance iterator
 		listClassInheritance.add(0, List.class);
 		MethodIterator methodInHierarchyIterator = new MethodIterator(listClassInheritance.iterator());
@@ -175,7 +175,7 @@ class ReadOnlyListTest {
 		Mockito.when(list.listIterator(eq(0))).thenReturn(delegate);
 		
 		ListIterator testInstance = new ReadOnlyList<>(list).listIterator();
-		List<Class> listClassInheritance = Iterables.copy(new InterfaceIterator(new ClassIterator(ListIterator.class, null)));
+		List<Class<?>> listClassInheritance = Iterables.copy(new InterfaceIterator(new ClassIterator(ListIterator.class, null)));
 		// ListIterator.class must be added because it is not included by inheritance iterator
 		listClassInheritance.add(0, ListIterator.class);
 		MethodIterator methodInHierarchyIterator = new MethodIterator(listClassInheritance.iterator());

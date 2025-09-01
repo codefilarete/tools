@@ -14,14 +14,14 @@ import org.codefilarete.tool.collection.ReadOnlyIterator;
  */
 public abstract class InheritedElementIterator<T> extends ReadOnlyIterator<T> {
 	
-	protected Iterator<Class> classIterator;
+	protected Iterator<Class<?>> classIterator;
 	protected Iterator<T> inheritedElementIterator = Collections.emptyIterator();
 	
-	public InheritedElementIterator(Class aClass) {
+	public InheritedElementIterator(Class<?> aClass) {
 		this(new ClassIterator(aClass));
 	}
 	
-	public InheritedElementIterator(Iterator<Class> classIterator) {
+	public InheritedElementIterator(Iterator<Class<?>> classIterator) {
 		this.classIterator = classIterator;
 	}
 	
@@ -58,5 +58,5 @@ public abstract class InheritedElementIterator<T> extends ReadOnlyIterator<T> {
 	 * @param clazz the class for which elements must be given
 	 * @return an array of element, not null
 	 */
-	protected abstract T[] getElements(Class clazz);
+	protected abstract T[] getElements(Class<?> clazz);
 }

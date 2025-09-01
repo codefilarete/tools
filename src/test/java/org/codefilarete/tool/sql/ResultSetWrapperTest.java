@@ -28,7 +28,7 @@ class ResultSetWrapperTest {
 	void methodsInvocation_forwardToDelegateMethods() {
 		ResultSet delegate = Mockito.mock(ResultSet.class);
 		ResultSetWrapper testInstance = new ResultSetWrapper(delegate);
-		List<Class> dataSourceClassInheritance = Iterables.copy(new InterfaceIterator(new ClassIterator(ResultSet.class, null)));
+		List<Class<?>> dataSourceClassInheritance = Iterables.copy(new InterfaceIterator(new ClassIterator(ResultSet.class, null)));
 		// ResultSet.class must be added because it is not included by inheritance iterator
 		dataSourceClassInheritance.add(0, ResultSet.class);
 		MethodIterator methodIterator = new MethodIterator(dataSourceClassInheritance.iterator());

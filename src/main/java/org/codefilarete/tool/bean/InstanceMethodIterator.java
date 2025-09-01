@@ -2,6 +2,7 @@ package org.codefilarete.tool.bean;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Iterator;
 
 import org.codefilarete.tool.collection.ArrayIterator;
 import org.codefilarete.tool.collection.Iterables;
@@ -17,8 +18,12 @@ public class InstanceMethodIterator extends MethodIterator {
 		super(currentClass);
 	}
 	
-	public InstanceMethodIterator(Class fromClass, Class toClass) {
+	public InstanceMethodIterator(Class<?> fromClass, Class<?> toClass) {
 		super(fromClass, toClass);
+	}
+	
+	public InstanceMethodIterator(Iterator<Class<?>> classIterator) {
+		super(classIterator);
 	}
 	
 	/**

@@ -37,7 +37,7 @@ class CollectionWrapperTest {
 		Collection delegate = Mockito.mock(Collection.class);
 		
 		CollectionWrapper testInstance = new CollectionWrapper(delegate);
-		List<Class> collectionClassInheritance = Iterables.copy(new InterfaceIterator(new ClassIterator(Collection.class, null)));
+		List<Class<?>> collectionClassInheritance = Iterables.copy(new InterfaceIterator(new ClassIterator(Collection.class, null)));
 		// Collection.class must be added because it is not included by inheritance iterator
 		collectionClassInheritance.add(0, Collection.class);
 		MethodIterator methodInHierarchyIterator = new MethodIterator(collectionClassInheritance.iterator());
