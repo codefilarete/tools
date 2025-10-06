@@ -8,7 +8,7 @@ import org.codefilarete.tool.collection.ArrayIterator;
 import org.codefilarete.tool.collection.ReadOnlyIterator;
 
 /**
- * An {@link java.util.Iterator} that gets its informations from each class of a hierarchy.
+ * An {@link java.util.Iterator} that gets its information from each class of a hierarchy.
  * 
  * @author Guillaume Mary
  */
@@ -56,7 +56,7 @@ public abstract class InheritedElementIterator<T> extends ReadOnlyIterator<T> {
 	 * Gives any element from a class: field, method, interface, ...
 	 *
 	 * @param clazz the class for which elements must be given
-	 * @return an array of element, not null
+	 * @return an array of elements, not null
 	 */
 	protected abstract T[] getElements(Class<?> clazz);
 }

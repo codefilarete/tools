@@ -31,7 +31,7 @@ public class MethodIterator extends InheritedElementIterator<Method> {
 	
 	/**
 	 * Gives methods of a class. Default is {@link Class#getDeclaredMethods()}.
-	 * Can be overriden to filter methods for instance.
+	 * Can be overridden to filter methods for instance.
 	 * 
 	 * @param clazz the class for which fields must be given
 	 * @return an array of Field, not null
