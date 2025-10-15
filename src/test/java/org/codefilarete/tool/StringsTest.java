@@ -1,10 +1,15 @@
 package org.codefilarete.tool;
 
 import org.codefilarete.tool.collection.Arrays;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 
 /**
@@ -25,6 +30,23 @@ class StringsTest {
 		assertThat(Strings.capitalize("BONJOUR")).isEqualTo("BONJOUR");
 		assertThat(Strings.capitalize("")).isEqualTo("");
 		assertThat(Strings.capitalize(null)).isEqualTo(null);
+	}
+	
+	static Iterable<Arguments> snakeCaseData() {
+		return Arrays.asList(
+				arguments("convertCamelCase", "convert_camel_case"),
+				arguments("convertCCamelCase", "convert_c_camel_case"),
+				arguments("snake_case", "snake_case"),
+				arguments("snakecase", "snakecase"),
+				arguments("sn@keCase#", "sn@ke_case#"),
+				arguments("", "")
+		);
+	}
+	
+	@ParameterizedTest
+	@MethodSource("snakeCaseData")
+	void snakeCase(String input, String expected) {
+		assertThat(Strings.snakeCase(input)).isEqualTo(expected);
 	}
 	
 	@Test

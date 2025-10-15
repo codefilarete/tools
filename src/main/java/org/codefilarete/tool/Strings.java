@@ -41,12 +41,33 @@ public abstract class Strings {
 	}
 	
 	/**
+	 * Converts given input to a snake case string. For instance, "HelloWorld" becomes "hello_world".
+	 *
+	 * @param input any {@link String}
+	 * @return a snake case version of given input {@link String}.
+	 */
+	public static String snakeCase(String input) {
+		StringBuilder result = new StringBuilder();
+		for (char c : input.toCharArray()) {
+			if (Character.isUpperCase(c)) {
+				result.append("_").append(Character.toLowerCase(c));
+			} else {
+				result.append(c);
+			}
+		}
+		if (result.length() > 0 && result.charAt(0) == '_') {
+			result.deleteCharAt(0);
+		}
+		return result.toString();
+	}
+	
+	/**
 	 * Concatenate count (positive) times parameter s.
 	 * Optional Strings in prebuildStrings are used to speed concatenation for large count numbers if you already have
 	 * large snippets of s pre-concatenated. For instance, you want 3456 times "a" and you already got constants with
 	 * a*500, a*100, a*10, then this method will only cat 6*a*500, 4*a*100, 5*a*10 and 6*a. Instead of 3456 times "a".
 	 *
-	 * @param count expected repeatition of s
+	 * @param count expected repetition of s
 	 * @param s the String to be concatenated
 	 * @param prebuiltStrings optional pre-concatenated "s" strings, <b>in descent size order</b>.
 	 * @return s repeated count times
