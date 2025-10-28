@@ -502,7 +502,7 @@ public final class Reflections {
 	}
 	
 	/**
-	 * Very technical method to centralize similar code of Java bean method name convention.
+	 * Very technical method to share similar code of Java bean method name convention.
 	 *
 	 * @param methodName method name
 	 * @param input real object that represents the method
