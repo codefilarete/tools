@@ -7,19 +7,46 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.AbstractMap;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Queue;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedTransferQueue;
+import java.util.concurrent.TransferQueue;
+import java.util.stream.Stream;
 
 import org.assertj.core.api.AbstractThrowableAssert;
+import org.codefilarete.tool.collection.Arrays;
+import org.codefilarete.tool.collection.KeepOrderSet;
 import org.codefilarete.tool.exception.Exceptions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.InstanceOfAssertFactories.THROWABLE;
 import static org.codefilarete.tool.Reflections.*;
+import static org.junit.jupiter.params.provider.Arguments.*;
 
 /**
  * @author Guillaume Mary
@@ -271,33 +298,33 @@ public class ReflectionsTest {
 	}
 	
 	@Test
-	void newInstance_class_privateConstructor() {
+	void newBeanInstance_class_privateConstructor() {
 		// This shouldn't cause problem
-		ClosedClass closedClass = Reflections.newInstance(ClosedClass.class);
+		ClosedClass closedClass = Reflections.newBeanInstance(ClosedClass.class);
 		// minimal test
 		assertThat(closedClass).isNotNull();
 	}
 	
 	@Test
-	void newInstance_interface_throwsException() {
-		assertThatThrownBy(() -> Reflections.newInstance(CharSequence.class))
+	void newBeanInstance_interface_throwsException() {
+		assertThatThrownBy(() -> Reflections.newBeanInstance(CharSequence.class))
 				.isInstanceOf(InvokationRuntimeException.class)
 				.extracting(thrownException -> Exceptions.findExceptionInCauses(thrownException, UnsupportedOperationException.class), THROWABLE)
 				.hasMessage("Class j.l.CharSequence has no default constructor because it is an interface");
 	}
 	
 	@Test
-	void newInstance_abstractClass_throwsException() {
-		assertThatThrownBy(() -> Reflections.newInstance(AbstractClass.class))
+	void newBeanInstance_abstractClass_throwsException() {
+		assertThatThrownBy(() -> Reflections.newBeanInstance(AbstractClass.class))
 				.isInstanceOf(InvokationRuntimeException.class)
 				.extracting(thrownException -> Exceptions.findExceptionInCauses(thrownException, InvokationRuntimeException.class), THROWABLE)
 				.hasMessage("Class o.c.t.ReflectionsTest$AbstractClass can't be instantiated because it is abstract");
 	}
 	
 	@Test
-	void newInstance_classWhichConstructorThrowsException_throwsException() {
+	void newBeanInstance_classWhichConstructorThrowsException_throwsException() {
 		AbstractThrowableAssert<?, ? extends Throwable> exceptionAsserter =
-				assertThatThrownBy(() -> Reflections.newInstance(ThrowingConstructorClass.class))
+				assertThatThrownBy(() -> Reflections.newBeanInstance(ThrowingConstructorClass.class))
 				.isInstanceOf(InvokationRuntimeException.class);
 		
 		exceptionAsserter
@@ -307,6 +334,61 @@ public class ReflectionsTest {
 		exceptionAsserter
 				.extracting(thrownException -> Exceptions.findExceptionInCauses(thrownException, NullPointerException.class), THROWABLE)
 				.isNotNull();
+	}
+	
+	static Stream<Arguments> newCollectionInstance_data() {
+		return Stream.of(
+				arguments(SortedSet.class, TreeSet.class),
+				arguments(Set.class, HashSet.class),
+				arguments(LinkedHashSet.class, LinkedHashSet.class),
+				arguments(KeepOrderSet.class, KeepOrderSet.class),
+				arguments(List.class, ArrayList.class),
+				arguments(LinkedList.class, LinkedList.class),
+				arguments(Queue.class, ArrayDeque.class),
+				arguments(BlockingDeque.class, LinkedBlockingDeque.class),
+				arguments(BlockingQueue.class, ArrayBlockingQueue.class),
+				arguments(TransferQueue.class, LinkedTransferQueue.class)
+		);
+	}
+	
+	@ParameterizedTest
+	@MethodSource("newCollectionInstance_data")
+	void newCollectionInstance(Class<? extends Collection> collectionType, Class<? extends Collection> expectedType) {
+		Collection instance = Reflections.newCollectionInstance(collectionType);
+		assertThat(instance).isInstanceOf(expectedType);
+	}
+	
+	static Stream<Arguments> newMapInstance_data() {
+		return Stream.of(
+				arguments(SortedMap.class, TreeMap.class),
+				arguments(Map.class, HashMap.class),
+				arguments(LinkedHashMap.class, LinkedHashMap.class)
+		);
+	}
+	
+	@ParameterizedTest
+	@MethodSource("newMapInstance_data")
+	void newMapInstance(Class<? extends Map> collectionType, Class<? extends Map> expectedType) {
+		Map instance = Reflections.newMapInstance(collectionType);
+		assertThat(instance).isInstanceOf(expectedType);
+	}
+	
+	@Test
+	void newInstance() {
+		List listInstance = Reflections.newInstance(List.class);
+		assertThat(listInstance).isInstanceOf(ArrayList.class);
+		
+		Set setInstance = Reflections.newInstance(Set.class);
+		assertThat(setInstance).isInstanceOf(HashSet.class);
+		
+		Queue queueInstance = Reflections.newInstance(Queue.class);
+		assertThat(queueInstance).isInstanceOf(ArrayDeque.class);
+		
+		Map mapInstance = Reflections.newInstance(Map.class);
+		assertThat(mapInstance).isInstanceOf(HashMap.class);
+		
+		ClosedClass beanInstance = Reflections.newInstance(ClosedClass.class);
+		assertThat(beanInstance).isInstanceOf(ClosedClass.class);
 	}
 	
 	@Test

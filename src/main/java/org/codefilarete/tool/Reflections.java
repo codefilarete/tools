@@ -11,10 +11,27 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedTransferQueue;
+import java.util.concurrent.TransferQueue;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -126,7 +143,7 @@ public final class Reflections {
 	 * @return the default constructor of the given class (never null)
 	 * @throws UnsupportedOperationException if the class doesn't have a default constructor
 	 */
-	public static <T> Constructor<T> getDefaultConstructor(@Nonnull Class<T> clazz) {
+	public static <T> Constructor<T> getDefaultConstructor(Class<T> clazz) {
 		try {
 			return clazz.getDeclaredConstructor();
 		} catch (NoSuchMethodException e) {
@@ -335,18 +352,119 @@ public final class Reflections {
 	}
 	
 	/**
+	 * Return an instance compatible with given <code>clazz</code> type.
+	 * Handle Collections and Maps type by providing a default instance. For usual bean type it looks up for a non-arg constructor.
+	 *
+	 * @param clazz expected compatible type
+	 * @return a concrete and instantiable type compatible with accessor input type
+	 */
+	public static <E> E newInstance(Class<E> clazz) {
+		if (Collection.class.isAssignableFrom(clazz)) {
+			return (E) newCollectionInstance((Class<Collection>) clazz);
+		} else if (Map.class.isAssignableFrom(clazz)) {
+			return (E) newMapInstance((Class<Map>) clazz);
+		} else {
+			return newBeanInstance(clazz);
+		}
+	}
+	
+	/**
 	 * Instantiates a class from its default constructor
-	 * 
+	 *
 	 * @param clazz the target instance class
 	 * @param <E> the target instance type
 	 * @return a new instance of type E, never null
 	 */
-	public static <E> E newInstance(Class<E> clazz) {
+	public static <E> E newBeanInstance(Class<E> clazz) {
 		try {
 			return newInstance(getDefaultConstructor(clazz));
 		} catch (UnsupportedOperationException e) {
 			throw new InvokationRuntimeException("Class " + toString(clazz) + " can't be instantiated", e);
 		}
+	}
+	
+	/**
+	 * Return an instance compatible with given {@link Collection} <code>collectionType</code> type.
+	 *
+	 * @param collectionType the expected {@link Collection} type
+	 * @return a concrete instance which type is compatible with given argument
+	 * @see #giveCollectionFactory(Class)
+	 */
+	public static <C extends Collection<?>> C newCollectionInstance(Class<C> collectionType) {
+		return giveCollectionFactory(collectionType).get();
+	}
+	
+	/**
+	 * Return an instance compatible with given {@link Map} <code>mapType</code> type.
+	 *
+	 * @param mapType the expected {@link Map} type
+	 * @return a concrete instance which type is compatible with given argument
+	 * @see #giveMapFactory(Class)
+	 */
+	public static <M extends Map> M newMapInstance(Class<M> mapType) {
+		return giveMapFactory(mapType).get();
+	}
+	
+	/**
+	 * Returns a {@link Supplier} of concrete instance for given collection type according to the following correspondance:
+	 * <ul>
+	 * <li> {@link List} => {@link ArrayList}</li>
+	 * <li> {@link SortedSet} => {@link TreeSet}</li>
+	 * <li> {@link Set} => {@link HashSet}</li>
+	 * <li> {@link BlockingDeque} => {@link LinkedBlockingDeque}</li>
+	 * <li> {@link TransferQueue} => {@link LinkedTransferQueue}</li>
+	 * <li> {@link BlockingQueue} => {@link ArrayBlockingQueue}</li>
+	 * <li> {@link Queue} => {@link ArrayDeque}</li>
+	 * </ul>
+	 * For any other case, collectionType is expected to be concrete, therefore it will try to instantiate it through its default constructor.
+	 *
+	 * @param collectionType expected to be one of {@link List}, {@link Set}, {@link Queue} or a concrete type
+	 * @return a {@link Supplier} of a concrete {@link Collection} compatible with given collectionType
+	 */
+	public static <C extends Collection<?>> Supplier<C> giveCollectionFactory(Class<C> collectionType) {
+		Class<? extends C> concreteType;
+		if (List.class.equals(collectionType)) {
+			concreteType = (Class) ArrayList.class;
+		} else if (SortedSet.class.equals(collectionType)) {
+			concreteType = (Class) TreeSet.class;
+		} else if (Set.class.equals(collectionType)) {
+			concreteType = (Class) HashSet.class;
+		} else if (BlockingDeque.class.equals(collectionType)) {
+			concreteType = (Class) LinkedBlockingDeque.class;
+		} else if (TransferQueue.class.equals(collectionType)) {
+			concreteType = (Class) LinkedTransferQueue.class;
+		} else if (BlockingQueue.class.equals(collectionType)) {
+			return () -> (C) new ArrayBlockingQueue(16);
+		} else if (Queue.class.equals(collectionType)) {
+			concreteType = (Class) ArrayDeque.class;
+		} else {
+			// given type is expected to be concrete, we'll instantiate it
+			concreteType = collectionType;
+		}
+		return () -> Reflections.newBeanInstance(concreteType);
+	}
+	
+	/**
+	 * Returns a {@link Supplier} of concrete instance for given {@link Map} type according to the following correspondance:
+	 * <ul>
+	 * <li> {@link SortedMap} => {@link TreeMap}</li>
+	 * <li> {@link Map} => {@link HashMap}</li>
+	 * </ul>
+	 * For any other case, maType is expected to be concrete, therefore it will try to instantiate it through its default constructor.
+	 *
+	 * @param mapType expected to be one of {@link SortedMap} or a concrete {@link Map} type
+	 * @return a {@link Supplier} of a concrete {@link Collection} compatible with given mapType
+	 */
+	public static <M extends Map> Supplier<M> giveMapFactory(Class<M> mapType) {
+		if (SortedMap.class.equals(mapType)) {
+			return () -> (M) Reflections.newInstance(TreeMap.class);
+		} else if (!Modifier.isAbstract(mapType.getModifiers())) {
+			return () -> Reflections.newBeanInstance(mapType);
+		} else {
+			// given type is expected to be concrete, we'll instantiate it
+			return () -> (M) new HashMap<>();
+		}
+		
 	}
 	
 	/**
