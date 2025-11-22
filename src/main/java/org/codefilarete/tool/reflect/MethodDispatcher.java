@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import org.codefilarete.tool.InvocationHandlerSupport;
 import org.codefilarete.tool.Reflections;
@@ -33,14 +34,10 @@ public class MethodDispatcher {
 	protected final Map<String /* simple method signature */, Interceptor> interceptors = new HashMap<>();
 	
 	/** Final target when no interceptor handled method, not null after {@link #build(Class)} invocation */
-	private Object fallback;
+	private Supplier<?> fallback;
 	
 	public Map<String, Interceptor> getInterceptors() {
 		return interceptors;
-	}
-	
-	public Object getFallback() {
-		return fallback;
 	}
 	
 	/**
@@ -124,7 +121,8 @@ public class MethodDispatcher {
 		Object[] proxyHolder = new Object[1];
 		InvocationHandler dispatcher = new InvocationHandlerSupport((input, method, args) -> {
 			// looking for method to be really invoked
-			Interceptor interceptor = interceptors.get(giveSignature(method));
+            String key = giveSignature(method);
+            Interceptor interceptor = interceptors.get(key);
 			Object targetInstance;
 			boolean returnProxy = false;
 			Object returningMethodsTarget = null;
@@ -140,7 +138,7 @@ public class MethodDispatcher {
 					throw new NullPointerException("No fallback instance was declared, therefore calling " + Reflections.toString(method)
 							+ " would throw NullPointerException: try to set one or redirect given method to a compatible instance");
 				}
-				targetInstance = fallback;
+				targetInstance = fallback.get();
 			}
 			Object result = invoke(targetInstance, method, args);
 			
@@ -155,7 +153,7 @@ public class MethodDispatcher {
 			/** We handle toString() to have some message indicating who we are to avoid "ghost" behavior and hard debug */
 			@Override
 			public String toString() {
-				return "Dispatcher to " + fallback.toString();
+				return "Dispatcher to " + fallback.get().toString();
 			}
 		};
 		proxyHolder[0] = Proxy.newProxyInstance(classLoader, targetInterfaces.toArray(new Class[0]), dispatcher);
@@ -185,10 +183,14 @@ public class MethodDispatcher {
 	 * @return this
 	 */
 	public MethodDispatcher fallbackOn(Object fallback) {
+		return fallbackOn(() -> fallback);
+	}
+	
+	public MethodDispatcher fallbackOn(Supplier<?> fallback) {
 		this.fallback = fallback;
 		return this;
 	}
-	
+
 	/**
 	 * Invokes a method on a target
 	 * @param target instance target of the method
