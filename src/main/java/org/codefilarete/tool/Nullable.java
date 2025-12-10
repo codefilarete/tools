@@ -15,7 +15,6 @@ import org.codefilarete.tool.function.ThrowingFunction;
  *
  * @author Guillaume Mary
  */
-@ParametersAreNonnullByDefault
 public class Nullable<T> implements Supplier<T> {
 	
 	/**

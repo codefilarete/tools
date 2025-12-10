@@ -154,7 +154,6 @@ public class Functions {
 		 */
 		@Override
 		public <V> NullProofFunction<I, V> andThen(Function<? super O, ? extends V> after) {
-			Objects.requireNonNull(after);
 			return new NullProofFunction<>(i -> {
 				O result = apply(i);
 				return result == null ? null : after.apply(result);

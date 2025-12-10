@@ -1,7 +1,6 @@
 package org.codefilarete.tool;
 
 import javax.annotation.Nonnegative;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
@@ -133,7 +132,7 @@ public abstract class Strings {
 	public static CharSequence head(@Nullable CharSequence cs, @Nonnegative int headSize) {
 		return doWithDelegate(cs, new DefaultNullOrEmptyDelegate() {
 			@Override
-			public CharSequence onNotNullNotEmpty(@Nonnull CharSequence cs) {
+			public CharSequence onNotNullNotEmpty(CharSequence cs) {
 				return cs.subSequence(0, Math.min(cs.length(), headSize));
 			}
 		});
@@ -142,7 +141,7 @@ public abstract class Strings {
 	public static CharSequence head(@Nullable String cs, String untilIncluded) {
 		return doWithDelegate(cs, new DefaultNullOrEmptyDelegate() {
 			@Override
-			public CharSequence onNotNullNotEmpty(@Nonnull CharSequence cs) {
+			public CharSequence onNotNullNotEmpty(CharSequence cs) {
 				int index = ((String) cs).indexOf(untilIncluded);
 				return cs.subSequence(0, Math.min(cs.length(), Objects.fallback(index, -1, 0)));
 			}
@@ -152,7 +151,7 @@ public abstract class Strings {
 	public static CharSequence cutHead(@Nullable CharSequence cs, @Nonnegative int headSize) {
 		return doWithDelegate(cs, new DefaultNullOrEmptyDelegate() {
 			@Override
-			public CharSequence onNotNullNotEmpty(@Nonnull CharSequence cs) {
+			public CharSequence onNotNullNotEmpty(CharSequence cs) {
 				return cs.subSequence(Math.min(headSize, cs.length()), cs.length());
 			}
 		});
@@ -161,7 +160,7 @@ public abstract class Strings {
 	public static CharSequence tail(@Nullable CharSequence cs, @Nonnegative int tailSize) {
 		return doWithDelegate(cs, new DefaultNullOrEmptyDelegate() {
 			@Override
-			public CharSequence onNotNullNotEmpty(@Nonnull CharSequence cs) {
+			public CharSequence onNotNullNotEmpty(CharSequence cs) {
 				return cs.subSequence(Math.max(0, cs.length() - tailSize), cs.length());
 			}
 		});
@@ -176,7 +175,7 @@ public abstract class Strings {
 	public static CharSequence tail(@Nullable CharSequence cs, String afterLast) {
 		return doWithDelegate(cs, new DefaultNullOrEmptyDelegate() {
 			@Override
-			public CharSequence onNotNullNotEmpty(@Nonnull CharSequence cs) {
+			public CharSequence onNotNullNotEmpty(CharSequence cs) {
 				return cs.subSequence(Math.max(0, cs.toString().lastIndexOf(afterLast) + afterLast.length()), cs.length());
 			}
 		});
@@ -185,7 +184,7 @@ public abstract class Strings {
 	public static CharSequence cutTail(@Nullable CharSequence cs, @Nonnegative int tailSize) {
 		return doWithDelegate(cs, new DefaultNullOrEmptyDelegate() {
 			@Override
-			public CharSequence onNotNullNotEmpty(@Nonnull CharSequence cs) {
+			public CharSequence onNotNullNotEmpty(CharSequence cs) {
 				return cs.subSequence(0, preventNegative(cs.length() - tailSize));
 			}
 		});
@@ -201,7 +200,7 @@ public abstract class Strings {
 	public static CharSequence ellipsis(@Nullable CharSequence cs, @Nonnegative int length) {
 		return doWithDelegate(cs, new DefaultNullOrEmptyDelegate() {
 			@Override
-			public CharSequence onNotNullNotEmpty(@Nonnull CharSequence cs) {
+			public CharSequence onNotNullNotEmpty(CharSequence cs) {
 				if (cs.length() > length) {
 					return cs.subSequence(0, length) + "...";
 				} else {
@@ -251,7 +250,7 @@ public abstract class Strings {
 	private interface INullOrEmptyDelegate {
 		CharSequence onNull();
 		CharSequence onEmpty();
-		CharSequence onNotNullNotEmpty(@Nonnull CharSequence cs);
+		CharSequence onNotNullNotEmpty(CharSequence cs);
 	}
 	
 	private static abstract class DefaultNullOrEmptyDelegate implements INullOrEmptyDelegate {

@@ -1,6 +1,5 @@
 package org.codefilarete.tool;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
@@ -193,7 +192,7 @@ public final class Reflections {
 	 * @param clazz a class, not null
 	 * @return true is the given class is a non-static inner class
 	 */
-	public static boolean isInnerClass(@Nonnull Class<?> clazz) {
+	public static boolean isInnerClass(Class<?> clazz) {
 		return clazz.isMemberClass() && !Modifier.isStatic(clazz.getModifiers());
 	}
 	
@@ -203,7 +202,7 @@ public final class Reflections {
 	 * @param clazz any non null {@link Class}
 	 * @return true if given {@link Class} is a static one, else false
 	 */
-	public static boolean isStatic(@Nonnull Class<?> clazz) {
+	public static boolean isStatic(Class<?> clazz) {
 		return Modifier.isStatic(clazz.getModifiers());
 	}
 	
@@ -213,7 +212,7 @@ public final class Reflections {
 	 * @param method any non null {@link Method}
 	 * @return true if given {@link Method} is a static one, else false
 	 */
-	public static boolean isStatic(@Nonnull Method method) {
+	public static boolean isStatic(Method method) {
 		return Modifier.isStatic(method.getModifiers());
 	}
 	
@@ -223,7 +222,7 @@ public final class Reflections {
 	 * @param field any non null {@link Field}
 	 * @return true if given {@link Field} is a static one, else false
 	 */
-	public static boolean isStatic(@Nonnull Field field) {
+	public static boolean isStatic(Field field) {
 		return Modifier.isStatic(field.getModifiers());
 	}
 	
