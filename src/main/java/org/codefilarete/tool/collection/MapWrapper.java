@@ -8,7 +8,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
- * {@link Map} that wraps another one and delegates all its methods to it without any additionnal feature.
+ * {@link Map} that wraps another one and delegates all its methods to it without any additional feature.
  * Made for overriding only some targeted methods.
  * 
  * @author Guillaume Mary
