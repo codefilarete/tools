@@ -35,9 +35,10 @@ class StringsTest {
 	static Iterable<Arguments> snakeCaseData() {
 		return Arrays.asList(
 				arguments("convertCamelCase", "convert_camel_case"),
-				arguments("convertCCamelCase", "convert_c_camel_case"),
+				arguments("convertCCamelCase", "convert_ccamel_case"),
 				arguments("snake_case", "snake_case"),
 				arguments("snakecase", "snakecase"),
+				arguments("SNAKECASE", "snakecase"),
 				arguments("sn@keCase#", "sn@ke_case#"),
 				arguments("", "")
 		);

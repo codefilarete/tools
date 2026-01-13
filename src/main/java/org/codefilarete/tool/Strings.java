@@ -40,17 +40,24 @@ public abstract class Strings {
 	}
 	
 	/**
-	 * Converts given input to a snake case string. For instance, "HelloWorld" becomes "hello_world".
+	 * Converts the given input to a snake case string. For instance, "HelloWorld" becomes "hello_world".
+	 * Continuous uppercase characters are converted to lowercase with an underscore prefix: "HelloWORLD" becomes "hello_world".
 	 *
 	 * @param input any {@link String}
 	 * @return a snake case version of given input {@link String}.
 	 */
 	public static String snakeCase(String input) {
 		StringBuilder result = new StringBuilder();
+		boolean previousWasUpperCase = false;
 		for (char c : input.toCharArray()) {
 			if (Character.isUpperCase(c)) {
-				result.append("_").append(Character.toLowerCase(c));
+				if (!previousWasUpperCase) {
+					result.append("_");
+				}
+				result.append(Character.toLowerCase(c));
+				previousWasUpperCase = true;
 			} else {
+				previousWasUpperCase = false;
 				result.append(c);
 			}
 		}
