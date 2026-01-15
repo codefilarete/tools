@@ -8,6 +8,11 @@ import java.util.function.Function;
 
 import org.codefilarete.tool.bean.Objects;
 
+import static java.lang.Character.isLowerCase;
+import static java.lang.Character.isUpperCase;
+import static java.lang.Character.toLowerCase;
+import static java.lang.Character.toUpperCase;
+
 /**
  * @author Guillaume Mary
  */
@@ -25,7 +30,7 @@ public abstract class Strings {
 		return (String) doWithDelegate(cs, new DefaultNullOrEmptyDelegate() {
 			@Override
 			public CharSequence onNotNullNotEmpty(CharSequence cs) {
-				return Character.toUpperCase(cs.charAt(0)) + cs.subSequence(1, cs.length()).toString();
+				return toUpperCase(cs.charAt(0)) + cs.subSequence(1, cs.length()).toString();
 			}
 		});
 	}
@@ -34,7 +39,7 @@ public abstract class Strings {
 		return (String) doWithDelegate(cs, new DefaultNullOrEmptyDelegate() {
 			@Override
 			public CharSequence onNotNullNotEmpty(CharSequence cs) {
-				return Character.toLowerCase(cs.charAt(0)) + cs.subSequence(1, cs.length()).toString();
+				return toLowerCase(cs.charAt(0)) + cs.subSequence(1, cs.length()).toString();
 			}
 		});
 	}
@@ -47,17 +52,23 @@ public abstract class Strings {
 	 * @return a snake case version of given input {@link String}.
 	 */
 	public static String snakeCase(String input) {
+		if (input.isEmpty()) {
+			return "";
+		}
 		StringBuilder result = new StringBuilder();
-		boolean previousWasUpperCase = false;
-		for (char c : input.toCharArray()) {
-			if (Character.isUpperCase(c)) {
-				if (!previousWasUpperCase) {
+		char[] charArray = input.toCharArray();
+		char firstChar = charArray[0];
+		result.append(isUpperCase(firstChar) ? toLowerCase(firstChar) : firstChar);
+		
+		for (int i = 1, charArrayLength = charArray.length; i < charArrayLength; i++) {
+			char c = charArray[i];
+			if (isUpperCase(c)) {
+				// we add '_' only if the previous character is lower case, and we avoid duplicating '_'
+				if (isLowerCase(charArray[i - 1]) && charArray[i - 1] != '_') {
 					result.append("_");
 				}
-				result.append(Character.toLowerCase(c));
-				previousWasUpperCase = true;
+				result.append(toLowerCase(c));
 			} else {
-				previousWasUpperCase = false;
 				result.append(c);
 			}
 		}

@@ -39,6 +39,7 @@ class StringsTest {
 				arguments("snake_case", "snake_case"),
 				arguments("snakecase", "snakecase"),
 				arguments("SNAKECASE", "snakecase"),
+				arguments("Partially_snake_CASED", "partially_snake_cased"),
 				arguments("sn@keCase#", "sn@ke_case#"),
 				arguments("", "")
 		);
