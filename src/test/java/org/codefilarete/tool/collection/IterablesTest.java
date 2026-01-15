@@ -1,5 +1,6 @@
 package org.codefilarete.tool.collection;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -7,35 +8,34 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.Spliterators;
-import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.stream.IntStream;
-import java.util.stream.StreamSupport;
 
 import org.codefilarete.tool.Duo;
 import org.codefilarete.tool.collection.PairIterator.EmptyIterator;
-import org.codefilarete.tool.function.Hanger.Holder;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.ArgumentCaptor;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.codefilarete.tool.collection.Arrays.*;
+import static org.codefilarete.tool.collection.Arrays.asHashSet;
+import static org.codefilarete.tool.collection.Arrays.asList;
+import static org.codefilarete.tool.collection.Arrays.asSet;
+import static org.codefilarete.tool.collection.Iterables.asIterable;
+import static org.codefilarete.tool.collection.Iterables.collectToList;
+import static org.codefilarete.tool.collection.Iterables.copy;
 import static org.codefilarete.tool.collection.Iterables.first;
+import static org.codefilarete.tool.collection.Iterables.firstValue;
 import static org.codefilarete.tool.collection.Iterables.last;
-import static org.codefilarete.tool.collection.Iterables.*;
 
 /**
  * @author Guillaume Mary
@@ -517,6 +517,40 @@ class IterablesTest {
 		List<String> strings = asList("a", "b");
 		assertThat(Iterables.contains(strings, String::toUpperCase, s -> s.equals("B"))).isTrue();
 		assertThat(Iterables.contains(strings, String::toUpperCase, s -> s.equals("C"))).isFalse();
+	}
+	
+	@Test
+	void indexOf() {
+		// Test with List
+		List<String> list = Arrays.asList("first", "second", "third", "second", "fourth");
+		assertThat(Iterables.indexOf(list, "first")).isEqualTo(0);
+		assertThat(Iterables.indexOf(list, "second")).isEqualTo(1);  // returns first occurrence
+		assertThat(Iterables.indexOf(list, "third")).isEqualTo(2);
+		assertThat(Iterables.indexOf(list, "fourth")).isEqualTo(4);
+		assertThat(Iterables.indexOf(list, "x")).isEqualTo(-1);  // not found
+		
+		// Test with null element
+		List<String> listWithNull = Arrays.asList("first", null, "third");
+		assertThat(Iterables.indexOf(listWithNull, null)).isEqualTo(1);
+		assertThat(Iterables.indexOf(listWithNull, "first")).isEqualTo(0);
+		
+		// Test with Set
+		Set<String> set = new LinkedHashSet<>(Arrays.asList("first", "second", "third"));
+		assertThat(Iterables.indexOf(set, "first")).isEqualTo(0);
+		assertThat(Iterables.indexOf(set, "second")).isEqualTo(1);
+		assertThat(Iterables.indexOf(set, "third")).isEqualTo(2);
+		assertThat(Iterables.indexOf(set, "x")).isEqualTo(-1);
+		
+		// Test with Queue
+		Queue<String> queue = new ArrayDeque<>(Arrays.asList("first", "second", "third"));
+		assertThat(Iterables.indexOf(queue, "first")).isEqualTo(0);
+		assertThat(Iterables.indexOf(queue, "second")).isEqualTo(1);
+		assertThat(Iterables.indexOf(queue, "third")).isEqualTo(2);
+		assertThat(Iterables.indexOf(queue, "fourth")).isEqualTo(-1);
+		
+		// Test with empty collection
+		assertThat(Iterables.indexOf(emptyList(), "x")).isEqualTo(-1);
+		assertThat(Iterables.indexOf(emptySet(), "x")).isEqualTo(-1);
 	}
 	
 	@Test

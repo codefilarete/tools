@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.Spliterator;
@@ -1088,6 +1089,28 @@ public final class Iterables {
 	 */
 	public static <I, O> boolean contains(Iterable<I> iterable, Function<I, O> mapper, Predicate<O> predicate) {
 		return find(iterable.iterator(), mapper, predicate) != null;
+	}
+	
+	/**
+	 * Returns the index of the first occurrence of the specified element in the given {@link Iterable},
+	 * or -1 if this {@link Iterable} does not contain the element.
+	 *
+	 * @param iterable the {@link Iterable} to search
+	 * @param o element to search for
+	 * @return the index of the first occurrence of the specified element in the specified {@link Iterable}, or -1 if the element is not found
+	 */
+	public static <E> int indexOf(Iterable<E> iterable, E o) {
+		if (iterable instanceof List) {
+			return ((List<?>) iterable).indexOf(o);
+		}
+		int index = 0;
+		for (E element : iterable) {
+			if (Objects.equals(o, element)) {
+				return index;
+			}
+			index++;
+		}
+		return -1;
 	}
 	
 	public static <E> Iterator<E> reverseIterator(List<E> list) {
