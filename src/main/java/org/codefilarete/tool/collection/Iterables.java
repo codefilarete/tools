@@ -652,8 +652,8 @@ public final class Iterables {
 	 * @param <E> type of elements
 	 * @return the complement of c1 in c2
 	 */
-	public static <E> Set<E> minus(Collection<E> c1, Collection<E> c2) {
-		return minus(c1, c2, (Function<Collection<E>, HashSet<E>>) HashSet::new);
+	public static <E> Set<E> minus(Collection<? extends E> c1, Collection<? extends E> c2) {
+		return minus(c1, c2, (Function<Collection<? extends E>, HashSet<E>>) HashSet::new);
 	}
 	
 	/**
@@ -668,7 +668,7 @@ public final class Iterables {
 	 * @param <E> type of elements
 	 * @return the complement of c1 in c2
 	 */
-	public static <E, S extends Set<E>> S minus(Collection<E> c1, Collection<E> c2, Function<Collection<E>, S> resultHolder) {
+	public static <E, S extends Set<E>> S minus(Collection<? extends E> c1, Collection<? extends E> c2, Function<Collection<? extends E>, S> resultHolder) {
 		S copy = resultHolder.apply(c1);
 		copy.removeAll(c2);
 		return copy;
@@ -683,7 +683,7 @@ public final class Iterables {
 	 * @param <E> type of elements
 	 * @return the complement of c1 in c2
 	 */
-	public static <E, T> Set<E> minus(Collection<E> c1, Collection<T> c2, BiPredicate<E, T> predicate) {
+	public static <E, T> Set<E> minus(Collection<? extends E> c1, Collection<? extends T> c2, BiPredicate<E, T> predicate) {
 		Set<E> copy = new HashSet<>(c1);
 		copy.removeIf(e -> contains(c2, c -> predicate.test(e, c)));
 		return copy;

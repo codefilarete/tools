@@ -25,7 +25,7 @@ public class KeepOrderSet<E> extends SetWrapper<E> {
 	 * 
 	 * @param elements the elements that fill the new instance
 	 */
-	public KeepOrderSet(Collection<E> elements) {
+	public KeepOrderSet(Collection<? extends E> elements) {
 		super(new LinkedHashSet<>(elements));
 	}
 	
