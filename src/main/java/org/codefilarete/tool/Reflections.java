@@ -317,11 +317,22 @@ public final class Reflections {
 	 */
 	@Nullable
 	public static <C> Constructor<C> findConstructor(Class<C> clazz, Class<?>... argTypes) {
-		try {
-			return getConstructor(clazz, argTypes);
-		} catch (MemberNotFoundException e) {
-			return null;
+		Constructor<C>[] declaredConstructors = (Constructor<C>[]) clazz.getDeclaredConstructors();
+		Constructor<C> foundConstructor = null;
+		for (Constructor<C> declaredConstructor : declaredConstructors) {
+			if (declaredConstructor.getParameterTypes().length == argTypes.length) {
+				boolean argsAreCompatible = true;
+				PairIterator<Class<?>, Class<?>> argsIterator = new PairIterator<>(new ArrayIterator<>(declaredConstructor.getParameterTypes()), new ArrayIterator<>(argTypes));
+				while (argsAreCompatible && argsIterator.hasNext()) {
+					Duo<Class<?>, Class<?>> next = argsIterator.next();
+					argsAreCompatible = isAssignableFrom(next.getLeft(), next.getRight());
+				}
+				if (argsAreCompatible) {
+					foundConstructor = declaredConstructor;
+				}
+			}
 		}
+		return foundConstructor;
 	}
 	
 	/**
@@ -334,9 +345,8 @@ public final class Reflections {
 	 * @throws MemberNotFoundException in case of non-existing constructor
 	 */
 	public static <C> Constructor<C> getConstructor(Class<C> clazz, Class<?>... argTypes) {
-		try {
-			return clazz.getDeclaredConstructor(argTypes);
-		} catch (NoSuchMethodException e) {
+		Constructor<C> foundConstructor = findConstructor(clazz, argTypes);
+		if (foundConstructor == null) {
 			String className = toString(clazz);
 			MemberNotFoundException detailedException = new MemberNotFoundException(
 					className + ".<init>",
@@ -347,6 +357,8 @@ public final class Reflections {
 			} else {
 				throw detailedException;
 			}
+		} else {
+			return foundConstructor;
 		}
 	}
 	

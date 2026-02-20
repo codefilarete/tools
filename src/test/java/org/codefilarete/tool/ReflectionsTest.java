@@ -2,6 +2,7 @@ package org.codefilarete.tool;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -34,7 +35,6 @@ import java.util.concurrent.TransferQueue;
 import java.util.stream.Stream;
 
 import org.assertj.core.api.AbstractThrowableAssert;
-import org.codefilarete.tool.collection.Arrays;
 import org.codefilarete.tool.collection.KeepOrderSet;
 import org.codefilarete.tool.exception.Exceptions;
 import org.junit.jupiter.api.Test;
@@ -131,6 +131,26 @@ public class ReflectionsTest {
 	}
 	
 	@Test
+	void getConstructor() throws NoSuchMethodException {
+		assertThat(Reflections.getConstructor(String.class, String.class)).isEqualTo(String.class.getConstructor(String.class));
+		assertThatThrownBy(() -> Reflections.getConstructor(String.class, Reflections.class)).isInstanceOf(MemberNotFoundException.class);
+	}
+	
+	@Test
+	void findConstructor() throws NoSuchMethodException {
+		assertThat(Reflections.findConstructor(String.class, String.class)).isEqualTo(String.class.getConstructor(String.class));
+		assertThat(Reflections.findConstructor(String.class, Reflections.class)).isNull();
+		Constructor<ConstructorWithCompatibleType> constructor1 = Reflections.findConstructor(ConstructorWithCompatibleType.class, String.class);
+		assertThat(constructor1).isNotNull();
+		Constructor<ConstructorWithCompatibleType> constructor2 = Reflections.findConstructor(ConstructorWithCompatibleType.class, String.class, Integer.class);
+		assertThat(constructor2).isNotNull();
+		Constructor<ConstructorWithCompatibleType> constructor3 = Reflections.findConstructor(ConstructorWithCompatibleType.class, String.class, Serializable.class);
+		assertThat(constructor3).isNull();
+		Constructor<ConstructorWithCompatibleType> constructor4 = Reflections.findConstructor(ConstructorWithCompatibleType.class);
+		assertThat(constructor4).isNull();
+	}
+	
+	@Test
 	void getConstructor_innerNonStaticClass_missingEnclosingClassAsParameter_throwsException() {
 		assertThatThrownBy(() -> Reflections.getConstructor(InnerClassWithPrivateConstructor.class))
 				.isInstanceOf(MemberNotFoundException.class)
@@ -189,18 +209,6 @@ public class ReflectionsTest {
 		assertThat(method.getName()).isEqualTo(methodName);
 		assertThat(method.getDeclaringClass()).isEqualTo(expectedDeclaringClass);
 		assertThat(method.getParameterTypes().length).isEqualTo(expectedParameterCount);
-	}
-	
-	@Test
-	void getConstructor() throws NoSuchMethodException {
-		assertThat(Reflections.getConstructor(String.class, String.class)).isEqualTo(String.class.getConstructor(String.class));
-		assertThatThrownBy(() -> Reflections.getConstructor(String.class, Reflections.class)).isInstanceOf(MemberNotFoundException.class);
-	}
-	
-	@Test
-	void findConstructor() throws NoSuchMethodException {
-		assertThat(Reflections.findConstructor(String.class, String.class)).isEqualTo(String.class.getConstructor(String.class));
-		assertThat(Reflections.findConstructor(String.class, Reflections.class)).isNull();
 	}
 	
 	@Test
@@ -653,6 +661,17 @@ public class ReflectionsTest {
 		
 		private InnerStaticClassWithPrivateConstructor() {
 			
+		}
+	}
+	
+	private static class ConstructorWithCompatibleType {
+		
+		private ConstructorWithCompatibleType(CharSequence s) {
+		
+		}
+		
+		private ConstructorWithCompatibleType(CharSequence s, Number n) {
+		
 		}
 	}
 	
