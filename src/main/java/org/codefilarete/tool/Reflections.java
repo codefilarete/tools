@@ -1,5 +1,15 @@
 package org.codefilarete.tool;
 
+import org.codefilarete.tool.bean.FieldIterator;
+import org.codefilarete.tool.bean.MethodIterator;
+import org.codefilarete.tool.collection.ArrayIterator;
+import org.codefilarete.tool.collection.Arrays;
+import org.codefilarete.tool.collection.Iterables;
+import org.codefilarete.tool.collection.Maps;
+import org.codefilarete.tool.collection.PairIterator;
+import org.codefilarete.tool.function.ThrowingFunction;
+import org.codefilarete.tool.reflect.MemberPrinter;
+
 import javax.annotation.Nullable;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
@@ -34,16 +44,6 @@ import java.util.concurrent.TransferQueue;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-
-import org.codefilarete.tool.bean.FieldIterator;
-import org.codefilarete.tool.bean.MethodIterator;
-import org.codefilarete.tool.collection.ArrayIterator;
-import org.codefilarete.tool.collection.Arrays;
-import org.codefilarete.tool.collection.Iterables;
-import org.codefilarete.tool.collection.Maps;
-import org.codefilarete.tool.collection.PairIterator;
-import org.codefilarete.tool.function.ThrowingFunction;
-import org.codefilarete.tool.reflect.MemberPrinter;
 
 import static org.codefilarete.tool.Nullable.nullable;
 
@@ -623,7 +623,8 @@ public final class Reflections {
 	 * @return the result of the called action
 	 */
 	private static <I, E> E onJavaBeanPropertyWrapperName(String methodName, I input,
-														  Function<I, E> getterAction, Function<I, E> setterAction,
+														  Function<I, E> getterAction,
+														  Function<I, E> setterAction,
 														  Function<I, E> booleanGetterAction,
 														  Supplier<String> inputToString) {
 		return onJavaBeanPropertyWrapperNameGeneric(methodName, input, getterAction, setterAction, booleanGetterAction,
