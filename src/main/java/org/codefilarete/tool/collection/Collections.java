@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * @author Guillaume Mary
@@ -72,16 +73,23 @@ public class Collections {
 	 * @param <C> Collection type
 	 * @return c
 	 */
+	@SafeVarargs
 	public static <T, C extends Collection<? super T>> C addAll(C c, T... elements) {
 		c.addAll(Arrays.asList(elements));
 		return c;
 	}
 	
-	public static <E> List<E> cat(Collection<? extends E>... collections) {
-		List<E> toReturn = new ArrayList<>(collections.length * 10);    // arbitrary size, ArrayList.addAll will adapt
+	@SafeVarargs
+	public static <E, S extends Collection<E>> S cat(Supplier<S> collectionFactory, Collection<? extends E>... collections) {
+		S toReturn = collectionFactory.get();
 		for (Collection<? extends E> collection : collections) {
 			toReturn.addAll(collection);
 		}
 		return toReturn;
+	}
+	
+	@SafeVarargs
+	public static <E> List<E> cat(Collection<? extends E>... collections) {
+		return cat(() -> new ArrayList<>(collections.length * 10) /* arbitrary size, ArrayList.addAll will adapt */, collections);
 	}
 }
